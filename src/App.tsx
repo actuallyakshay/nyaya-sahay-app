@@ -37,7 +37,6 @@ import AdminCases from "./pages/admin/AdminCases";
 import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
-import AdminReports from "./pages/admin/AdminReports";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 import NotFound from "./pages/NotFound";

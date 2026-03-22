@@ -8,7 +8,6 @@ import { useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { mockLawyers, mockSubscription, mockPlans } from '@/lib/mock-data';
 import { LEGAL_CATEGORIES, LegalCategory } from '@/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CheckCircle2, CreditCard, Calendar } from 'lucide-react';
 
 const UserProfile = () => {
@@ -91,8 +90,8 @@ const UserProfile = () => {
                   <Input defaultValue={lawyerData.degree} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Years of Experience</Label>
-                  <Input type="number" defaultValue={lawyerData.experience} />
+                  <Label>Career Started From</Label>
+                  <Input type="date" defaultValue="2015-07-01" />
                 </div>
                 <div className="space-y-2">
                   <Label>Bar Council ID</Label>

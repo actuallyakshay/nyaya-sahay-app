@@ -1,7 +1,7 @@
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { mockLawyers } from '@/lib/mock-data';
 import { LEGAL_CATEGORIES } from '@/types';
-import { CheckCircle, Star, Briefcase, Award } from 'lucide-react';
+import { CheckCircle, Briefcase, Award } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
 import { Link } from 'react-router-dom';
@@ -40,7 +40,6 @@ const LawyersDirectory = () => {
                 ))}
               </div>
               <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Star className="h-3 w-3 text-gold" />{l.rating}/5</span>
                 <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" />{l.casesHandled} cases</span>
                 <span className="flex items-center gap-1"><Award className="h-3 w-3" />{l.experience} yrs</span>
               </div>

@@ -80,10 +80,23 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </button>
           </div>
 
+          {/* Profile section in sidebar */}
           {!collapsed && (
-            <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5">
-              <p className="text-xs font-medium text-gold">{roleName} Panel</p>
-              <p className="truncate text-sm font-semibold text-primary-foreground">{user?.name}</p>
+            <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5 flex items-center gap-3">
+              <div className="h-9 w-9 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm shrink-0">
+                {user?.name?.charAt(0)}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-gold">{roleName} Panel</p>
+                <p className="truncate text-sm font-semibold text-primary-foreground">{user?.name}</p>
+              </div>
+            </div>
+          )}
+          {collapsed && (
+            <div className="mx-auto mb-4">
+              <div className="h-9 w-9 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm">
+                {user?.name?.charAt(0)}
+              </div>
             </div>
           )}
 

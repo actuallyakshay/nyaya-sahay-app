@@ -1,8 +1,8 @@
 import { AdminLayout } from '@/layouts/AdminLayout';
-import { adminStats, mockCases, mockLawyers, mockPayments } from '@/lib/mock-data';
+import { adminStats, mockCases, mockPayments } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Link } from 'react-router-dom';
-import { Users, UserCheck, Briefcase, IndianRupee, AlertTriangle, FileText } from 'lucide-react';
+import { Users, UserCheck, Briefcase, FileText } from 'lucide-react';
 
 const AdminDashboard = () => (
   <AdminLayout>
@@ -12,14 +12,12 @@ const AdminDashboard = () => (
         <p className="mt-1 text-muted-foreground">Platform overview and management.</p>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
           { label: 'Users', value: adminStats.totalUsers.toLocaleString(), icon: Users, color: 'text-info' },
           { label: 'Lawyers', value: adminStats.totalLawyers, icon: UserCheck, color: 'text-gold' },
           { label: 'Active Cases', value: adminStats.activeCases, icon: Briefcase, color: 'text-foreground' },
           { label: 'Resolved', value: adminStats.resolvedCases.toLocaleString(), icon: FileText, color: 'text-success' },
-          { label: 'Revenue (₹)', value: `₹${(adminStats.monthlyRevenue / 1000).toFixed(0)}k`, icon: IndianRupee, color: 'text-gold' },
-          { label: 'Emergency', value: adminStats.emergencyRequests, icon: AlertTriangle, color: 'text-destructive' },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-4 shadow-sm">
             <div className="flex items-center justify-between mb-2">
@@ -51,7 +49,9 @@ const AdminDashboard = () => (
             <tbody>
               {mockCases.map((c) => (
                 <tr key={c.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 font-mono text-xs">{c.caseNumber}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    <Link to={`/admin/cases/${c.id}`} className="hover:text-gold hover:underline">{c.caseNumber}</Link>
+                  </td>
                   <td className="px-4 py-3">{c.userName}</td>
                   <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground">{c.category}</td>
                   <td className="px-4 py-3"><StatusBadge status={c.status} /></td>

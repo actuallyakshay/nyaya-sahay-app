@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, BarChart3, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
@@ -11,7 +11,6 @@ const adminNav = [
   { label: 'Cases', to: '/admin/cases', icon: Briefcase },
   { label: 'Subscriptions', to: '/admin/subscriptions', icon: FileText },
   { label: 'Payments', to: '/admin/payments', icon: CreditCard },
-  { label: 'Reports', to: '/admin/reports', icon: BarChart3 },
   { label: 'Settings', to: '/admin/settings', icon: Settings },
 ];
 
@@ -54,7 +53,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
           <nav className={cn("flex-1 space-y-0.5 mt-2", collapsed ? 'px-1.5' : 'px-3')}>
             {adminNav.map((item) => {
-              const active = location.pathname === item.to;
+              const active = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
               return (
                 <Link key={item.to} to={item.to} onClick={() => setSidebarOpen(false)}
                   title={collapsed ? item.label : undefined}
@@ -71,7 +70,6 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             })}
           </nav>
 
-          {/* Collapse toggle */}
           <div className="hidden lg:block border-t border-sidebar-border p-2">
             <button onClick={() => setCollapsed(!collapsed)}
               className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground"

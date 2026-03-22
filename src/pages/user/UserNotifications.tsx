@@ -2,9 +2,12 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { Bell, CheckCircle, Info, AlertTriangle, XCircle, Video, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePagination } from '@/hooks/usePagination';
+import { PaginationControls } from '@/components/PaginationControls';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ConsultationNotification {
   id: string;
@@ -26,67 +29,21 @@ interface ConsultationNotification {
 }
 
 const mockLawyerNotifications: ConsultationNotification[] = [
-  {
-    id: 'ln1',
-    title: 'Consultation Request',
-    message: 'Rajesh Kumar has requested a video consultation for case LSP-2024-001.',
-    type: 'consultation',
-    isRead: false,
-    createdAt: '2024-09-06T10:00:00',
-    link: '/lawyer/cases/c1',
-    consultationDetails: {
-      sessionType: 'Video Call',
-      date: '2024-09-10',
-      time: '14:00',
-      userName: 'Rajesh Kumar',
-      caseNumber: 'LSP-2024-001',
-      status: 'pending',
-    },
-  },
-  {
-    id: 'ln2',
-    title: 'Consultation Accepted',
-    message: 'You accepted the consultation with Rajesh Kumar. Google Meet link is ready.',
-    type: 'success',
-    isRead: true,
-    createdAt: '2024-09-05T16:00:00',
-    link: '/lawyer/cases/c1',
-    consultationDetails: {
-      sessionType: 'Video Call',
-      date: '2024-09-08',
-      time: '11:00',
-      userName: 'Rajesh Kumar',
-      caseNumber: 'LSP-2024-001',
-      status: 'accepted',
-      meetLink: 'https://meet.google.com/abc-defg-hij',
-    },
-  },
+  { id: 'ln1', title: 'Consultation Request', message: 'Rajesh Kumar has requested a video consultation for case LSP-2024-001.', type: 'consultation', isRead: false, createdAt: '2024-09-06T10:00:00', link: '/lawyer/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-10', time: '14:00', userName: 'Rajesh Kumar', caseNumber: 'LSP-2024-001', status: 'pending' } },
+  { id: 'ln2', title: 'Consultation Accepted', message: 'You accepted the consultation with Rajesh Kumar. Google Meet link is ready.', type: 'success', isRead: true, createdAt: '2024-09-05T16:00:00', link: '/lawyer/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-08', time: '11:00', userName: 'Rajesh Kumar', caseNumber: 'LSP-2024-001', status: 'accepted', meetLink: 'https://meet.google.com/abc-defg-hij' } },
   { id: 'ln3', title: 'New Case Assigned', message: 'You have been assigned to a new property dispute case.', type: 'info', isRead: false, createdAt: '2024-09-02T09:00:00', link: '/lawyer/cases/c1' },
   { id: 'ln4', title: 'New Message', message: 'Rajesh Kumar sent a new message on case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-09-01T10:30:00', link: '/lawyer/cases/c1' },
+  { id: 'ln5', title: 'Document Uploaded', message: 'Client uploaded Sale Deed Copy for case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-08-30T09:00:00', link: '/lawyer/cases/c1' },
+  { id: 'ln6', title: 'Case Update', message: 'Case LSP-2024-001 status changed to In Consultation.', type: 'info', isRead: true, createdAt: '2024-08-28T14:00:00', link: '/lawyer/cases/c1' },
 ];
 
 const mockUserNotifications: ConsultationNotification[] = [
-  {
-    id: 'un1',
-    title: 'Consultation Accepted',
-    message: 'Adv. Priya Sharma accepted your consultation request. Join via the link below.',
-    type: 'success',
-    isRead: false,
-    createdAt: '2024-09-06T16:00:00',
-    link: '/app/cases/c1',
-    consultationDetails: {
-      sessionType: 'Video Call',
-      date: '2024-09-10',
-      time: '14:00',
-      userName: 'Adv. Priya Sharma',
-      caseNumber: 'LSP-2024-001',
-      status: 'accepted',
-      meetLink: 'https://meet.google.com/abc-defg-hij',
-    },
-  },
+  { id: 'un1', title: 'Consultation Accepted', message: 'Adv. Priya Sharma accepted your consultation request. Join via the link below.', type: 'success', isRead: false, createdAt: '2024-09-06T16:00:00', link: '/app/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-10', time: '14:00', userName: 'Adv. Priya Sharma', caseNumber: 'LSP-2024-001', status: 'accepted', meetLink: 'https://meet.google.com/abc-defg-hij' } },
   { id: 'un2', title: 'Lawyer Assigned', message: 'Adv. Priya Sharma has been assigned to your property case.', type: 'success', isRead: false, createdAt: '2024-09-02T09:00:00', link: '/app/cases/c1' },
   { id: 'un3', title: 'New Message', message: 'You have a new message from your lawyer regarding case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-09-03T11:30:00', link: '/app/cases/c1' },
   { id: 'un4', title: 'Subscription Active', message: 'Your Professional plan is now active until August 2025.', type: 'success', isRead: true, createdAt: '2024-08-15T10:00:00' },
+  { id: 'un5', title: 'Case Created', message: 'Your case LSP-2024-002 has been submitted for review.', type: 'info', isRead: true, createdAt: '2024-10-10T09:00:00', link: '/app/cases/c2' },
+  { id: 'un6', title: 'Reminder', message: 'Your subscription expires in 30 days.', type: 'warning', isRead: true, createdAt: '2024-07-15T10:00:00' },
 ];
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -97,12 +54,32 @@ const iconMap: Record<string, React.ReactNode> = {
   consultation: <Video className="h-4 w-4 text-gold" />,
 };
 
+const FILTER_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'unread', label: 'Unread' },
+  { value: 'consultation', label: 'Consultation' },
+  { value: 'info', label: 'Info' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+];
+
 const UserNotifications = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const isLawyer = user?.role === 'lawyer';
   const notifications = isLawyer ? mockLawyerNotifications : mockUserNotifications;
   const [statuses, setStatuses] = useState<Record<string, string>>({});
+  const [filter, setFilter] = useState('all');
+
+  const filtered = useMemo(() => {
+    return notifications.filter(n => {
+      if (filter === 'all') return true;
+      if (filter === 'unread') return !n.isRead;
+      return n.type === filter;
+    });
+  }, [notifications, filter]);
+
+  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 5);
 
   const handleAccept = (notif: ConsultationNotification) => {
     setStatuses(prev => ({ ...prev, [notif.id]: 'accepted' }));
@@ -117,9 +94,24 @@ const UserNotifications = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-2xl">
-        <h1 className="text-2xl font-bold">Notifications</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Notifications</h1>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {FILTER_OPTIONS.map(f => (
+                <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-3">
-          {notifications.map((n) => {
+          {paginated.length === 0 ? (
+            <div className="rounded-xl border bg-card p-8 text-center">
+              <p className="text-muted-foreground">No notifications found.</p>
+            </div>
+          ) : paginated.map((n) => {
             const cd = n.consultationDetails;
             const currentStatus = statuses[n.id] || cd?.status;
 
@@ -131,7 +123,6 @@ const UserNotifications = () => {
                     <p className={`text-sm ${!n.isRead ? 'font-semibold' : 'font-medium'}`}>{n.title}</p>
                     <p className="text-sm text-muted-foreground mt-0.5">{n.message}</p>
 
-                    {/* Consultation details */}
                     {cd && (
                       <div className="mt-3 rounded-lg bg-muted p-3 space-y-2">
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -141,7 +132,6 @@ const UserNotifications = () => {
                           <span><span className="text-muted-foreground">Case:</span> {cd.caseNumber}</span>
                         </div>
 
-                        {/* Lawyer: accept/decline pending requests */}
                         {isLawyer && currentStatus === 'pending' && (
                           <div className="flex gap-2 pt-1">
                             <Button size="sm" onClick={() => handleAccept(n)}>
@@ -153,30 +143,14 @@ const UserNotifications = () => {
                           </div>
                         )}
 
-                        {/* Accepted — show meet link */}
                         {currentStatus === 'accepted' && (
                           <div className="flex items-center gap-2 pt-1">
                             <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
                               <CheckCircle className="h-3 w-3" /> Accepted
                             </span>
-                            {cd.meetLink && (
-                              <a
-                                href={cd.meetLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-gold hover:underline"
-                              >
-                                <ExternalLink className="h-3 w-3" /> Join Google Meet
-                              </a>
-                            )}
-                            {/* If just accepted by lawyer, show generated link */}
-                            {isLawyer && statuses[n.id] === 'accepted' && !cd.meetLink && (
-                              <a
-                                href="https://meet.google.com/new-generated-link"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-gold hover:underline"
-                              >
+                            {(cd.meetLink || statuses[n.id] === 'accepted') && (
+                              <a href={cd.meetLink || 'https://meet.google.com/new-generated-link'} target="_blank" rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-gold hover:underline">
                                 <ExternalLink className="h-3 w-3" /> Join Google Meet
                               </a>
                             )}
@@ -199,6 +173,8 @@ const UserNotifications = () => {
             );
           })}
         </div>
+
+        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
       </div>
     </DashboardLayout>
   );

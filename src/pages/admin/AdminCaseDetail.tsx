@@ -2,14 +2,12 @@ import { useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockCases, mockLawyers } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
-import { CaseTimeline } from '@/components/CaseTimeline';
 import { DocumentList } from '@/components/DocumentList';
 import { SearchableSelect } from '@/components/SearchableSelect';
 import { LEGAL_CATEGORIES } from '@/types';
-import { User, Scale, ChevronLeft, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -19,10 +17,8 @@ const AdminCaseDetail = () => {
   const caseData = mockCases.find((c) => c.id === id);
   const { toast } = useToast();
   const [selectedLawyer, setSelectedLawyer] = useState(caseData?.lawyerId || '');
-  const [newStatus, setNewStatus] = useState(caseData?.status || '');
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
-  const [adminNote, setAdminNote] = useState('');
 
   if (!caseData) return (
     <AdminLayout>
@@ -38,7 +34,7 @@ const AdminCaseDetail = () => {
   const lawyerOptions = mockLawyers.filter(l => l.isVerified && l.isAvailable).map(l => ({
     value: l.id,
     label: l.name,
-    sublabel: `${l.specializations.map(s => LEGAL_CATEGORIES[s]).join(', ')} • ${l.rating}★ • ${l.experience} yrs`,
+    sublabel: `${l.specializations.map(s => LEGAL_CATEGORIES[s]).join(', ')} • ${l.experience} yrs`,
   }));
 
   const handleAssign = () => {
@@ -48,23 +44,14 @@ const AdminCaseDetail = () => {
     }
   };
 
-  const handleStatusChange = () => {
-    if (newStatus && newStatus !== caseData.status) {
-      toast({ title: 'Status Updated', description: `Case status changed to ${newStatus}` });
-    }
-  };
-
   const handleCloseCase = () => {
     toast({ title: 'Case Closed', description: `Case ${caseData.caseNumber} has been closed.` });
     setCloseDialogOpen(false);
     setCloseReason('');
   };
 
-  const handleAddNote = () => {
-    if (adminNote.trim()) {
-      toast({ title: 'Note Added', description: 'Admin note has been added to the case.' });
-      setAdminNote('');
-    }
+  const handleResetCase = () => {
+    toast({ title: 'Case Reset', description: `Case ${caseData.caseNumber} has been reset to New status.` });
   };
 
   return (
@@ -99,6 +86,10 @@ const AdminCaseDetail = () => {
                 }}>
                   <CheckCircle className="mr-1.5 h-3.5 w-3.5" />
                   Finalize
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleResetCase}>
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                  Reset
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => setCloseDialogOpen(true)}>
                   <XCircle className="mr-1.5 h-3.5 w-3.5" />
@@ -136,56 +127,12 @@ const AdminCaseDetail = () => {
               )}
             </div>
 
-            {/* Update Status */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Update Status</h3>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <div className="flex-1">
-                  <Select value={newStatus} onValueChange={setNewStatus}>
-                    <SelectTrigger><SelectValue placeholder="Select status..." /></SelectTrigger>
-                    <SelectContent>
-                      {['new','under_review','lawyer_assigned','in_consultation','waiting_for_user','resolved','closed','emergency'].map(s => (
-                        <SelectItem key={s} value={s}>{s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleStatusChange} disabled={!newStatus || newStatus === caseData.status}>Update</Button>
-              </div>
-            </div>
-
-            {/* Admin Notes */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Admin Notes</h3>
-              {caseData.notes.length > 0 && (
-                <ul className="space-y-1.5 mb-4">
-                  {caseData.notes.map((n, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                      <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-warning" />
-                      {n}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Textarea
-                  placeholder="Add a note..."
-                  className="flex-1 min-h-[60px]"
-                  value={adminNote}
-                  onChange={e => setAdminNote(e.target.value)}
-                />
-                <Button onClick={handleAddNote} disabled={!adminNote.trim()} className="sm:self-end">
-                  Add Note
-                </Button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="rounded-xl border bg-card">
-              <div className="border-b p-4">
+            {/* Communication History — scrollable */}
+            <div className="rounded-xl border bg-card flex flex-col" style={{ height: '500px' }}>
+              <div className="border-b p-4 shrink-0">
                 <h3 className="text-sm font-semibold">Communication History</h3>
               </div>
-              <div className="max-h-[400px] space-y-3 overflow-y-auto p-4">
+              <div className="flex-1 space-y-3 overflow-y-auto p-4">
                 {caseData.messages.length === 0 ? (
                   <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
                 ) : caseData.messages.map((m) => (
@@ -240,12 +187,6 @@ const AdminCaseDetail = () => {
                   <span>{new Date(caseData.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
               </div>
-            </div>
-
-            {/* Timeline */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Timeline</h3>
-              <CaseTimeline events={caseData.timeline} />
             </div>
           </div>
         </div>
