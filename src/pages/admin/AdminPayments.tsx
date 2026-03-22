@@ -1,21 +1,91 @@
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockPayments } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { usePagination } from '@/hooks/usePagination';
+import { PaginationControls } from '@/components/PaginationControls';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminPayments = () => {
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
+
   const filtered = mockPayments.filter(p =>
     p.userName.toLowerCase().includes(search.toLowerCase()) || p.transactionId.toLowerCase().includes(search.toLowerCase())
   );
+  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 10);
+
+  const handleCreatePayment = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({ title: 'Payment Created', description: 'Manual payment has been recorded successfully.' });
+    setDialogOpen(false);
+  };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Payment Tracking</h1>
-          <p className="mt-1 text-muted-foreground">Track all transactions and payments.</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Payment Tracking</h1>
+            <p className="mt-1 text-muted-foreground">Track all transactions and payments.</p>
+          </div>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="mr-2 h-4 w-4" />Create Payment</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Record Manual Payment</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreatePayment} className="space-y-4 mt-2">
+                <div className="space-y-2">
+                  <Label>User Name</Label>
+                  <Input placeholder="Enter user name" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Amount (₹)</Label>
+                  <Input type="number" placeholder="e.g. 1999" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Plan</Label>
+                  <Select required>
+                    <SelectTrigger><SelectValue placeholder="Select plan" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Basic">Basic — ₹999</SelectItem>
+                      <SelectItem value="Professional">Professional — ₹1,999</SelectItem>
+                      <SelectItem value="Premium">Premium — ₹4,999</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Payment Method</Label>
+                  <Select required>
+                    <SelectTrigger><SelectValue placeholder="Select method" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="upi">UPI / QR</SelectItem>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="net_banking">Net Banking</SelectItem>
+                      <SelectItem value="credit_card">Credit Card</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Transaction ID / Reference</Label>
+                  <Input placeholder="e.g. TXN20240815..." required />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                  <Button type="submit">Record Payment</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="relative max-w-sm">
@@ -37,7 +107,7 @@ const AdminPayments = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(p => (
+              {paginated.map(p => (
                 <tr key={p.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3 font-mono text-xs">{p.transactionId}</td>
                   <td className="px-4 py-3">{p.userName}</td>
@@ -55,6 +125,7 @@ const AdminPayments = () => {
             </tbody>
           </table>
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
       </div>
     </AdminLayout>
   );

@@ -5,12 +5,31 @@ import { Button } from '@/components/ui/button';
 import { Search, UserPlus, CheckCircle, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { LEGAL_CATEGORIES } from '@/types';
+import { Link } from 'react-router-dom';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { usePagination } from '@/hooks/usePagination';
+import { PaginationControls } from '@/components/PaginationControls';
 
 const AdminLawyers = () => {
   const [search, setSearch] = useState('');
+  const { toast } = useToast();
+  const [lawyerStates, setLawyerStates] = useState<Record<string, boolean>>(
+    Object.fromEntries(mockLawyers.map(l => [l.id, l.isAvailable]))
+  );
+
   const filtered = mockLawyers.filter(l =>
     l.name.toLowerCase().includes(search.toLowerCase()) || l.email.toLowerCase().includes(search.toLowerCase())
   );
+  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 10);
+
+  const toggleLawyer = (id: string) => {
+    setLawyerStates(prev => {
+      const newState = !prev[id];
+      toast({ title: newState ? 'Lawyer Enabled' : 'Lawyer Disabled', description: `Lawyer has been ${newState ? 'enabled' : 'disabled'}.` });
+      return { ...prev, [id]: newState };
+    });
+  };
 
   return (
     <AdminLayout>
@@ -36,16 +55,17 @@ const AdminLawyers = () => {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Specialization</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Bar Council ID</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Verified</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Active</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Rating</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map(l => (
+              {paginated.map(l => (
                 <tr key={l.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3">
                     <div>
-                      <p className="font-medium">{l.name}</p>
+                      <Link to={`/admin/lawyers/${l.id}`} className="font-medium hover:text-gold hover:underline">{l.name}</Link>
                       <p className="text-xs text-muted-foreground">{l.experience} yrs exp</p>
                     </div>
                   </td>
@@ -59,15 +79,19 @@ const AdminLawyers = () => {
                       : <XCircle className="h-4 w-4 text-red-500" />
                     }
                   </td>
+                  <td className="px-4 py-3">
+                    <Switch checked={lawyerStates[l.id]} onCheckedChange={() => toggleLawyer(l.id)} />
+                  </td>
                   <td className="px-4 py-3 hidden lg:table-cell">{l.rating}/5</td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" size="sm">View</Button>
+                    <Link to={`/admin/lawyers/${l.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
       </div>
     </AdminLayout>
   );
