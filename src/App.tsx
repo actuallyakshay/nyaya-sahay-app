@@ -22,6 +22,7 @@ import UserSubscription from "./pages/user/UserSubscription";
 import UserNotifications from "./pages/user/UserNotifications";
 import UserProfile from "./pages/user/UserProfile";
 import LawyersDirectory from "./pages/user/LawyersDirectory";
+import LawyerProfileView from "./pages/user/LawyerProfileView";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
