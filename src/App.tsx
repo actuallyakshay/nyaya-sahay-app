@@ -21,6 +21,7 @@ import NewCase from "./pages/user/NewCase";
 import UserSubscription from "./pages/user/UserSubscription";
 import UserNotifications from "./pages/user/UserNotifications";
 import UserProfile from "./pages/user/UserProfile";
+import LawyersDirectory from "./pages/user/LawyersDirectory";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
@@ -28,8 +29,11 @@ import LawyerCases from "./pages/lawyer/LawyerCases";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminUserDetail from "./pages/admin/AdminUserDetail";
 import AdminLawyers from "./pages/admin/AdminLawyers";
+import AdminLawyerDetail from "./pages/admin/AdminLawyerDetail";
 import AdminCases from "./pages/admin/AdminCases";
+import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminReports from "./pages/admin/AdminReports";
@@ -64,6 +68,7 @@ const App = () => (
             <Route path="/app/subscription" element={<ProtectedRoute allowedRoles={['user']}><UserSubscription /></ProtectedRoute>} />
             <Route path="/app/notifications" element={<ProtectedRoute allowedRoles={['user']}><UserNotifications /></ProtectedRoute>} />
             <Route path="/app/profile" element={<ProtectedRoute allowedRoles={['user']}><UserProfile /></ProtectedRoute>} />
+            <Route path="/app/lawyers" element={<ProtectedRoute allowedRoles={['user']}><LawyersDirectory /></ProtectedRoute>} />
 
             {/* Lawyer */}
             <Route path="/lawyer/dashboard" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} />
@@ -76,8 +81,11 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/users/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminUserDetail /></ProtectedRoute>} />
             <Route path="/admin/lawyers" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyers /></ProtectedRoute>} />
+            <Route path="/admin/lawyers/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyerDetail /></ProtectedRoute>} />
             <Route path="/admin/cases" element={<ProtectedRoute allowedRoles={['admin']}><AdminCases /></ProtectedRoute>} />
+            <Route path="/admin/cases/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminCaseDetail /></ProtectedRoute>} />
             <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={['admin']}><AdminSubscriptions /></ProtectedRoute>} />
             <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={['admin']}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><AdminReports /></ProtectedRoute>} />

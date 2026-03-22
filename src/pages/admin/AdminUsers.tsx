@@ -4,12 +4,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, UserPlus } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { usePagination } from '@/hooks/usePagination';
+import { PaginationControls } from '@/components/PaginationControls';
 
 const AdminUsers = () => {
   const [search, setSearch] = useState('');
   const filtered = mockAllUsers.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
   );
+  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 10);
 
   return (
     <AdminLayout>
@@ -40,9 +44,11 @@ const AdminUsers = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(u => (
+              {paginated.map(u => (
                 <tr key={u.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 font-medium">{u.name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link to={`/admin/users/${u.id}`} className="hover:text-gold hover:underline">{u.name}</Link>
+                  </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground">{u.email}</td>
                   <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{u.phone}</td>
                   <td className="px-4 py-3">
@@ -52,13 +58,14 @@ const AdminUsers = () => {
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
                   <td className="px-4 py-3">
-                    <Button variant="ghost" size="sm">View</Button>
+                    <Link to={`/admin/users/${u.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
       </div>
     </AdminLayout>
   );
