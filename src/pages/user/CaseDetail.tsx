@@ -3,8 +3,9 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { mockCases } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseTimeline } from '@/components/CaseTimeline';
+import { DocumentList } from '@/components/DocumentList';
 import { LEGAL_CATEGORIES } from '@/types';
-import { FileText, Send, User, Scale, Upload, Video, Phone, Calendar } from 'lucide-react';
+import { Send, User, Scale, Upload, Video, Phone, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +33,7 @@ const CaseDetail = () => {
   };
 
   const handleBookSession = () => {
-    toast({ title: 'Session Booked', description: `Your ${sessionType} consultation has been scheduled.` });
+    toast({ title: 'Session Booked', description: `Your ${sessionType} consultation request has been sent to the lawyer.` });
     setBookingOpen(false);
   };
 
@@ -43,12 +44,6 @@ const CaseDetail = () => {
       </div>
     </DashboardLayout>
   );
-
-  const roleColorMap = {
-    user: { bg: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Client' },
-    lawyer: { bg: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Lawyer' },
-    admin: { bg: 'bg-purple-50 text-purple-700 border-purple-200', label: 'Admin' },
-  };
 
   const isUser = user?.role === 'user';
   const lawyerProfileLink = isUser && caseData.lawyerId ? `/app/lawyers/${caseData.lawyerId}` : undefined;
@@ -74,7 +69,6 @@ const CaseDetail = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
             <div className="rounded-xl border bg-card p-5">
@@ -83,13 +77,13 @@ const CaseDetail = () => {
             </div>
 
             {/* Chat */}
-            <div className="rounded-xl border bg-card flex flex-col" style={{ minHeight: '400px' }}>
+            <div className="rounded-xl border bg-card flex flex-col" style={{ minHeight: '500px' }}>
               <div className="border-b p-4">
                 <h3 className="text-sm font-semibold">Case Communication</h3>
               </div>
-              <div className="flex-1 space-y-3 overflow-y-auto p-4" style={{ maxHeight: '500px' }}>
+              <div className="flex-1 space-y-3 overflow-y-auto p-4" style={{ maxHeight: '600px' }}>
                 {caseData.messages.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
+                  <p className="py-8 text-center text-sm text-muted-foreground">No messages yet. Start the conversation.</p>
                 ) : caseData.messages.map((m) => (
                   <div key={m.id} className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}>
                     <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}>
@@ -113,7 +107,6 @@ const CaseDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Lawyer info */}
             {caseData.lawyerName && (
               <div className="rounded-xl border bg-card p-5">
                 <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Assigned Lawyer</h3>
@@ -138,28 +131,10 @@ const CaseDetail = () => {
               </div>
             )}
 
-            {/* Documents */}
+            {/* Documents — clickable with PDF viewer */}
             <div className="rounded-xl border bg-card p-5">
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Documents</h3>
-              <div className="space-y-2">
-                {caseData.documents.map((d) => {
-                  const roleInfo = roleColorMap[d.uploadedByRole] || roleColorMap.user;
-                  return (
-                    <div key={d.id} className="rounded-lg bg-muted p-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="text-sm truncate flex-1">{d.name}</span>
-                      </div>
-                      <div className="mt-1.5 flex items-center gap-2 ml-6">
-                        <span className={`inline-flex rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${roleInfo.bg}`}>
-                          {roleInfo.label}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">{d.uploadedByName}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <DocumentList documents={caseData.documents} />
               <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => fileInputRef.current?.click()}>
                 <Upload className="mr-2 h-3.5 w-3.5" /> Upload Document
               </Button>
@@ -179,7 +154,7 @@ const CaseDetail = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Book Consultation</DialogTitle>
-            <DialogDescription>Schedule a session with {caseData.lawyerName}</DialogDescription>
+            <DialogDescription>Schedule a session with {caseData.lawyerName}. The lawyer will receive a notification and can accept or decline.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
@@ -201,7 +176,7 @@ const CaseDetail = () => {
               <Label>Preferred Time</Label>
               <Input type="time" />
             </div>
-            <Button className="w-full" onClick={handleBookSession}>Confirm Booking</Button>
+            <Button className="w-full" onClick={handleBookSession}>Send Booking Request</Button>
           </div>
         </DialogContent>
       </Dialog>
