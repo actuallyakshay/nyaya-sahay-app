@@ -1,0 +1,197 @@
+import type { Case, Lawyer, Notification, Payment, SubscriptionPlan, Subscription, User } from '@/types';
+
+export const mockPlans: SubscriptionPlan[] = [
+  {
+    id: 'basic',
+    name: 'Basic',
+    price: 999,
+    period: 'yearly',
+    features: [
+      'Unlimited legal queries',
+      'Standard response time (48 hrs)',
+      'Document review (up to 5/month)',
+      'Email support',
+      'Case tracking dashboard',
+    ],
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    price: 1999,
+    period: 'yearly',
+    isPopular: true,
+    badge: 'Most Popular',
+    features: [
+      'Everything in Basic',
+      'Priority response (24 hrs)',
+      'Unlimited document review',
+      'Phone consultation (2/month)',
+      'Dedicated case manager',
+      'Legal notice drafting',
+    ],
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    price: 4999,
+    period: 'yearly',
+    badge: 'Best Value',
+    features: [
+      'Everything in Professional',
+      'Emergency consultation (4 hrs)',
+      'Unlimited phone & video calls',
+      'On-site assistance (metro cities)',
+      'Court representation coordination',
+      'Priority case assignment',
+      'Dedicated senior advocate',
+    ],
+  },
+];
+
+export const mockUser: User = {
+  id: 'u1',
+  name: 'Rajesh Kumar',
+  email: 'rajesh@example.com',
+  phone: '+91 98765 43210',
+  role: 'user',
+  createdAt: '2024-08-15',
+  isActive: true,
+};
+
+export const mockLawyers: Lawyer[] = [
+  {
+    id: 'l1',
+    name: 'Adv. Priya Sharma',
+    email: 'priya@legalfirm.in',
+    phone: '+91 99887 76655',
+    specializations: ['family', 'property'],
+    barCouncilId: 'BCI/DEL/2015/4532',
+    experience: 9,
+    bio: 'Specializing in family law and property disputes across Delhi NCR courts.',
+    isVerified: true,
+    isAvailable: true,
+    rating: 4.8,
+    casesHandled: 214,
+    createdAt: '2023-01-10',
+  },
+  {
+    id: 'l2',
+    name: 'Adv. Vikram Desai',
+    email: 'vikram@legalfirm.in',
+    phone: '+91 88776 65544',
+    specializations: ['criminal', 'civil'],
+    barCouncilId: 'BCI/MH/2012/2891',
+    experience: 12,
+    bio: 'Senior criminal defense advocate with experience in Maharashtra High Court.',
+    isVerified: true,
+    isAvailable: true,
+    rating: 4.9,
+    casesHandled: 347,
+    createdAt: '2022-06-20',
+  },
+  {
+    id: 'l3',
+    name: 'Adv. Ananya Iyer',
+    email: 'ananya@legalfirm.in',
+    phone: '+91 77665 54433',
+    specializations: ['corporate', 'consumer'],
+    barCouncilId: 'BCI/KA/2017/6712',
+    experience: 7,
+    bio: 'Corporate law specialist handling NCLT cases and consumer forum matters.',
+    isVerified: true,
+    isAvailable: false,
+    rating: 4.7,
+    casesHandled: 156,
+    createdAt: '2023-03-15',
+  },
+];
+
+export const mockCases: Case[] = [
+  {
+    id: 'c1',
+    caseNumber: 'LSP-2024-001',
+    userId: 'u1',
+    userName: 'Rajesh Kumar',
+    lawyerId: 'l1',
+    lawyerName: 'Adv. Priya Sharma',
+    category: 'property',
+    title: 'Property ownership dispute — ancestral land in Jaipur',
+    description: 'Dispute regarding ancestral property ownership. Multiple claimants involved. Need legal assistance for mutation and title clearance.',
+    status: 'in_consultation',
+    priority: 'high',
+    documents: [
+      { id: 'd1', name: 'Sale Deed Copy.pdf', type: 'pdf', size: 245000, uploadedAt: '2024-09-01', uploadedBy: 'u1' },
+      { id: 'd2', name: 'Mutation Records.pdf', type: 'pdf', size: 180000, uploadedAt: '2024-09-02', uploadedBy: 'u1' },
+    ],
+    timeline: [
+      { id: 't1', title: 'Case Created', description: 'New case filed by user', timestamp: '2024-09-01T10:00:00', type: 'status_change' },
+      { id: 't2', title: 'Under Review', description: 'Admin reviewing case details', timestamp: '2024-09-01T14:00:00', type: 'status_change' },
+      { id: 't3', title: 'Lawyer Assigned', description: 'Adv. Priya Sharma assigned to case', timestamp: '2024-09-02T09:00:00', type: 'assignment' },
+      { id: 't4', title: 'Documents Reviewed', description: 'Lawyer reviewed submitted documents', timestamp: '2024-09-03T11:00:00', type: 'note' },
+      { id: 't5', title: 'In Consultation', description: 'Initial consultation scheduled', timestamp: '2024-09-05T10:00:00', type: 'status_change' },
+    ],
+    messages: [
+      { id: 'm1', senderId: 'u1', senderName: 'Rajesh Kumar', senderRole: 'user', content: 'I have uploaded the sale deed and mutation records. Please review.', timestamp: '2024-09-01T10:30:00' },
+      { id: 'm2', senderId: 'l1', senderName: 'Adv. Priya Sharma', senderRole: 'lawyer', content: 'Thank you, Rajesh. I have reviewed the documents. We need to file a civil suit for declaration of title. I will prepare the draft.', timestamp: '2024-09-03T11:30:00' },
+    ],
+    notes: ['Ancestral property — multiple legal heirs involved', 'Mutation pending since 2019'],
+    createdAt: '2024-09-01T10:00:00',
+    updatedAt: '2024-09-05T10:00:00',
+  },
+  {
+    id: 'c2',
+    caseNumber: 'LSP-2024-002',
+    userId: 'u1',
+    userName: 'Rajesh Kumar',
+    category: 'consumer',
+    title: 'Defective product complaint — electronics retailer',
+    description: 'Purchased a laptop that stopped working within 15 days. Retailer refusing refund or replacement.',
+    status: 'new',
+    priority: 'medium',
+    documents: [
+      { id: 'd3', name: 'Purchase Invoice.pdf', type: 'pdf', size: 120000, uploadedAt: '2024-10-10', uploadedBy: 'u1' },
+    ],
+    timeline: [
+      { id: 't6', title: 'Case Created', description: 'New complaint filed', timestamp: '2024-10-10T09:00:00', type: 'status_change' },
+    ],
+    messages: [],
+    notes: [],
+    createdAt: '2024-10-10T09:00:00',
+    updatedAt: '2024-10-10T09:00:00',
+  },
+];
+
+export const mockSubscription: Subscription = {
+  id: 's1',
+  userId: 'u1',
+  planId: 'professional',
+  planName: 'Professional',
+  status: 'active',
+  startDate: '2024-08-15',
+  endDate: '2025-08-15',
+  autoRenew: true,
+};
+
+export const mockNotifications: Notification[] = [
+  { id: 'n1', title: 'Lawyer Assigned', message: 'Adv. Priya Sharma has been assigned to your property case.', type: 'success', isRead: false, createdAt: '2024-09-02T09:00:00', link: '/app/cases/c1' },
+  { id: 'n2', title: 'New Message', message: 'You have a new message from your lawyer regarding case LSP-2024-001.', type: 'info', isRead: false, createdAt: '2024-09-03T11:30:00', link: '/app/cases/c1' },
+  { id: 'n3', title: 'Subscription Active', message: 'Your Professional plan is now active until August 2025.', type: 'success', isRead: true, createdAt: '2024-08-15T10:00:00' },
+  { id: 'n4', title: 'Document Uploaded', message: 'Sale Deed Copy has been uploaded to case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-09-01T10:30:00' },
+];
+
+export const mockPayments: Payment[] = [
+  { id: 'p1', userId: 'u1', userName: 'Rajesh Kumar', amount: 1999, method: 'upi', status: 'success', planName: 'Professional', transactionId: 'TXN202408150001', createdAt: '2024-08-15' },
+  { id: 'p2', userId: 'u2', userName: 'Meera Patel', amount: 999, method: 'credit_card', status: 'success', planName: 'Basic', transactionId: 'TXN202409010002', createdAt: '2024-09-01' },
+  { id: 'p3', userId: 'u3', userName: 'Arjun Singh', amount: 4999, method: 'net_banking', status: 'pending', planName: 'Premium', transactionId: 'TXN202410050003', createdAt: '2024-10-05' },
+];
+
+export const adminStats = {
+  totalUsers: 1247,
+  totalLawyers: 83,
+  activeCases: 312,
+  resolvedCases: 1856,
+  monthlyRevenue: 487500,
+  emergencyRequests: 4,
+  pendingVerifications: 7,
+  activePlans: { basic: 645, professional: 412, premium: 190 },
+};
