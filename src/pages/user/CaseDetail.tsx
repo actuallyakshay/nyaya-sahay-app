@@ -4,15 +4,30 @@ import { mockCases } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseTimeline } from '@/components/CaseTimeline';
 import { LEGAL_CATEGORIES } from '@/types';
-import { FileText, Send, Paperclip, User, Scale } from 'lucide-react';
+import { FileText, Send, User, Scale, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const CaseDetail = () => {
   const { id } = useParams();
   const caseData = mockCases.find((c) => c.id === id);
   const [message, setMessage] = useState('');
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      toast({
+        title: 'Documents uploaded',
+        description: `${files.length} file(s) uploaded successfully.`,
+      });
+    }
+  };
 
   if (!caseData) return (
     <DashboardLayout>
@@ -21,6 +36,12 @@ const CaseDetail = () => {
       </div>
     </DashboardLayout>
   );
+
+  const roleColorMap = {
+    user: { bg: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Client' },
+    lawyer: { bg: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Lawyer' },
+    admin: { bg: 'bg-purple-50 text-purple-700 border-purple-200', label: 'Admin' },
+  };
 
   return (
     <DashboardLayout>
@@ -68,7 +89,8 @@ const CaseDetail = () => {
               </div>
               <div className="border-t p-3 flex gap-2">
                 <Input placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} className="flex-1" />
-                <Button size="icon" variant="ghost"><Paperclip className="h-4 w-4" /></Button>
+                <input ref={fileInputRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden" onChange={handleUpload} />
+                <Button size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4" /></Button>
                 <Button size="icon"><Send className="h-4 w-4" /></Button>
               </div>
             </div>
@@ -92,18 +114,32 @@ const CaseDetail = () => {
               </div>
             )}
 
-            {/* Documents */}
+            {/* Documents — with uploader info */}
             <div className="rounded-xl border bg-card p-5">
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Documents</h3>
               <div className="space-y-2">
-                {caseData.documents.map((d) => (
-                  <div key={d.id} className="flex items-center gap-2.5 rounded-lg bg-muted p-2.5">
-                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span className="text-sm truncate">{d.name}</span>
-                  </div>
-                ))}
+                {caseData.documents.map((d) => {
+                  const roleInfo = roleColorMap[d.uploadedByRole] || roleColorMap.user;
+                  return (
+                    <div key={d.id} className="rounded-lg bg-muted p-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm truncate flex-1">{d.name}</span>
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-2 ml-6">
+                        <span className={`inline-flex rounded-full border px-1.5 py-0.5 text-[10px] font-medium ${roleInfo.bg}`}>
+                          {roleInfo.label}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">{d.uploadedByName}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <Button variant="outline" size="sm" className="mt-3 w-full"><Paperclip className="mr-2 h-3.5 w-3.5" /> Upload Document</Button>
+              <input ref={fileInputRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden" onChange={handleUpload} />
+              <Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="mr-2 h-3.5 w-3.5" /> Upload Document
+              </Button>
             </div>
 
             {/* Timeline */}

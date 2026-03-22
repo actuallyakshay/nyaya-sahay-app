@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare } from 'lucide-react';
+import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -27,6 +27,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const nav = user?.role === 'lawyer' ? lawyerNav : userNav;
   const roleName = user?.role === 'lawyer' ? 'Advocate' : 'User';
@@ -57,50 +58,74 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         <div className="fixed inset-0 z-50 bg-foreground/40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — sticky + collapsible */}
       <aside className={cn(
-        'fixed inset-y-0 left-0 z-50 w-64 transform bg-navy transition-transform duration-200 lg:relative lg:translate-x-0',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        'fixed inset-y-0 left-0 z-50 transform bg-navy transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        collapsed ? 'lg:w-16' : 'lg:w-64',
+        'w-64'
       )}>
         <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-between px-5">
-            <Link to="/" className="flex items-center gap-2.5">
+          <div className={cn("flex h-16 items-center px-5", collapsed ? 'lg:justify-center lg:px-0' : 'justify-between')}>
+            <Link to="/" className={cn("flex items-center gap-2.5", collapsed && 'lg:hidden')}>
               <Scale className="h-5 w-5 text-gold" />
               <span className="font-serif text-lg font-bold text-primary-foreground">NyayaSetu</span>
+            </Link>
+            <Link to="/" className={cn("hidden", collapsed && 'lg:flex items-center justify-center')}>
+              <Scale className="h-5 w-5 text-gold" />
             </Link>
             <button className="p-1 text-primary-foreground/60 lg:hidden" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5">
-            <p className="text-xs font-medium text-gold">{roleName} Panel</p>
-            <p className="truncate text-sm font-semibold text-primary-foreground">{user?.name}</p>
-          </div>
+          {!collapsed && (
+            <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5">
+              <p className="text-xs font-medium text-gold">{roleName} Panel</p>
+              <p className="truncate text-sm font-semibold text-primary-foreground">{user?.name}</p>
+            </div>
+          )}
 
-          <nav className="flex-1 space-y-0.5 px-3">
+          <nav className={cn("flex-1 space-y-0.5", collapsed ? 'px-1.5' : 'px-3')}>
             {nav.map((item) => {
               const active = location.pathname === item.to || location.pathname.startsWith(item.to + '/');
               return (
                 <Link key={item.to + item.label} to={item.to} onClick={() => setSidebarOpen(false)}
+                  title={collapsed ? item.label : undefined}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    collapsed && 'lg:justify-center lg:px-0 lg:py-2.5',
                     active ? 'bg-sidebar-accent text-primary-foreground' : 'text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground'
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
+                  <item.icon className="h-4 w-4 shrink-0" />
+                  <span className={cn(collapsed && 'lg:hidden')}>{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
+          {/* Collapse toggle — desktop only */}
+          <div className="hidden lg:block border-t border-sidebar-border p-2">
+            <button onClick={() => setCollapsed(!collapsed)}
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground"
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              {!collapsed && <span>Collapse</span>}
+            </button>
+          </div>
+
           <div className="border-t border-sidebar-border p-3">
             <button onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground"
+              title={collapsed ? 'Sign Out' : undefined}
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground',
+                collapsed && 'lg:justify-center lg:px-0'
+              )}
             >
-              <LogOut className="h-4 w-4" />
-              Sign Out
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span className={cn(collapsed && 'lg:hidden')}>Sign Out</span>
             </button>
           </div>
         </div>
