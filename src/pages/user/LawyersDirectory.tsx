@@ -4,6 +4,8 @@ import { LEGAL_CATEGORIES } from '@/types';
 import { CheckCircle, Star, Briefcase, Award } from 'lucide-react';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const LawyersDirectory = () => {
   const availableLawyers = mockLawyers.filter(l => l.isVerified && l.isAvailable);
@@ -43,6 +45,9 @@ const LawyersDirectory = () => {
                 <span className="flex items-center gap-1"><Award className="h-3 w-3" />{l.experience} yrs</span>
               </div>
               {l.bio && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{l.bio}</p>}
+              <Button variant="outline" size="sm" className="mt-3 w-full" asChild>
+                <Link to={`/app/lawyers/${l.id}`}>View Profile</Link>
+              </Button>
             </div>
           ))}
         </div>

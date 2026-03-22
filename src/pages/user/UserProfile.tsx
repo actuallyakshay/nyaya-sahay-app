@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Shield, Camera } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { mockLawyers } from '@/lib/mock-data';
-import { LEGAL_CATEGORIES } from '@/types';
+import { mockLawyers, mockSubscription, mockPlans } from '@/lib/mock-data';
+import { LEGAL_CATEGORIES, LegalCategory } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CheckCircle2, CreditCard, Calendar } from 'lucide-react';
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -16,6 +18,9 @@ const UserProfile = () => {
   const [avatar, setAvatar] = useState<string | null>(null);
   const isLawyer = user?.role === 'lawyer';
   const lawyerData = isLawyer ? mockLawyers[0] : null;
+  const [specializations, setSpecializations] = useState<LegalCategory[]>(lawyerData?.specializations || []);
+
+  const plan = mockPlans.find(p => p.id === mockSubscription.planId);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,6 +29,12 @@ const UserProfile = () => {
       setAvatar(url);
       toast({ title: 'Photo updated', description: 'Profile photo has been changed.' });
     }
+  };
+
+  const toggleSpecialization = (cat: LegalCategory) => {
+    setSpecializations(prev =>
+      prev.includes(cat) ? prev.filter(s => s !== cat) : [...prev, cat]
+    );
   };
 
   return (
@@ -72,37 +83,83 @@ const UserProfile = () => {
 
           {/* Lawyer-specific fields */}
           {isLawyer && lawyerData && (
-            <>
-              <div className="border-t pt-5 mt-3">
-                <h3 className="font-semibold mb-4">Professional Details</h3>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Degree / Qualification</Label>
-                    <Input defaultValue={lawyerData.degree} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Years of Experience</Label>
-                    <Input type="number" defaultValue={lawyerData.experience} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Bar Council ID</Label>
-                    <Input defaultValue={lawyerData.barCouncilId} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Specializations</Label>
-                    <Input defaultValue={lawyerData.specializations.map(s => LEGAL_CATEGORIES[s]).join(', ')} disabled />
-                  </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label>Bio</Label>
-                    <Input defaultValue={lawyerData.bio} />
+            <div className="border-t pt-5 mt-3">
+              <h3 className="font-semibold mb-4">Professional Details</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Degree / Qualification</Label>
+                  <Input defaultValue={lawyerData.degree} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Years of Experience</Label>
+                  <Input type="number" defaultValue={lawyerData.experience} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Bar Council ID</Label>
+                  <Input defaultValue={lawyerData.barCouncilId} disabled />
+                </div>
+                <div className="space-y-2">
+                  <Label>Specializations</Label>
+                  <div className="flex flex-wrap gap-1.5 rounded-lg border p-2.5">
+                    {(Object.entries(LEGAL_CATEGORIES) as [LegalCategory, string][]).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => toggleSpecialization(key)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                          specializations.includes(key)
+                            ? 'bg-gold text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
                   </div>
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Bio</Label>
+                  <Input defaultValue={lawyerData.bio} />
+                </div>
               </div>
-            </>
+            </div>
           )}
 
           <Button>Save Changes</Button>
         </div>
+
+        {/* My Plan — for users */}
+        {!isLawyer && plan && (
+          <div className="rounded-xl border bg-card p-6 space-y-3">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-gold" />
+              <h3 className="font-semibold">My Plan</h3>
+            </div>
+            <div className="flex items-start justify-between flex-wrap gap-3">
+              <div>
+                <p className="font-bold text-lg">{plan.name} Plan</p>
+                <p className="text-sm text-muted-foreground">₹{plan.price.toLocaleString('en-IN')}/{plan.period}</p>
+              </div>
+              <div className="text-right text-sm">
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Calendar className="h-3.5 w-3.5" />
+                  Valid until {new Date(mockSubscription.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+                <div className="flex items-center gap-1 mt-0.5 text-green-600 text-xs">
+                  <CheckCircle2 className="h-3 w-3" /> Active
+                </div>
+              </div>
+            </div>
+            <ul className="grid gap-1 sm:grid-cols-2">
+              {plan.features.map(f => (
+                <li key={f} className="flex items-start gap-2 text-sm"><CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-600 mt-0.5" />{f}</li>
+              ))}
+            </ul>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/app/subscription">Manage Subscription</a>
+            </Button>
+          </div>
+        )}
 
         <div className="rounded-xl border bg-card p-6 space-y-3">
           <div className="flex items-center gap-2">
