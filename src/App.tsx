@@ -22,6 +22,7 @@ import UserSubscription from "./pages/user/UserSubscription";
 import UserNotifications from "./pages/user/UserNotifications";
 import UserProfile from "./pages/user/UserProfile";
 import LawyersDirectory from "./pages/user/LawyersDirectory";
+import LawyerProfileView from "./pages/user/LawyerProfileView";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
@@ -69,6 +70,7 @@ const App = () => (
             <Route path="/app/notifications" element={<ProtectedRoute allowedRoles={['user']}><UserNotifications /></ProtectedRoute>} />
             <Route path="/app/profile" element={<ProtectedRoute allowedRoles={['user']}><UserProfile /></ProtectedRoute>} />
             <Route path="/app/lawyers" element={<ProtectedRoute allowedRoles={['user']}><LawyersDirectory /></ProtectedRoute>} />
+            <Route path="/app/lawyers/:id" element={<ProtectedRoute allowedRoles={['user']}><LawyerProfileView /></ProtectedRoute>} />
 
             {/* Lawyer */}
             <Route path="/lawyer/dashboard" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} />
