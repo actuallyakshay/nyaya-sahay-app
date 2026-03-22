@@ -3,7 +3,7 @@ import { mockCases, mockLawyers } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { Briefcase, Clock, CheckCircle, AlertTriangle, Star } from 'lucide-react';
+import { Briefcase, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { LEGAL_CATEGORIES } from '@/types';
 
 const LawyerDashboard = () => {
@@ -20,11 +20,10 @@ const LawyerDashboard = () => {
           <p className="mt-1 text-muted-foreground">Your case assignments and tasks at a glance.</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { label: 'Active Cases', value: activeCases.length, icon: Briefcase, color: 'text-info' },
             { label: 'Total Handled', value: lawyerData.casesHandled, icon: CheckCircle, color: 'text-success' },
-            { label: 'Rating', value: `${lawyerData.rating}/5`, icon: Star, color: 'text-gold' },
             { label: 'Experience', value: `${lawyerData.experience} yrs`, icon: Clock, color: 'text-muted-foreground' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl border bg-card p-5 shadow-sm">

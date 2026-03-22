@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { mockLawyers } from '@/lib/mock-data';
 import { LEGAL_CATEGORIES } from '@/types';
-import { Star, Briefcase, Award, CheckCircle, ChevronLeft, Phone, Mail, Video, Calendar } from 'lucide-react';
+import { Briefcase, Award, CheckCircle, ChevronLeft, Phone, Mail, Video, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -62,14 +62,7 @@ const LawyerProfileView = () => {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-4 rounded-lg bg-muted/50 p-4">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-gold">
-                <Star className="h-4 w-4" />
-                <span className="font-bold">{lawyer.rating}/5</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">Rating</p>
-            </div>
+          <div className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-muted/50 p-4">
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
                 <Briefcase className="h-4 w-4 text-muted-foreground" />
