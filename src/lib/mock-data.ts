@@ -67,6 +67,7 @@ export const mockLawyers: Lawyer[] = [
     specializations: ['family', 'property'],
     barCouncilId: 'BCI/DEL/2015/4532',
     experience: 9,
+    degree: 'LL.B, Delhi University (2015)',
     bio: 'Specializing in family law and property disputes across Delhi NCR courts.',
     isVerified: true,
     isAvailable: true,
@@ -82,6 +83,7 @@ export const mockLawyers: Lawyer[] = [
     specializations: ['criminal', 'civil'],
     barCouncilId: 'BCI/MH/2012/2891',
     experience: 12,
+    degree: 'LL.M, Mumbai University (2012)',
     bio: 'Senior criminal defense advocate with experience in Maharashtra High Court.',
     isVerified: true,
     isAvailable: true,
@@ -97,6 +99,7 @@ export const mockLawyers: Lawyer[] = [
     specializations: ['corporate', 'consumer'],
     barCouncilId: 'BCI/KA/2017/6712',
     experience: 7,
+    degree: 'B.A. LL.B (Hons), NLSIU Bangalore (2017)',
     bio: 'Corporate law specialist handling NCLT cases and consumer forum matters.',
     isVerified: true,
     isAvailable: false,
@@ -120,8 +123,9 @@ export const mockCases: Case[] = [
     status: 'in_consultation',
     priority: 'high',
     documents: [
-      { id: 'd1', name: 'Sale Deed Copy.pdf', type: 'pdf', size: 245000, uploadedAt: '2024-09-01', uploadedBy: 'u1' },
-      { id: 'd2', name: 'Mutation Records.pdf', type: 'pdf', size: 180000, uploadedAt: '2024-09-02', uploadedBy: 'u1' },
+      { id: 'd1', name: 'Sale Deed Copy.pdf', type: 'pdf', size: 245000, uploadedAt: '2024-09-01', uploadedBy: 'u1', uploadedByName: 'Rajesh Kumar', uploadedByRole: 'user' },
+      { id: 'd2', name: 'Mutation Records.pdf', type: 'pdf', size: 180000, uploadedAt: '2024-09-02', uploadedBy: 'u1', uploadedByName: 'Rajesh Kumar', uploadedByRole: 'user' },
+      { id: 'd5', name: 'Legal Opinion Draft.pdf', type: 'pdf', size: 320000, uploadedAt: '2024-09-04', uploadedBy: 'l1', uploadedByName: 'Adv. Priya Sharma', uploadedByRole: 'lawyer' },
     ],
     timeline: [
       { id: 't1', title: 'Case Created', description: 'New case filed by user', timestamp: '2024-09-01T10:00:00', type: 'status_change' },
@@ -149,7 +153,7 @@ export const mockCases: Case[] = [
     status: 'new',
     priority: 'medium',
     documents: [
-      { id: 'd3', name: 'Purchase Invoice.pdf', type: 'pdf', size: 120000, uploadedAt: '2024-10-10', uploadedBy: 'u1' },
+      { id: 'd3', name: 'Purchase Invoice.pdf', type: 'pdf', size: 120000, uploadedAt: '2024-10-10', uploadedBy: 'u1', uploadedByName: 'Rajesh Kumar', uploadedByRole: 'user' },
     ],
     timeline: [
       { id: 't6', title: 'Case Created', description: 'New complaint filed', timestamp: '2024-10-10T09:00:00', type: 'status_change' },
@@ -195,3 +199,11 @@ export const adminStats = {
   pendingVerifications: 7,
   activePlans: { basic: 645, professional: 412, premium: 190 },
 };
+
+export const mockAllUsers: User[] = [
+  { id: 'u1', name: 'Rajesh Kumar', email: 'rajesh@example.com', phone: '+91 98765 43210', role: 'user', createdAt: '2024-08-15', isActive: true },
+  { id: 'u2', name: 'Meera Patel', email: 'meera@example.com', phone: '+91 87654 32109', role: 'user', createdAt: '2024-09-01', isActive: true },
+  { id: 'u3', name: 'Arjun Singh', email: 'arjun@example.com', phone: '+91 76543 21098', role: 'user', createdAt: '2024-10-05', isActive: true },
+  { id: 'u4', name: 'Sunita Devi', email: 'sunita@example.com', phone: '+91 65432 10987', role: 'user', createdAt: '2024-10-12', isActive: false },
+  { id: 'u5', name: 'Karan Mehta', email: 'karan@example.com', phone: '+91 54321 09876', role: 'user', createdAt: '2024-11-01', isActive: true },
+];

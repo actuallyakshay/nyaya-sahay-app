@@ -7,19 +7,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Paperclip, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import { FileUpload } from '@/components/FileUpload';
 
 const NewCase = () => {
   const [category, setCategory] = useState<LegalCategory | ''>('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: 'Case submitted', description: 'Your legal query has been filed. We will assign a lawyer shortly.' });
+    toast({ title: 'Case submitted', description: `Your legal query has been filed with ${files.length} document(s). We will assign a lawyer shortly.` });
     navigate('/app/cases');
   };
 
@@ -55,11 +57,7 @@ const NewCase = () => {
 
           <div className="space-y-2">
             <Label>Upload Documents (optional)</Label>
-            <div className="rounded-lg border-2 border-dashed bg-card p-8 text-center">
-              <Paperclip className="mx-auto h-6 w-6 text-muted-foreground" />
-              <p className="mt-2 text-sm text-muted-foreground">Drag & drop or click to upload</p>
-              <p className="mt-1 text-xs text-muted-foreground">PDF, JPEG, PNG — max 10MB each</p>
-            </div>
+            <FileUpload onFilesChange={setFiles} maxFiles={10} />
           </div>
 
           <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4">

@@ -20,6 +20,7 @@ export interface Lawyer {
   specializations: LegalCategory[];
   barCouncilId: string;
   experience: number;
+  degree: string;
   bio: string;
   isVerified: boolean;
   isAvailable: boolean;
@@ -82,7 +83,7 @@ export interface Case {
   description: string;
   status: CaseStatus;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  documents: Document[];
+  documents: CaseDocument[];
   timeline: TimelineEvent[];
   messages: CaseMessage[];
   notes: string[];
@@ -90,13 +91,15 @@ export interface Case {
   updatedAt: string;
 }
 
-export interface Document {
+export interface CaseDocument {
   id: string;
   name: string;
   type: string;
   size: number;
   uploadedAt: string;
   uploadedBy: string;
+  uploadedByName: string;
+  uploadedByRole: UserRole;
 }
 
 export interface TimelineEvent {
@@ -114,7 +117,7 @@ export interface CaseMessage {
   senderRole: UserRole;
   content: string;
   timestamp: string;
-  attachments?: Document[];
+  attachments?: CaseDocument[];
 }
 
 export interface SubscriptionPlan {
