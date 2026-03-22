@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -9,6 +9,7 @@ const userNav = [
   { label: 'Dashboard', to: '/app/dashboard', icon: LayoutDashboard },
   { label: 'My Cases', to: '/app/cases', icon: Briefcase },
   { label: 'New Case', to: '/app/new-case', icon: Plus },
+  { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
   { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
   { label: 'Notifications', to: '/app/notifications', icon: Bell },
   { label: 'Profile', to: '/app/profile', icon: User },
