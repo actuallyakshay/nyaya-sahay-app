@@ -72,7 +72,7 @@ const CaseDetail = () => {
               <div className="border-b p-4">
                 <h3 className="text-sm font-semibold">Case Communication</h3>
               </div>
-              <div className="max-h-80 space-y-3 overflow-y-auto p-4">
+              <div className="min-h-[300px] max-h-[500px] space-y-3 overflow-y-auto p-4">
                 {caseData.messages.length === 0 ? (
                   <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
                 ) : caseData.messages.map((m) => (
