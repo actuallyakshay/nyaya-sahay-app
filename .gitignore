@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Amazon Q
+.amazonq/
+
+# Markdown files
+*.md
+
+# Environment files
+.env
+.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { env } from "@/config/env";
 
 import Index from "./pages/Index";
 import PlansPage from "./pages/PlansPage";
@@ -43,60 +45,241 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+console.log("[App] Origin:", window.location.origin);
+console.log("[App] Full URL:", window.location.href);
+console.log("[App] Protocol:", window.location.protocol);
+console.log("[App] Hostname:", window.location.hostname);
+console.log("[App] Port:", window.location.port);
+console.log(
+  "[App] VITE_GOOGLE_CLIENT_ID:",
+  import.meta.env.VITE_GOOGLE_CLIENT_ID,
+);
+console.log("[App] env.googleClientId:", env.googleClientId);
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<Index />} />
-            <Route path="/plans" element={<PlansPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+  <GoogleOAuthProvider clientId={env.googleClientId}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Routes>
+              {/* Public */}
+              <Route path="/" element={<Index />} />
+              <Route path="/plans" element={<PlansPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/faq" element={<FAQPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* User */}
-            <Route path="/app/dashboard" element={<ProtectedRoute allowedRoles={['user']}><UserDashboard /></ProtectedRoute>} />
-            <Route path="/app/cases" element={<ProtectedRoute allowedRoles={['user']}><UserCases /></ProtectedRoute>} />
-            <Route path="/app/cases/:id" element={<ProtectedRoute allowedRoles={['user']}><CaseDetail /></ProtectedRoute>} />
-            <Route path="/app/new-case" element={<ProtectedRoute allowedRoles={['user']}><NewCase /></ProtectedRoute>} />
-            <Route path="/app/subscription" element={<ProtectedRoute allowedRoles={['user']}><UserSubscription /></ProtectedRoute>} />
-            <Route path="/app/notifications" element={<ProtectedRoute allowedRoles={['user']}><UserNotifications /></ProtectedRoute>} />
-            <Route path="/app/profile" element={<ProtectedRoute allowedRoles={['user']}><UserProfile /></ProtectedRoute>} />
-            <Route path="/app/lawyers" element={<ProtectedRoute allowedRoles={['user']}><LawyersDirectory /></ProtectedRoute>} />
-            <Route path="/app/lawyers/:id" element={<ProtectedRoute allowedRoles={['user']}><LawyerProfileView /></ProtectedRoute>} />
+              {/* User */}
+              <Route
+                path="/app/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <UserDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/cases"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <UserCases />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/cases/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <CaseDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/new-case"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <NewCase />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/subscription"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <UserSubscription />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/notifications"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <UserNotifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/profile"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/lawyers"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <LawyersDirectory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/app/lawyers/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["user"]}>
+                    <LawyerProfileView />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Lawyer */}
-            <Route path="/lawyer/dashboard" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} />
-            <Route path="/lawyer/cases" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerCases /></ProtectedRoute>} />
-            <Route path="/lawyer/cases/:id" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseDetail /></ProtectedRoute>} />
-            <Route path="/lawyer/notifications" element={<ProtectedRoute allowedRoles={['lawyer']}><UserNotifications /></ProtectedRoute>} />
-            <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><UserProfile /></ProtectedRoute>} />
+              {/* Lawyer */}
+              <Route
+                path="/lawyer/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                    <LawyerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lawyer/cases"
+                element={
+                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                    <LawyerCases />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lawyer/cases/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                    <CaseDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lawyer/notifications"
+                element={
+                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                    <UserNotifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/lawyer/profile"
+                element={
+                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Admin */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
-            <Route path="/admin/users/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminUserDetail /></ProtectedRoute>} />
-            <Route path="/admin/lawyers" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyers /></ProtectedRoute>} />
-            <Route path="/admin/lawyers/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyerDetail /></ProtectedRoute>} />
-            <Route path="/admin/cases" element={<ProtectedRoute allowedRoles={['admin']}><AdminCases /></ProtectedRoute>} />
-            <Route path="/admin/cases/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminCaseDetail /></ProtectedRoute>} />
-            <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={['admin']}><AdminSubscriptions /></ProtectedRoute>} />
-            <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={['admin']}><AdminPayments /></ProtectedRoute>} />
-            <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
+              {/* Admin */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminUsers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/users/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminUserDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/lawyers"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminLawyers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/lawyers/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminLawyerDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/cases"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminCases />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/cases/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminCaseDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/subscriptions"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminSubscriptions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/payments"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminPayments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminSettings />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </GoogleOAuthProvider>
 );
 
 export default App;
