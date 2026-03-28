@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import type { CaseStatus } from '@/types';
+import type { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
@@ -31,28 +31,6 @@ const STATUS_FILTERS: { value: string; label: string }[] = [
   { value: 'closed', label: 'Closed' },
   { value: 'emergency', label: 'Emergency' },
 ];
-
-interface CaseItem {
-  id: string;
-  caseCode: string;
-  title: string;
-  status: CaseStatus;
-  practiceArea: { id: string; name: string } | null;
-  assignedLawyer: { user: { fullName: string } } | null;
-  createdAt: string;
-}
-
-interface Pagination {
-  total: number;
-  totalPages: number;
-  next: number | null;
-  prev: number | null;
-}
-
-interface CasesResponse {
-  data: CaseItem[];
-  pagination: Pagination;
-}
 
 const buildQueryParams = (
   page: number,

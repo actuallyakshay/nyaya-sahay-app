@@ -8,31 +8,23 @@ import {
   resetCookies,
   setCookie,
 } from '@/lib/helpers';
-import type { UserRole } from '@/types';
+import type { AuthUser, UserRole } from '@/types';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-  phone?: string;
-  avatarUrl?: string;
-  roles: UserRole[];
-}
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
   logout: () => void;
-  setUser: (user: User | null) => void;
+  setUser: (user: AuthUser | null) => void;
   isLoading: boolean;
 }
 
-const getStoredUser = (): User | null => {
+const getStoredUser = (): AuthUser | null => {
   const storedUser = getCookie('user');
   return storedUser ? JSON.parse(storedUser) : null;
 };
 
-const persistUser = (user: User) => {
+const persistUser = (user: AuthUser) => {
   setCookie('user', JSON.stringify(user));
 };
 
@@ -45,7 +37,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(getStoredUser);
+  const [user, setUser] = useState<AuthUser | null>(getStoredUser);
 
   const [isLoading, setIsLoading] = useState(false);
 

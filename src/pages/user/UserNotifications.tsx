@@ -8,25 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface ConsultationNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error' | 'consultation';
-  isRead: boolean;
-  createdAt: string;
-  link?: string;
-  consultationDetails?: {
-    sessionType: string;
-    date: string;
-    time: string;
-    userName: string;
-    caseNumber: string;
-    status: 'pending' | 'accepted' | 'declined';
-    meetLink?: string;
-  };
-}
+import type { ConsultationNotification } from '@/types';
 
 const mockLawyerNotifications: ConsultationNotification[] = [
   { id: 'ln1', title: 'Consultation Request', message: 'Rajesh Kumar has requested a video consultation for case LSP-2024-001.', type: 'consultation', isRead: false, createdAt: '2024-09-06T10:00:00', link: '/lawyer/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-10', time: '14:00', userName: 'Rajesh Kumar', caseNumber: 'LSP-2024-001', status: 'pending' } },

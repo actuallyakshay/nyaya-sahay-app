@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getApiErrorMessage } from '@/lib/utils';
+import type { UploadedDoc } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
@@ -26,12 +27,8 @@ const SKELETON_WIDTHS = [
 ];
 
 const MAX_FILES = 5;
-const MAX_SIZE_MB = 10;
 
-interface UploadedDoc {
-  assetUrl: string;
-  assetType: string;
-}
+const MAX_SIZE_MB = 10;
 
 const uploadFiles = async (files: File[]): Promise<UploadedDoc[]> => {
   const results = await Promise.all(

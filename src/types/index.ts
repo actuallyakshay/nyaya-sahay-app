@@ -198,3 +198,68 @@ export interface LawyersListResponse {
   data: LawyerListItem[];
   pagination: LawyersPagination;
 }
+
+// Auth user (from API — has fullName, roles, avatarUrl)
+export interface AuthUser {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  avatarUrl?: string;
+  roles: UserRole[];
+}
+
+// Cases list API response types
+export interface CaseItem {
+  id: string;
+  caseCode: string;
+  title: string;
+  status: CaseStatus;
+  practiceArea: { id: string; name: string } | null;
+  assignedLawyer: { user: { fullName: string } } | null;
+  createdAt: string;
+}
+
+export interface Pagination {
+  total: number;
+  totalPages: number;
+  next: number | null;
+  prev: number | null;
+}
+
+export interface CasesResponse {
+  data: CaseItem[];
+  pagination: Pagination;
+}
+
+// Upload API response
+export interface UploadedDoc {
+  assetUrl: string;
+  assetType: string;
+}
+
+// Notification types
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'consultation';
+
+export type ConsultationStatus = 'pending' | 'accepted' | 'declined';
+
+export interface ConsultationDetails {
+  sessionType: string;
+  date: string;
+  time: string;
+  userName: string;
+  caseNumber: string;
+  status: ConsultationStatus;
+  meetLink?: string;
+}
+
+export interface ConsultationNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  createdAt: string;
+  link?: string;
+  consultationDetails?: ConsultationDetails;
+}
