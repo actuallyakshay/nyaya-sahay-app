@@ -63,7 +63,8 @@ const AdminUsers = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingUser(u); setModalOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
                     <Link to={`/admin/users/${u.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
