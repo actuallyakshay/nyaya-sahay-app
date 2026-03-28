@@ -4,6 +4,7 @@ import {
   googleAuthLogin as googleAuthLoginApi,
   logout as logoutApi,
 } from "@/api-client";
+import { setCookie, getCookie, removeCookie } from "@/lib/cookies";
 
 interface AuthUser {
   id: string;
@@ -16,7 +17,7 @@ interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
+  setAuthUser: (user: AuthUser) => void;
   googleLogin: (idToken: string, role: UserRole) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -25,16 +26,18 @@ interface AuthContextType {
 const AUTH_USER_KEY = "auth_user";
 
 const getStoredUser = (): AuthUser | null => {
-  const stored = localStorage.getItem(AUTH_USER_KEY);
+  const stored = getCookie(AUTH_USER_KEY);
   return stored ? JSON.parse(stored) : null;
 };
 
 const persistUser = (user: AuthUser) => {
-  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  setCookie(AUTH_USER_KEY, JSON.stringify(user));
 };
 
 const clearStoredUser = () => {
-  localStorage.removeItem(AUTH_USER_KEY);
+  removeCookie(AUTH_USER_KEY);
+  removeCookie("access_token");
+  removeCookie("refresh_token");
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,23 +48,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(getStoredUser);
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = useCallback(
-    async (email: string, _password: string, role: UserRole) => {
-      setIsLoading(true);
-      // Mock login — will be replaced with real API call
-      await new Promise((r) => setTimeout(r, 800));
-      const mockUsers: Record<UserRole, AuthUser> = {
-        user: { id: "u1", name: "Rajesh Kumar", email, role: "user" },
-        lawyer: { id: "l1", name: "Adv. Priya Sharma", email, role: "lawyer" },
-        admin: { id: "a1", name: "Platform Admin", email, role: "admin" },
-      };
-      const authUser = mockUsers[role];
-      setUser(authUser);
-      persistUser(authUser);
-      setIsLoading(false);
-    },
-    [],
-  );
+  const setAuthUser = useCallback((authUser: AuthUser) => {
+    setUser(authUser);
+    persistUser(authUser);
+  }, []);
 
   const googleLogin = useCallback(async (idToken: string, role: UserRole) => {
     setIsLoading(true);
@@ -93,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         isAuthenticated: !!user,
-        login,
+        setAuthUser,
         googleLogin,
         logout,
         isLoading,

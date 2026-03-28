@@ -1,41 +1,146 @@
-import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { mockCases } from '@/lib/mock-data';
-import { StatusBadge } from '@/components/StatusBadge';
-import { Link } from 'react-router-dom';
-import { LEGAL_CATEGORIES, CaseStatus } from '@/types';
-import { usePagination } from '@/hooks/usePagination';
-import { PaginationControls } from '@/components/PaginationControls';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { StatusBadge } from "@/components/StatusBadge";
+import { PaginationControls } from "@/components/PaginationControls";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search } from "lucide-react";
+import { getCases } from "@/api-client";
+import { useDebounce } from "@/hooks/useDebounce";
+import type { CaseStatus } from "@/types";
+
+const PAGE_SIZE = 10;
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'new', label: 'New' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'lawyer_assigned', label: 'Lawyer Assigned' },
-  { value: 'in_consultation', label: 'In Consultation' },
-  { value: 'waiting_for_user', label: 'Waiting for User' },
-  { value: 'resolved', label: 'Resolved' },
-  { value: 'closed', label: 'Closed' },
-  { value: 'emergency', label: 'Emergency' },
+  { value: "all", label: "All Statuses" },
+  { value: "new", label: "New" },
+  { value: "under_review", label: "Under Review" },
+  { value: "lawyer_assigned", label: "Lawyer Assigned" },
+  { value: "in_consultation", label: "In Consultation" },
+  { value: "waiting_for_user", label: "Waiting for User" },
+  { value: "resolved", label: "Resolved" },
+  { value: "closed", label: "Closed" },
+  { value: "emergency", label: "Emergency" },
 ];
 
+interface CaseItem {
+  id: string;
+  caseCode: string;
+  title: string;
+  status: CaseStatus;
+  practiceArea: { id: string; name: string } | null;
+  assignedLawyer: { fullName: string } | null;
+  createdAt: string;
+}
+
+interface Pagination {
+  total: number;
+  totalPages: number;
+  next: number | null;
+  prev: number | null;
+}
+
+interface CasesResponse {
+  data: CaseItem[];
+  pagination: Pagination;
+}
+
+const buildQueryParams = (
+  page: number,
+  search: string,
+  statusFilter: string,
+) => {
+  const params: Record<string, string | number> = {
+    page,
+    limit: PAGE_SIZE,
+    orderBy: "createdAt",
+    order: "DESC",
+  };
+  if (search.trim()) params.search = search.trim();
+  if (statusFilter !== "all") params.status = statusFilter;
+  return params;
+};
+
+const SKELETON_WIDTHS = [
+  ["w-24", "w-44", "w-20", "w-20", "w-32", "w-16"],
+  ["w-20", "w-36", "w-24", "w-16", "w-28", "w-20"],
+  ["w-28", "w-48", "w-16", "w-24", "w-24", "w-14"],
+  ["w-22", "w-40", "w-28", "w-20", "w-36", "w-18"],
+  ["w-24", "w-32", "w-20", "w-16", "w-28", "w-20"],
+  ["w-20", "w-44", "w-24", "w-24", "w-32", "w-16"],
+  ["w-28", "w-36", "w-16", "w-20", "w-24", "w-14"],
+  ["w-24", "w-48", "w-28", "w-16", "w-36", "w-20"],
+  ["w-20", "w-40", "w-20", "w-24", "w-28", "w-18"],
+  ["w-28", "w-32", "w-24", "w-20", "w-32", "w-16"],
+];
+
+const TableSkeleton = () => (
+  <>
+    {SKELETON_WIDTHS.map((widths, i) => (
+      <tr key={i} className="border-b last:border-0">
+        <td className="px-4 py-3">
+          <Skeleton className={`h-4 ${widths[0]} rounded`} />
+        </td>
+        <td className="px-4 py-3">
+          <Skeleton className={`h-4 ${widths[1]} rounded`} />
+        </td>
+        <td className="px-4 py-3 hidden md:table-cell">
+          <Skeleton className={`h-4 ${widths[2]} rounded`} />
+        </td>
+        <td className="px-4 py-3">
+          <Skeleton className={`h-5 ${widths[3]} rounded-full`} />
+        </td>
+        <td className="px-4 py-3 hidden lg:table-cell">
+          <Skeleton className={`h-4 ${widths[4]} rounded`} />
+        </td>
+        <td className="px-4 py-3 hidden sm:table-cell">
+          <Skeleton className={`h-4 ${widths[5]} rounded`} />
+        </td>
+      </tr>
+    ))}
+  </>
+);
+
 const UserCases = () => {
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const debouncedSearch = useDebounce(search, 500);
 
-  const filtered = useMemo(() => {
-    return mockCases.filter(c => {
-      const matchSearch = c.title.toLowerCase().includes(search.toLowerCase()) ||
-        c.caseNumber.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = statusFilter === 'all' || c.status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [search, statusFilter]);
+  const { data, isLoading, isError } = useQuery<CasesResponse>({
+    queryKey: ["cases", page, debouncedSearch, statusFilter],
+    queryFn: async () => {
+      const params = buildQueryParams(page, debouncedSearch, statusFilter);
+      const response = await getCases(params);
+      return response.data;
+    },
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
 
-  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 10);
+  const cases = data?.data ?? [];
+  const pagination = data?.pagination;
+  const totalPages = pagination?.totalPages ?? 1;
+  const total = pagination?.total ?? 0;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    if (page !== 1) setPage(1);
+  };
 
   return (
     <DashboardLayout>
@@ -45,15 +150,22 @@ const UserCases = () => {
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search cases..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+            <Input
+              placeholder="Search cases..."
+              className="pl-9"
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_FILTERS.map(s => (
-                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+              {STATUS_FILTERS.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -63,33 +175,92 @@ const UserCases = () => {
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Case #</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Category</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Lawyer</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Date</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Case #
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Title
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">
+                  Category
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">
+                  Lawyer
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">
+                  Date
+                </th>
               </tr>
             </thead>
             <tbody>
-              {paginated.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No cases found.</td></tr>
-              ) : paginated.map((c) => (
-                <tr key={c.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 font-mono text-xs">{c.caseNumber}</td>
-                  <td className="px-4 py-3 font-medium max-w-[200px] truncate">
-                    <Link to={`/app/cases/${c.id}`} className="hover:text-gold hover:underline">{c.title}</Link>
+              {isLoading && <TableSkeleton />}
+              {isError && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-8 text-center text-destructive"
+                  >
+                    Failed to load cases.
                   </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{LEGAL_CATEGORIES[c.category]}</td>
-                  <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
-                  <td className="px-4 py-3 hidden lg:table-cell">{c.lawyerName || '—'}</td>
-                  <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground text-xs">{new Date(c.createdAt).toLocaleDateString('en-IN')}</td>
                 </tr>
-              ))}
+              )}
+              {!isLoading && !isError && cases.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-8 text-center text-muted-foreground"
+                  >
+                    No cases found.
+                  </td>
+                </tr>
+              )}
+              {!isLoading &&
+                !isError &&
+                cases.map((c) => (
+                  <tr
+                    key={c.id}
+                    className="border-b last:border-0 hover:bg-muted/30"
+                  >
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {c.caseCode}
+                    </td>
+                    <td className="px-4 py-3 font-medium max-w-[200px] truncate">
+                      <Link
+                        to={`/app/cases/${c.id}`}
+                        className="hover:text-gold hover:underline"
+                      >
+                        {c.title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
+                      {c.practiceArea?.name || "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={c.status} />
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      {c.assignedLawyer?.fullName || "—"}
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground text-xs">
+                      {new Date(c.createdAt).toLocaleDateString("en-IN")}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
-        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
+          onPrev={() => setPage((p) => Math.max(p - 1, 1))}
+          onPageChange={setPage}
+        />
       </div>
     </DashboardLayout>
   );

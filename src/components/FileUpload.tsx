@@ -10,25 +10,39 @@ interface UploadedFile {
 
 interface FileUploadProps {
   onFilesChange?: (files: File[]) => void;
+  onError?: (message: string) => void;
   maxFiles?: number;
   maxSizeMB?: number;
   accept?: string;
   label?: string;
 }
 
-export const FileUpload = ({ onFilesChange, maxFiles = 10, maxSizeMB = 10, accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx', label = 'Upload Documents' }: FileUploadProps) => {
+export const FileUpload = ({ onFilesChange, onError, maxFiles = 10, maxSizeMB = 10, accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx', label = 'Upload Documents' }: FileUploadProps) => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
-    const incoming = Array.from(newFiles).filter(f => {
-      if (f.size > maxSizeMB * 1024 * 1024) return false;
-      return true;
-    });
+
+    if (files.length >= maxFiles) {
+      onError?.(`Maximum ${maxFiles} files allowed`);
+      return;
+    }
+
+    const incoming = Array.from(newFiles);
+    const oversized = incoming.filter(f => f.size > maxSizeMB * 1024 * 1024);
+    if (oversized.length > 0) {
+      onError?.(`Each file must be less than ${maxSizeMB}MB`);
+    }
+
+    const valid = incoming.filter(f => f.size <= maxSizeMB * 1024 * 1024);
+    const remaining = maxFiles - files.length;
+    if (valid.length > remaining) {
+      onError?.(`Only ${remaining} more file(s) can be added`);
+    }
 
     const updated = [...files];
-    for (const file of incoming) {
+    for (const file of valid) {
       if (updated.length >= maxFiles) break;
       const id = Math.random().toString(36).slice(2);
       const preview = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;

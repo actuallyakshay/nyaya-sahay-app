@@ -41,6 +41,11 @@ export interface FormErrors {
   password?: string[];
 }
 
+export interface LoginErrors {
+  email?: string;
+  password?: string;
+}
+
 export const validateRegistrationForm = (fields: RegistrationFields): FormErrors => {
   const errors: FormErrors = {};
 
@@ -58,8 +63,26 @@ export const validateRegistrationForm = (fields: RegistrationFields): FormErrors
   return errors;
 };
 
-export const hasFormErrors = (errors: FormErrors): boolean => {
+export const hasFormErrors = (errors: FormErrors | LoginErrors): boolean => {
   return Object.keys(errors).length > 0;
+};
+
+export const validateEmail = (email: string): string | null => {
+  if (!email.trim()) return 'Email is required';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Enter a valid email';
+  return null;
+};
+
+export const validateLoginForm = (fields: { email: string; password: string }): LoginErrors => {
+  const errors: LoginErrors = {};
+
+  const emailError = validateEmail(fields.email);
+  if (emailError) errors.email = emailError;
+
+  if (!fields.password) errors.password = 'Password is required';
+  else if (fields.password.length < 8) errors.password = 'Password must be at least 8 characters';
+
+  return errors;
 };
 
 // --- API error helper ---

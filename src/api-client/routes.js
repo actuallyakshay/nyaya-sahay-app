@@ -19,6 +19,26 @@ const routes = {
     URL: "/api/auth/email",
     METHOD: "POST",
   },
+  CATEGORIES: {
+    URL: "/api/cases/categories",
+    METHOD: "GET",
+  },
+  CREATE_CASE: {
+    URL: "/api/cases",
+    METHOD: "POST",
+  },
+  UPLOAD_ASSET: {
+    URL: "/api/assets/upload",
+    METHOD: "POST",
+  },
+  GET_CASES: {
+    URL: "/api/cases",
+    METHOD: "GET",
+  },
+  CHECK_ROLE: {
+    URL: "/api/users/me",
+    METHOD: "GET",
+  },
 };
 
 export default routes;

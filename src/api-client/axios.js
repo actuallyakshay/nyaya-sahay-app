@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "@/config/env";
+import { getCookie, setCookie, removeCookie } from "@/lib/cookies";
 import routes from "./routes";
 
 // --- Axios instance ---
@@ -31,26 +32,56 @@ const enqueueFailedRequest = () => {
 
 // --- Helpers ---
 
+const getStoredRole = () => {
+  try {
+    const stored = getCookie("auth_user");
+    return stored ? JSON.parse(stored).role : null;
+  } catch {
+    return null;
+  }
+};
+
 const isRefreshRequest = (config) => {
   return config.url === routes.REFRESH_TOKEN.URL;
 };
 
 const redirectToLogin = () => {
-  localStorage.removeItem("auth_user");
+  removeCookie("auth_user");
+  removeCookie("access_token");
+  removeCookie("refresh_token");
   window.location.href = "/login";
 };
 
 const attemptTokenRefresh = async () => {
-  return apiClient({
+  const refreshToken = getCookie("refresh_token");
+  const response = await apiClient({
     method: routes.REFRESH_TOKEN.METHOD,
     url: routes.REFRESH_TOKEN.URL,
+    data: { refreshToken },
   });
+  if (response.data.accessToken) {
+    setCookie("access_token", response.data.accessToken);
+  }
+  if (response.data.refreshToken) {
+    setCookie("refresh_token", response.data.refreshToken);
+  }
+  return response;
 };
 
 // --- Request interceptor ---
 
 apiClient.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    const token = getCookie("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    const role = getStoredRole();
+    if (role) {
+      config.headers["x-active-role"] = role;
+    }
+    return config;
+  },
   (error) => Promise.reject(error),
 );
 
