@@ -131,7 +131,7 @@ const UserProfile = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl space-y-6">
+      <div className="w-full space-y-6">
         <h1 className="text-2xl font-bold">Profile & Settings</h1>
 
         <div className="space-y-5 rounded-xl border bg-card p-6">
@@ -242,7 +242,7 @@ const UserProfile = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Bar Council ID</Label>
-                  <Input defaultValue={lawyerData.barCouncilId} disabled />
+                  <Input defaultValue={lawyerData.barCouncilId} />
                 </div>
                 <div className="space-y-2">
                   <Label>Specializations</Label>
