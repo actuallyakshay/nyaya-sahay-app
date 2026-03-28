@@ -124,10 +124,11 @@ export const getSubscriptionPlans = () => {
   });
 };
 
-export const getLawyersList = () => {
+export const getLawyersList = (params) => {
   return apiClient({
     method: routes.LAWYERS_LIST.METHOD,
     url: routes.LAWYERS_LIST.URL,
+    params,
   });
 };
 

@@ -21,7 +21,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -42,7 +42,7 @@ const UserProfile = () => {
     queryKey: ['currentUser'],
     queryFn: async () => {
       const response = await getCurrentUser();
-      console.log('Current User API Response:', response.data);
+      setUser(response.data);
       return response.data;
     },
   });
@@ -50,9 +50,9 @@ const UserProfile = () => {
   // Set form values when data is loaded
   useEffect(() => {
     if (currentUser) {
-      setFullName((currentUser as any)?.fullName || '');
-      setPhone((currentUser as any)?.phone || '');
-      setAvatar((currentUser as any)?.avatarUrl || null);
+      setFullName(currentUser?.fullName || '');
+      setPhone(currentUser?.phone || '');
+      setAvatar(currentUser?.avatarUrl || null);
     }
   }, [currentUser]);
 
@@ -73,6 +73,9 @@ const UserProfile = () => {
         variant: 'destructive',
       });
     },
+    onSettled: () => {
+      setIsUploading(false);
+    },
   });
 
   const plan = mockPlans.find((p) => p.id === mockSubscription.planId);
@@ -83,10 +86,9 @@ const UserProfile = () => {
       try {
         setIsUploading(true);
         const response = await uploadAsset(file);
-        console.log('Upload Asset API Response:', response.data);
-        const avatarUrl = response.data.assetUrl; // Use assetUrl from response
+        const avatarUrl = response.data.assetUrl;
+        await updateProfileMutation.mutateAsync({ avatarUrl });
         setAvatar(avatarUrl);
-
         toast({
           title: 'Photo uploaded',
           description:
@@ -105,27 +107,19 @@ const UserProfile = () => {
   };
 
   const handleSaveChanges = () => {
-    const payload: any = {
-      fullName,
-    };
-
-    // Add optional fields only if they have values
-    if (phone) payload.phone = phone;
-    if (avatar) payload.avatarUrl = avatar;
-
-    updateProfileMutation.mutate(payload);
+    updateProfileMutation.mutate({ fullName, phone });
   };
 
   // Check if form has changes to enable/disable save button
   const hasChanges = () => {
-    const currentFullName = (currentUser as any)?.fullName || '';
-    const currentPhone = (currentUser as any)?.phone || '';
-    const currentAvatar = (currentUser as any)?.avatarUrl;
+    const currentFullName = currentUser?.fullName || '';
+    const currentPhone = currentUser?.phone || '';
+    const currentAvatar = currentUser?.avatarUrl;
 
     return (
       fullName !== currentFullName ||
       phone !== currentPhone ||
-      avatar !== currentAvatar // This will be true when user uploads new photo
+      avatar !== currentAvatar
     );
   };
 
@@ -170,16 +164,16 @@ const UserProfile = () => {
             <>
               <div className="flex items-center gap-4">
                 <div className="group relative">
-                  {avatar || (currentUser as any)?.avatarUrl ? (
+                  {avatar || currentUser?.avatarUrl ? (
                     <img
-                      src={avatar || (currentUser as any)?.avatarUrl}
+                      src={avatar || currentUser?.avatarUrl}
                       alt="Profile"
                       className="h-16 w-16 rounded-full object-cover"
                     />
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
-                      {(currentUser as any)?.fullName?.charAt(0) ||
-                        (user as any)?.fullName?.charAt(0)}
+                      {currentUser?.fullName?.charAt(0) ||
+                        user?.fullName?.charAt(0)}
                     </div>
                   )}
                   <button
@@ -200,10 +194,10 @@ const UserProfile = () => {
                 </div>
                 <div>
                   <p className="text-lg font-semibold">
-                    {(currentUser as any)?.fullName || (user as any)?.fullName}
+                    {currentUser?.fullName || user?.fullName}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {(currentUser as any)?.email || user?.email}
+                    {currentUser?.email || user?.email}
                   </p>
                 </div>
               </div>
@@ -219,10 +213,7 @@ const UserProfile = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input
-                    value={(currentUser as any)?.email || user?.email}
-                    disabled
-                  />
+                  <Input value={currentUser?.email || user?.email} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label>Phone</Label>

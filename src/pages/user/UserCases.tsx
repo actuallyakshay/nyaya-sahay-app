@@ -1,35 +1,35 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { DashboardLayout } from "@/layouts/DashboardLayout";
-import { StatusBadge } from "@/components/StatusBadge";
-import { PaginationControls } from "@/components/PaginationControls";
-import { Input } from "@/components/ui/input";
+import { getCases } from '@/api-client';
+import { PaginationControls } from '@/components/PaginationControls';
+import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Search } from "lucide-react";
-import { getCases } from "@/api-client";
-import { useDebounce } from "@/hooks/useDebounce";
-import type { CaseStatus } from "@/types";
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useDebounce } from '@/hooks/useDebounce';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
+import type { CaseStatus } from '@/types';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Search } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
-  { value: "all", label: "All Statuses" },
-  { value: "new", label: "New" },
-  { value: "under_review", label: "Under Review" },
-  { value: "lawyer_assigned", label: "Lawyer Assigned" },
-  { value: "in_consultation", label: "In Consultation" },
-  { value: "waiting_for_user", label: "Waiting for User" },
-  { value: "resolved", label: "Resolved" },
-  { value: "closed", label: "Closed" },
-  { value: "emergency", label: "Emergency" },
+  { value: 'all', label: 'All Statuses' },
+  { value: 'new', label: 'New' },
+  { value: 'under_review', label: 'Under Review' },
+  { value: 'lawyer_assigned', label: 'Lawyer Assigned' },
+  { value: 'in_consultation', label: 'In Consultation' },
+  { value: 'waiting_for_user', label: 'Waiting for User' },
+  { value: 'resolved', label: 'Resolved' },
+  { value: 'closed', label: 'Closed' },
+  { value: 'emergency', label: 'Emergency' },
 ];
 
 interface CaseItem {
@@ -57,30 +57,30 @@ interface CasesResponse {
 const buildQueryParams = (
   page: number,
   search: string,
-  statusFilter: string,
+  statusFilter: string
 ) => {
   const params: Record<string, string | number> = {
     page,
     limit: PAGE_SIZE,
-    orderBy: "createdAt",
-    order: "DESC",
+    orderBy: 'createdAt',
+    order: 'DESC',
   };
   if (search.trim()) params.search = search.trim();
-  if (statusFilter !== "all") params.status = statusFilter;
+  if (statusFilter !== 'all') params.status = statusFilter;
   return params;
 };
 
 const SKELETON_WIDTHS = [
-  ["w-24", "w-44", "w-20", "w-20", "w-32", "w-16"],
-  ["w-20", "w-36", "w-24", "w-16", "w-28", "w-20"],
-  ["w-28", "w-48", "w-16", "w-24", "w-24", "w-14"],
-  ["w-22", "w-40", "w-28", "w-20", "w-36", "w-18"],
-  ["w-24", "w-32", "w-20", "w-16", "w-28", "w-20"],
-  ["w-20", "w-44", "w-24", "w-24", "w-32", "w-16"],
-  ["w-28", "w-36", "w-16", "w-20", "w-24", "w-14"],
-  ["w-24", "w-48", "w-28", "w-16", "w-36", "w-20"],
-  ["w-20", "w-40", "w-20", "w-24", "w-28", "w-18"],
-  ["w-28", "w-32", "w-24", "w-20", "w-32", "w-16"],
+  ['w-24', 'w-44', 'w-20', 'w-20', 'w-32', 'w-16'],
+  ['w-20', 'w-36', 'w-24', 'w-16', 'w-28', 'w-20'],
+  ['w-28', 'w-48', 'w-16', 'w-24', 'w-24', 'w-14'],
+  ['w-22', 'w-40', 'w-28', 'w-20', 'w-36', 'w-18'],
+  ['w-24', 'w-32', 'w-20', 'w-16', 'w-28', 'w-20'],
+  ['w-20', 'w-44', 'w-24', 'w-24', 'w-32', 'w-16'],
+  ['w-28', 'w-36', 'w-16', 'w-20', 'w-24', 'w-14'],
+  ['w-24', 'w-48', 'w-28', 'w-16', 'w-36', 'w-20'],
+  ['w-20', 'w-40', 'w-20', 'w-24', 'w-28', 'w-18'],
+  ['w-28', 'w-32', 'w-24', 'w-20', 'w-32', 'w-16'],
 ];
 
 const TableSkeleton = () => (
@@ -93,16 +93,16 @@ const TableSkeleton = () => (
         <td className="px-4 py-3">
           <Skeleton className={`h-4 ${widths[1]} rounded`} />
         </td>
-        <td className="px-4 py-3 hidden md:table-cell">
+        <td className="hidden px-4 py-3 md:table-cell">
           <Skeleton className={`h-4 ${widths[2]} rounded`} />
         </td>
         <td className="px-4 py-3">
           <Skeleton className={`h-5 ${widths[3]} rounded-full`} />
         </td>
-        <td className="px-4 py-3 hidden lg:table-cell">
+        <td className="hidden px-4 py-3 lg:table-cell">
           <Skeleton className={`h-4 ${widths[4]} rounded`} />
         </td>
-        <td className="px-4 py-3 hidden sm:table-cell">
+        <td className="hidden px-4 py-3 sm:table-cell">
           <Skeleton className={`h-4 ${widths[5]} rounded`} />
         </td>
       </tr>
@@ -112,12 +112,12 @@ const TableSkeleton = () => (
 
 const UserCases = () => {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading, isError } = useQuery<CasesResponse>({
-    queryKey: ["cases", page, debouncedSearch, statusFilter],
+    queryKey: ['cases', page, debouncedSearch, statusFilter],
     queryFn: async () => {
       const params = buildQueryParams(page, debouncedSearch, statusFilter);
       const response = await getCases(params);
@@ -148,7 +148,7 @@ const UserCases = () => {
         <h1 className="text-2xl font-bold">My Cases</h1>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1 max-w-sm">
+          <div className="relative max-w-sm flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search cases..."
@@ -181,16 +181,19 @@ const UserCases = () => {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Title
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
                   Category
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Category
+                </th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">
                   Lawyer
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
                   Date
                 </th>
               </tr>
@@ -227,7 +230,7 @@ const UserCases = () => {
                     <td className="px-4 py-3 font-mono text-xs">
                       {c.caseCode}
                     </td>
-                    <td className="px-4 py-3 font-medium max-w-[200px] truncate">
+                    <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                       <Link
                         to={`/app/cases/${c.id}`}
                         className="hover:text-gold hover:underline"
@@ -235,17 +238,22 @@ const UserCases = () => {
                         {c.title}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
-                      {c.practiceArea?.name || "—"}
+                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
+                      {c.practiceArea?.name || '—'}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={c.status} />
                     </td>
-                    <td className="px-4 py-3 hidden lg:table-cell">
-                      {c.assignedLawyer?.fullName || "—"}
+                    <td className="px-4 py-3">
+                      <PracticeAreaBadge
+                        practiceArea={c.practiceArea?.name as string}
+                      />
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground text-xs">
-                      {new Date(c.createdAt).toLocaleDateString("en-IN")}
+                    <td className="hidden px-4 py-3 lg:table-cell">
+                      {c.assignedLawyer?.fullName || '—'}
+                    </td>
+                    <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
+                      {new Date(c.createdAt).toLocaleDateString('en-IN')}
                     </td>
                   </tr>
                 ))}

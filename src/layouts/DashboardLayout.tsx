@@ -138,9 +138,11 @@ export const DashboardLayout = ({
           {/* Profile section in sidebar */}
           {!collapsed && (
             <div className="mx-4 mb-4 flex items-center gap-3 rounded-lg bg-sidebar-accent px-3 py-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
-                {user?.fullName?.charAt(0)}
-              </div>
+              <img
+                src={user?.avatarUrl}
+                alt={user?.fullName}
+                className="h-9 w-9 rounded-full object-cover"
+              />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-gold">
                   {roleName} Panel
