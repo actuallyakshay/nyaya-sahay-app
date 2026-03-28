@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
+  ArrowRightLeft,
   Bell,
   Briefcase,
   ChevronLeft,
@@ -54,6 +55,11 @@ export const DashboardLayout = ({
 
   const nav = activeRole === 'lawyer' ? lawyerNav : userNav;
   const roleName = activeRole === 'lawyer' ? 'Advocate' : 'User';
+
+  // Check if user has multiple roles (both user and lawyer)
+  const hasMultipleRoles = user?.roles && Array.isArray(user.roles) && user.roles.length > 1;
+  const otherRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
+  const switchToText = activeRole === 'lawyer' ? 'Switch to User' : 'Switch to Lawyer';
 
   const handleLogout = async () => {
     await logout();
@@ -181,6 +187,36 @@ export const DashboardLayout = ({
                 </Link>
               );
             })}
+
+            {/* Role Switch - Only show if user has multiple roles */}
+            {hasMultipleRoles && (
+              <>
+                {!collapsed && (
+                  <div className="px-3 py-2">
+                    <p className="text-xs font-medium uppercase tracking-wide text-primary-foreground/40">
+                      Switch Profile
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    // TODO: Add role switching functionality
+                    console.log('Switch to:', otherRole);
+                  }}
+                  title={collapsed ? switchToText : undefined}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    collapsed && 'lg:justify-center lg:px-0 lg:py-2.5',
+                    'text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground'
+                  )}
+                >
+                  <ArrowRightLeft className="h-4 w-4 shrink-0" />
+                  <span className={cn(collapsed && 'lg:hidden')}>
+                    {switchToText}
+                  </span>
+                </button>
+              </>
+            )}
           </nav>
 
           {/* Collapse toggle — desktop only */}

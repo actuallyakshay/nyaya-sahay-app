@@ -348,15 +348,19 @@ const UserProfile = () => {
             Your data is encrypted and stored securely. All communications with
             your lawyer are confidential.
           </p>
-          <Button variant="outline" size="sm" onClick={() => setPasswordModalOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPasswordModalOpen(true)}
+          >
             Change Password
           </Button>
         </div>
       </div>
 
-      <PasswordResetModal 
-        open={passwordModalOpen} 
-        onOpenChange={setPasswordModalOpen} 
+      <PasswordResetModal
+        open={passwordModalOpen}
+        onOpenChange={setPasswordModalOpen}
       />
     </DashboardLayout>
   );
