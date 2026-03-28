@@ -19,6 +19,7 @@ const AdminSubscriptions = () => {
           <h1 className="text-2xl font-bold">Subscription Plans</h1>
           <p className="mt-1 text-muted-foreground">Manage and configure subscription plans.</p>
         </div>
+        <Button onClick={() => { setEditingPlan(null); setModalOpen(true); }}><Plus className="mr-2 h-4 w-4" />Add Plan</Button>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border bg-card p-5">
