@@ -1,11 +1,11 @@
-import axios from "axios";
-import { env } from "@/config/env";
-import { getCookie } from "@/lib/helpers";
-import { queryClient } from "@/lib/query-client";
-import routes from "./routes";
+import { env } from '@/config/env';
+import { getCookie } from '@/lib/helpers';
+import { queryClient } from '@/lib/query-client';
+import axios from 'axios';
+import routes from './routes';
 
-const ACCESS_TOKEN_COOKIE = "access-token";
-const REFRESH_TOKEN_COOKIE = "refresh-token";
+const ACCESS_TOKEN_COOKIE = 'access-token';
+const REFRESH_TOKEN_COOKIE = 'refresh-token';
 
 /** Paths where we do not attach Bearer (login/register/refresh). */
 const skipAccessTokenPaths = new Set([
@@ -19,7 +19,7 @@ const skipAccessTokenPaths = new Set([
 const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
   timeout: 15000,
-  headers: { "Content-Type": "application/json" },
+  headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
 
@@ -45,7 +45,7 @@ const enqueueFailedRequest = () => {
 
 const getStoredRole = () => {
   try {
-    const stored = getCookie("auth_user");
+    const stored = getCookie('auth_user');
     return stored ? JSON.parse(stored).role : null;
   } catch {
     return null;
@@ -58,22 +58,22 @@ const isRefreshRequest = (config) => {
 
 const redirectToLogin = () => {
   queryClient.clear();
-  localStorage.removeItem("auth_user");
-  window.location.href = "/login";
+  localStorage.removeItem('auth_user');
+  window.location.href = '/login';
 };
 
 const attemptTokenRefresh = async () => {
-  const refreshToken = getCookie("refresh_token");
+  const refreshToken = getCookie('refresh-token');
   const response = await apiClient({
     method: routes.REFRESH_TOKEN.METHOD,
     url: routes.REFRESH_TOKEN.URL,
     data: { refreshToken },
   });
   if (response.data.accessToken) {
-    setCookie("access_token", response.data.accessToken);
+    setCookie('access-token', response.data.accessToken);
   }
   if (response.data.refreshToken) {
-    setCookie("refresh_token", response.data.refreshToken);
+    setCookie('refresh-token', response.data.refreshToken);
   }
   return response;
 };
@@ -82,12 +82,12 @@ const attemptTokenRefresh = async () => {
 
 apiClient.interceptors.request.use(
   (config) => {
-    const url = config.url ?? "";
+    const url = config.url ?? '';
 
     if (url === routes.REFRESH_TOKEN.URL) {
       const refreshToken = getCookie(REFRESH_TOKEN_COOKIE);
       if (refreshToken) {
-        config.headers.set("X-Refresh-Token", refreshToken);
+        config.headers.set('X-Refresh-Token', refreshToken);
       }
       return config;
     }
@@ -98,12 +98,12 @@ apiClient.interceptors.request.use(
 
     const accessToken = getCookie(ACCESS_TOKEN_COOKIE);
     if (accessToken) {
-      config.headers.set("Authorization", `Bearer ${accessToken}`);
+      config.headers.set('Authorization', `Bearer ${accessToken}`);
     }
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 // --- Response interceptor ---
@@ -143,7 +143,7 @@ apiClient.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  },
+  }
 );
 
 export default apiClient;

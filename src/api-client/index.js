@@ -39,8 +39,6 @@ export const register = (body) => {
   });
 };
 
-
-
 export const getCurrentUser = () => {
   return apiClient({
     method: routes.USERS_ME.METHOD,
@@ -87,4 +85,56 @@ export const getUserRole = () => {
     method: routes.CHECK_ROLE.METHOD,
     url: routes.CHECK_ROLE.URL,
   });
-}
+};
+
+export const getUserAnalytics = () => {
+  return apiClient({
+    method: routes.USER_ANALYTICS.METHOD,
+    url: routes.USER_ANALYTICS.URL,
+  });
+};
+
+export const getCaseDetails = (params) => {
+  return apiClient({
+    method: routes.CASE_DETAILS.METHOD,
+    url: routes.CASE_DETAILS.URL,
+    params: params,
+  });
+};
+
+export const getLawyerAnalytics = () => {
+  return apiClient({
+    method: routes.LAWYER_ANALYTICS.METHOD,
+    url: routes.LAWYER_ANALYTICS.URL,
+  });
+};
+
+export const resetPassword = (body) => {
+  return apiClient({
+    method: routes.RESET_PASSWORD.METHOD,
+    url: routes.RESET_PASSWORD.URL,
+    data: body,
+  });
+};
+
+export const getSubscriptionPlans = () => {
+  return apiClient({
+    method: routes.SUBSCRIPTION_PLANS.METHOD,
+    url: routes.SUBSCRIPTION_PLANS.URL,
+  });
+};
+
+export const getLawyersList = () => {
+  return apiClient({
+    method: routes.LAWYERS_LIST.METHOD,
+    url: routes.LAWYERS_LIST.URL,
+  });
+};
+
+export const updateUserProfile = (data) => {
+  return apiClient({
+    method: routes.UPDATE_ME.METHOD,
+    url: routes.UPDATE_ME.URL,
+    data,
+  });
+};

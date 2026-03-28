@@ -23,25 +23,57 @@ const routes = {
     URL: '/api/users/me',
     METHOD: 'GET',
   },
+  UPDATE_ME: {
+    URL: '/api/users',
+    METHOD: 'PATCH',
+  },
   CATEGORIES: {
-    URL: "/api/cases/categories",
-    METHOD: "GET",
+    URL: '/api/cases/categories',
+    METHOD: 'GET',
   },
   CREATE_CASE: {
-    URL: "/api/cases",
-    METHOD: "POST",
+    URL: '/api/cases',
+    METHOD: 'POST',
   },
   UPLOAD_ASSET: {
-    URL: "/api/assets/upload",
-    METHOD: "POST",
+    URL: '/api/assets/upload',
+    METHOD: 'POST',
   },
   GET_CASES: {
-    URL: "/api/cases",
-    METHOD: "GET",
+    URL: '/api/cases',
+    METHOD: 'GET',
   },
   CHECK_ROLE: {
-    URL: "/api/users/me",
-    METHOD: "GET",
+    URL: '/api/users/me',
+    METHOD: 'GET',
+  },
+  USER_ANALYTICS: {
+    URL: '/api/users/analytics',
+    METHOD: 'GET',
+  },
+  USER_ANALYTICS: {
+    URL: '/api/users/analytics',
+    METHOD: 'GET',
+  },
+  CASE_DETAILS: {
+    URL: '/api/cases/',
+    METHOD: 'GET',
+  },
+  LAWYER_ANALYTICS: {
+    URL: '/api/lawyers/analytics',
+    METHOD: 'GET',
+  },
+  RESET_PASSWORD: {
+    URL: '/api/admin/reset-password',
+    METHOD: 'PATCH',
+  },
+  SUBSCRIPTION_PLANS: {
+    URL: '/api/subscriptions',
+    METHOD: 'GET',
+  },
+  LAWYERS_LIST: {
+    URL: '/api/lawyers',
+    METHOD: 'GET',
   },
 };
 

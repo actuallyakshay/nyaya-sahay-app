@@ -1,89 +1,245 @@
-import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { useAuth } from '@/contexts/AuthContext';
+import { getCurrentUser, updateUserProfile, uploadAsset } from '@/api-client';
+import PasswordResetModal from '@/components/PasswordResetModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield, Camera } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { mockLawyers, mockSubscription, mockPlans } from '@/lib/mock-data';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { getCookie } from '@/lib/helpers';
+import { mockLawyers, mockPlans, mockSubscription } from '@/lib/mock-data';
 import { LEGAL_CATEGORIES, LegalCategory } from '@/types';
-import { CheckCircle2, CreditCard, Calendar } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Calendar,
+  Camera,
+  CheckCircle2,
+  CreditCard,
+  Shield,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const UserProfile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
-  const isLawyer = user?.role === 'lawyer';
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+
+  const isLawyer = getCookie('x-active-role') === 'lawyer';
   const lawyerData = isLawyer ? mockLawyers[0] : null;
-  const [specializations, setSpecializations] = useState<LegalCategory[]>(lawyerData?.specializations || []);
+  const [specializations, setSpecializations] = useState<LegalCategory[]>(
+    lawyerData?.specializations || []
+  );
 
-  const plan = mockPlans.find(p => p.id === mockSubscription.planId);
+  // Fetch current user data
+  const { data: currentUser, isLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await getCurrentUser();
+      console.log('Current User API Response:', response.data);
+      return response.data;
+    },
+  });
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Set form values when data is loaded
+  useEffect(() => {
+    if (currentUser) {
+      setFullName((currentUser as any)?.fullName || '');
+      setPhone((currentUser as any)?.phone || '');
+      setAvatar((currentUser as any)?.avatarUrl || null);
+    }
+  }, [currentUser]);
+
+  // Update user profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
+      toast({
+        title: 'Profile updated',
+        description: 'Your profile has been updated successfully.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Update failed',
+        description: 'Failed to update profile. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const plan = mockPlans.find((p) => p.id === mockSubscription.planId);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setAvatar(url);
-      toast({ title: 'Photo updated', description: 'Profile photo has been changed.' });
+      try {
+        setIsUploading(true);
+        const response = await uploadAsset(file);
+        console.log('Upload Asset API Response:', response.data);
+        const avatarUrl = response.data.assetUrl; // Use assetUrl from response
+        setAvatar(avatarUrl);
+
+        toast({
+          title: 'Photo uploaded',
+          description:
+            'Profile photo has been uploaded. Click Save Changes to update your profile.',
+        });
+      } catch (error) {
+        toast({
+          title: 'Upload failed',
+          description: 'Failed to upload photo. Please try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
+  const handleSaveChanges = () => {
+    const payload: any = {
+      fullName,
+    };
+
+    // Add optional fields only if they have values
+    if (phone) payload.phone = phone;
+    if (avatar) payload.avatarUrl = avatar;
+
+    updateProfileMutation.mutate(payload);
+  };
+
+  // Check if form has changes to enable/disable save button
+  const hasChanges = () => {
+    const currentFullName = (currentUser as any)?.fullName || '';
+    const currentPhone = (currentUser as any)?.phone || '';
+    const currentAvatar = (currentUser as any)?.avatarUrl;
+
+    return (
+      fullName !== currentFullName ||
+      phone !== currentPhone ||
+      avatar !== currentAvatar // This will be true when user uploads new photo
+    );
+  };
+
   const toggleSpecialization = (cat: LegalCategory) => {
-    setSpecializations(prev =>
-      prev.includes(cat) ? prev.filter(s => s !== cat) : [...prev, cat]
+    setSpecializations((prev) =>
+      prev.includes(cat) ? prev.filter((s) => s !== cat) : [...prev, cat]
     );
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 max-w-2xl">
+      <div className="max-w-2xl space-y-6">
         <h1 className="text-2xl font-bold">Profile & Settings</h1>
 
-        <div className="rounded-xl border bg-card p-6 space-y-5">
-          <div className="flex items-center gap-4">
-            <div className="relative group">
-              {avatar ? (
-                <img src={avatar} alt="Profile" className="h-16 w-16 rounded-full object-cover" />
-              ) : (
-                <div className="h-16 w-16 rounded-full bg-navy flex items-center justify-center text-xl font-bold text-primary-foreground">
-                  {user?.name?.charAt(0)}
+        <div className="space-y-5 rounded-xl border bg-card p-6">
+          {isLoading ? (
+            <div className="space-y-5">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <div>
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="mt-1 h-4 w-48" />
                 </div>
-              )}
-              <button
-                onClick={() => fileRef.current?.click()}
-                className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Camera className="h-5 w-5 text-white" />
-              </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-32" />
             </div>
-            <div>
-              <p className="font-semibold text-lg">{user?.name}</p>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-4">
+                <div className="group relative">
+                  {avatar || (currentUser as any)?.avatarUrl ? (
+                    <img
+                      src={avatar || (currentUser as any)?.avatarUrl}
+                      alt="Profile"
+                      className="h-16 w-16 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
+                      {(currentUser as any)?.fullName?.charAt(0) ||
+                        (user as any)?.fullName?.charAt(0)}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={isUploading}
+                    className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 transition-opacity disabled:cursor-not-allowed group-hover:opacity-100"
+                  >
+                    <Camera className="h-5 w-5 text-white" />
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                    disabled={isUploading}
+                  />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold">
+                    {(currentUser as any)?.fullName || (user as any)?.fullName}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {(currentUser as any)?.email || user?.email}
+                  </p>
+                </div>
+              </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Full Name</Label>
-              <Input defaultValue={user?.name} />
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input defaultValue={user?.email} disabled />
-            </div>
-            <div className="space-y-2">
-              <Label>Phone</Label>
-              <Input defaultValue="+91 98765 43210" />
-            </div>
-          </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Full Name</Label>
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    value={(currentUser as any)?.email || user?.email}
+                    disabled
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone</Label>
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Lawyer-specific fields */}
           {isLawyer && lawyerData && (
-            <div className="border-t pt-5 mt-3">
-              <h3 className="font-semibold mb-4">Professional Details</h3>
+            <div className="mt-3 border-t pt-5">
+              <h3 className="mb-4 font-semibold">Professional Details</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Degree / Qualification</Label>
@@ -100,7 +256,12 @@ const UserProfile = () => {
                 <div className="space-y-2">
                   <Label>Specializations</Label>
                   <div className="flex flex-wrap gap-1.5 rounded-lg border p-2.5">
-                    {(Object.entries(LEGAL_CATEGORIES) as [LegalCategory, string][]).map(([key, label]) => (
+                    {(
+                      Object.entries(LEGAL_CATEGORIES) as [
+                        LegalCategory,
+                        string,
+                      ][]
+                    ).map(([key, label]) => (
                       <button
                         key={key}
                         type="button"
@@ -124,34 +285,52 @@ const UserProfile = () => {
             </div>
           )}
 
-          <Button>Save Changes</Button>
+          {!isLoading && (
+            <Button
+              onClick={handleSaveChanges}
+              disabled={
+                updateProfileMutation.isPending || isUploading || !hasChanges()
+              }
+            >
+              {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+            </Button>
+          )}
         </div>
 
         {/* My Plan — for users */}
         {!isLawyer && plan && (
-          <div className="rounded-xl border bg-card p-6 space-y-3">
+          <div className="space-y-3 rounded-xl border bg-card p-6">
             <div className="flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-gold" />
               <h3 className="font-semibold">My Plan</h3>
             </div>
-            <div className="flex items-start justify-between flex-wrap gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-bold text-lg">{plan.name} Plan</p>
-                <p className="text-sm text-muted-foreground">₹{plan.price.toLocaleString('en-IN')}/{plan.period}</p>
+                <p className="text-lg font-bold">{plan.name} Plan</p>
+                <p className="text-sm text-muted-foreground">
+                  ₹{plan.price.toLocaleString('en-IN')}/{plan.period}
+                </p>
               </div>
               <div className="text-right text-sm">
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <Calendar className="h-3.5 w-3.5" />
-                  Valid until {new Date(mockSubscription.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  Valid until{' '}
+                  {new Date(mockSubscription.endDate).toLocaleDateString(
+                    'en-IN',
+                    { day: 'numeric', month: 'long', year: 'numeric' }
+                  )}
                 </div>
-                <div className="flex items-center gap-1 mt-0.5 text-green-600 text-xs">
+                <div className="mt-0.5 flex items-center gap-1 text-xs text-green-600">
                   <CheckCircle2 className="h-3 w-3" /> Active
                 </div>
               </div>
             </div>
             <ul className="grid gap-1 sm:grid-cols-2">
-              {plan.features.map(f => (
-                <li key={f} className="flex items-start gap-2 text-sm"><CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-600 mt-0.5" />{f}</li>
+              {plan.features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-600" />
+                  {f}
+                </li>
               ))}
             </ul>
             <Button variant="outline" size="sm" asChild>
@@ -160,15 +339,25 @@ const UserProfile = () => {
           </div>
         )}
 
-        <div className="rounded-xl border bg-card p-6 space-y-3">
+        <div className="space-y-3 rounded-xl border bg-card p-6">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-gold" />
             <h3 className="font-semibold">Security</h3>
           </div>
-          <p className="text-sm text-muted-foreground">Your data is encrypted and stored securely. All communications with your lawyer are confidential.</p>
-          <Button variant="outline" size="sm">Change Password</Button>
+          <p className="text-sm text-muted-foreground">
+            Your data is encrypted and stored securely. All communications with
+            your lawyer are confidential.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => setPasswordModalOpen(true)}>
+            Change Password
+          </Button>
         </div>
       </div>
+
+      <PasswordResetModal 
+        open={passwordModalOpen} 
+        onOpenChange={setPasswordModalOpen} 
+      />
     </DashboardLayout>
   );
 };
