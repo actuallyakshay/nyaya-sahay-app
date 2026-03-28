@@ -2,14 +2,15 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockLawyers } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus, CheckCircle, XCircle } from 'lucide-react';
+import { Search, UserPlus, CheckCircle, XCircle, Edit } from 'lucide-react';
 import { useState } from 'react';
-import { LEGAL_CATEGORIES } from '@/types';
+import { LEGAL_CATEGORIES, type Lawyer } from '@/types';
 import { Link } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
+import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
 
 const AdminLawyers = () => {
   const [search, setSearch] = useState('');
