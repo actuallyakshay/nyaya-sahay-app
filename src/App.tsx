@@ -1,4 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/query-client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "@/components/ui/toaster";
@@ -42,8 +43,6 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
 
 console.log("[App] Origin:", window.location.origin);
 console.log("[App] Full URL:", window.location.href);

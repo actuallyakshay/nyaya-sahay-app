@@ -1,45 +1,64 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Scale, Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
+import { login } from '@/api-client';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { getCookie, setCookie } from '@/lib/helpers';
+import { Eye, EyeOff, Scale } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  const [role, setRole] = useState<"user" | "lawyer">("user");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<'user' | 'lawyer'>('user');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const activeRole = getCookie('x-active-role');
+  const authUser = getCookie('auth-user');
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (authUser) {
+      navigate(
+        activeRole === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard'
+      );
+    }
+  }, [user, navigate, activeRole, authUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password, role);
-      toast({ title: "Welcome back!", description: `Logged in as ${role}.` });
-      navigate(role === "lawyer" ? "/lawyer/dashboard" : "/app/dashboard");
+      setLoading(true);
+      const { data } = await login({ email, password, role });
+      setCookie('x-active-role', role as string);
+      setCookie('access-token', data.accessToken);
+      setCookie('refresh-token', data.refreshToken);
+      toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
+      navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
     } catch {
       toast({
-        title: "Login failed",
-        description: "Please check your credentials.",
-        variant: "destructive",
+        title: 'Login failed',
+        description: 'Please check your credentials.',
+        variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSuccess = () => {
-    navigate(role === "lawyer" ? "/lawyer/dashboard" : "/app/dashboard");
+    navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen">
       {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-navy flex-col justify-between p-10">
+      <div className="hidden flex-col justify-between bg-navy p-10 lg:flex lg:w-2/5">
         <Link to="/" className="flex items-center gap-2.5">
           <Scale className="h-6 w-6 text-gold" />
           <span className="font-serif text-xl font-bold text-primary-foreground">
@@ -52,7 +71,7 @@ const LoginPage = () => {
             <br />
             <span className="text-gold">protected.</span>
           </h2>
-          <p className="mt-4 text-sm text-primary-foreground/60 max-w-sm">
+          <p className="mt-4 max-w-sm text-sm text-primary-foreground/60">
             Access verified legal advocates, track your cases, and resolve
             disputes — all from one platform.
           </p>
@@ -63,9 +82,9 @@ const LoginPage = () => {
       </div>
 
       {/* Login form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+      <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="mb-8 lg:hidden flex items-center gap-2.5">
+          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
             <Scale className="h-6 w-6 text-gold" />
             <span className="font-serif text-xl font-bold">NyayaSetu</span>
           </div>
@@ -77,13 +96,13 @@ const LoginPage = () => {
 
           {/* Role toggle */}
           <div className="mt-6 flex rounded-lg border bg-muted p-1">
-            {(["user", "lawyer"] as const).map((r) => (
+            {(['user', 'lawyer'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRole(r)}
-                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                {r === "user" ? "User" : "Lawyer"}
+                {r === 'user' ? 'User' : 'Lawyer'}
               </button>
             ))}
           </div>
@@ -124,7 +143,7 @@ const LoginPage = () => {
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPw ? "text" : "password"}
+                  type={showPw ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -143,13 +162,13 @@ const LoginPage = () => {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link
               to="/register"
               state={{ role }}

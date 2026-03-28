@@ -1,6 +1,10 @@
-import { Navigate } from 'react-router-dom';
+import { getCurrentUser } from '@/api-client';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCookie, setCookie } from '@/lib/helpers';
 import type { UserRole } from '@/types';
+import { Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   children: React.ReactNode;
@@ -8,22 +12,51 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, setUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const activeRole = getCookie('x-active-role');
+  const accessToken = getCookie('access-token');
+  const refreshToken = getCookie('refresh-token');
+  const navigate = useNavigate();
+  const isAuthenticated = !!accessToken && !!refreshToken && !!activeRole;
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
+  const getUser = useCallback(async () => {
+    setIsLoading(true);
+    const { data } = await getCurrentUser();
+    setUser(data);
+    setCookie('auth-user', JSON.stringify(data));
+    setIsLoading(false);
+  }, [setUser]);
 
-  if (!allowedRoles.includes(user.role)) {
-    const redirectMap: Record<UserRole, string> = {
-      user: '/app/dashboard',
-      lawyer: '/lawyer/dashboard',
-      admin: '/admin/dashboard',
-    };
-    return <Navigate to={redirectMap[user.role]} replace />;
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
 
-  return <>{children}</>;
+    if (!user && accessToken && refreshToken && activeRole) {
+      void getUser();
+    }
+  }, [
+    isAuthenticated,
+    navigate,
+    getUser,
+    user,
+    accessToken,
+    refreshToken,
+    activeRole,
+  ]);
+
+  return (
+    <>
+      {isLoading ? (
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="size-10 animate-spin text-primary" />
+        </div>
+      ) : (
+        children
+      )}
+    </>
+  );
 };
 
 export default ProtectedRoute;

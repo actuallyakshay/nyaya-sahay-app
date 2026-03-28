@@ -162,3 +162,39 @@ export interface Payment {
   transactionId: string;
   createdAt: string;
 }
+
+export interface LawyersListUser {
+  id: string;
+  fullName: string;
+  avatarUrl: string | null;
+}
+
+export interface LawyerPracticeAreaRow {
+  practiceArea?: LegalCategory | string;
+}
+
+export interface LawyerListItem {
+  id: string;
+  userId: string;
+  degree: string | null;
+  barCouncilId: string | null;
+  careerStartDate: string | null;
+  bio: string | null;
+  gender: string | null;
+  createdAt: string;
+  updatedAt: string;
+  user: LawyersListUser;
+  lawyerPracticeAreas: LawyerPracticeAreaRow[];
+}
+
+export interface LawyersPagination {
+  total: number;
+  totalPages: number;
+  next: string | null;
+  prev: string | null;
+}
+
+export interface LawyersListResponse {
+  data: LawyerListItem[];
+  pagination: LawyersPagination;
+}
