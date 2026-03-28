@@ -5,10 +5,11 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { CaseTimeline } from '@/components/CaseTimeline';
 import { DocumentList } from '@/components/DocumentList';
 import { LEGAL_CATEGORIES } from '@/types';
-import { Send, User, Scale, Upload, Video, Phone, Calendar, ExternalLink } from 'lucide-react';
+import { Send, User, Scale, Upload, Video, Phone, Calendar, ExternalLink, StickyNote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -24,8 +25,12 @@ const CaseDetail = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [sessionType, setSessionType] = useState('video');
+  const [internalNote, setInternalNote] = useState('');
+  const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
+    { text: 'Ancestral property — multiple legal heirs involved', by: 'Adv. Priya Sharma', at: '2024-09-03T14:00:00' },
+    { text: 'Mutation pending since 2019, recommend civil suit', by: 'Platform Admin', at: '2024-09-04T10:00:00' },
+  ]);
 
-  // Mock meeting link (shows when consultation is booked)
   const [meetingLink] = useState('https://meet.google.com/abc-defg-hij');
   const hasMeeting = caseData?.status === 'in_consultation';
 
@@ -37,8 +42,15 @@ const CaseDetail = () => {
   };
 
   const handleBookSession = () => {
-    toast({ title: 'Session Booked', description: `Your ${sessionType} consultation request has been sent to the lawyer.` });
+    toast({ title: 'Session Booked', description: `Your ${sessionType} consultation request has been sent for admin approval.` });
     setBookingOpen(false);
+  };
+
+  const handleAddNote = () => {
+    if (!internalNote.trim()) return;
+    setInternalNotes(prev => [...prev, { text: internalNote.trim(), by: user?.name || 'Unknown', at: new Date().toISOString() }]);
+    setInternalNote('');
+    toast({ title: 'Note Added' });
   };
 
   if (!caseData) return (
@@ -51,12 +63,14 @@ const CaseDetail = () => {
 
   const isLawyer = user?.role === 'lawyer';
   const isUser = user?.role === 'user';
+  const isAdmin = user?.role === 'admin';
+  const canSeeNotes = isLawyer || isAdmin;
   const lawyerProfileLink = isUser && caseData.lawyerId ? `/app/lawyers/${caseData.lawyerId}` : undefined;
 
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        {/* Header — compact */}
+        {/* Header */}
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-muted-foreground">{caseData.caseNumber}</span>
@@ -69,35 +83,26 @@ const CaseDetail = () => {
           <p className="mt-0.5 text-sm text-muted-foreground leading-relaxed">{caseData.description}</p>
         </div>
 
-        {/* Action bar — compact */}
+        {/* Action bar */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Assigned lawyer — small chip */}
           {caseData.lawyerName && !isLawyer && (
             lawyerProfileLink ? (
               <Link to={lawyerProfileLink} className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 text-gold px-3 py-1 text-xs font-medium hover:bg-gold/20 transition-colors">
-                <Scale className="h-3 w-3" />
-                {caseData.lawyerName}
+                <Scale className="h-3 w-3" />{caseData.lawyerName}
               </Link>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 text-gold px-3 py-1 text-xs font-medium">
-                <Scale className="h-3 w-3" />
-                {caseData.lawyerName}
+                <Scale className="h-3 w-3" />{caseData.lawyerName}
               </span>
             )
           )}
-
-          {/* Client name — for lawyer view */}
           {isLawyer && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-              <User className="h-3 w-3" />
-              Client: {caseData.userName}
+              <User className="h-3 w-3" />Client: {caseData.userName}
             </span>
           )}
-
           <span className="text-xs text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</span>
-
           <div className="flex-1" />
-
           {caseData.lawyerName && (
             <Button variant="outline" size="sm" onClick={() => setBookingOpen(true)}>
               <Video className="mr-1.5 h-3.5 w-3.5" /> Book Session
@@ -120,7 +125,7 @@ const CaseDetail = () => {
         )}
 
         <div className="grid gap-4 lg:grid-cols-4">
-          {/* Chat — main focus, takes 3 cols */}
+          {/* Chat — main focus */}
           <div className="lg:col-span-3 rounded-xl border bg-card flex flex-col" style={{ height: '600px' }}>
             <div className="border-b p-3 shrink-0 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Case Communication</h3>
@@ -150,7 +155,7 @@ const CaseDetail = () => {
             </div>
           </div>
 
-          {/* Sidebar — compact, 1 col */}
+          {/* Sidebar */}
           <div className="space-y-4">
             {/* Documents */}
             <div className="rounded-xl border bg-card p-4">
@@ -161,13 +166,42 @@ const CaseDetail = () => {
               </Button>
             </div>
 
-            {/* Timeline — compact */}
+            {/* Timeline */}
             <div className="rounded-xl border bg-card p-4">
               <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Timeline</h3>
               <div className="max-h-[200px] overflow-y-auto">
                 <CaseTimeline events={caseData.timeline} />
               </div>
             </div>
+
+            {/* Internal Notes — only for lawyer & admin */}
+            {canSeeNotes && (
+              <div className="rounded-xl border bg-card p-4">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                  <StickyNote className="h-3 w-3" /> Internal Notes
+                </h3>
+                <div className="max-h-[180px] overflow-y-auto space-y-2 mb-2">
+                  {internalNotes.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No internal notes.</p>
+                  ) : internalNotes.map((n, i) => (
+                    <div key={i} className="rounded-lg bg-muted/50 p-2.5 text-xs">
+                      <p>{n.text}</p>
+                      <p className="mt-1 text-[10px] text-muted-foreground">{n.by} • {new Date(n.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-1.5">
+                  <Input
+                    placeholder="Add a note..."
+                    value={internalNote}
+                    onChange={e => setInternalNote(e.target.value)}
+                    className="text-xs h-8"
+                    onKeyDown={e => e.key === 'Enter' && handleAddNote()}
+                  />
+                  <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleAddNote}>Add</Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -177,7 +211,7 @@ const CaseDetail = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Book Consultation</DialogTitle>
-            <DialogDescription>Schedule a session with {caseData.lawyerName}. The lawyer will receive a notification.</DialogDescription>
+            <DialogDescription>Schedule a session with {caseData.lawyerName}. The request will be sent to admin for approval.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">

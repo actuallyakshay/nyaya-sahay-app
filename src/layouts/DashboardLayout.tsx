@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft, Users } from 'lucide-react';
+import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft, Users, ArrowRightLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { UserRole } from '@/types';
 
 const userNav = [
   { label: 'Dashboard', to: '/app/dashboard', icon: LayoutDashboard },
@@ -23,8 +24,20 @@ const lawyerNav = [
   { label: 'Profile', to: '/lawyer/profile', icon: User },
 ];
 
+const ROLE_LABELS: Record<UserRole, string> = {
+  user: 'User',
+  lawyer: 'Advocate',
+  admin: 'Admin',
+};
+
+const ROLE_DASHBOARDS: Record<UserRole, string> = {
+  user: '/app/dashboard',
+  lawyer: '/lawyer/dashboard',
+  admin: '/admin/dashboard',
+};
+
 export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, switchRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,10 +45,17 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
   const nav = user?.role === 'lawyer' ? lawyerNav : userNav;
   const roleName = user?.role === 'lawyer' ? 'Advocate' : 'User';
+  const availableRoles = user?.availableRoles || [user?.role || 'user'];
+  const hasMultipleRoles = availableRoles.length > 1;
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleSwitchRole = (role: UserRole) => {
+    switchRole(role);
+    navigate(ROLE_DASHBOARDS[role]);
   };
 
   return (
@@ -59,7 +79,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         <div className="fixed inset-0 z-50 bg-foreground/40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar — sticky + collapsible */}
+      {/* Sidebar */}
       <aside className={cn(
         'fixed inset-y-0 left-0 z-50 transform bg-navy transition-all duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full',
@@ -80,7 +100,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </button>
           </div>
 
-          {/* Profile section in sidebar */}
+          {/* Profile section */}
           {!collapsed && (
             <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5 flex items-center gap-3">
               <div className="h-9 w-9 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm shrink-0">
@@ -119,7 +139,34 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             })}
           </nav>
 
-          {/* Collapse toggle — desktop only */}
+          {/* Role switcher */}
+          {hasMultipleRoles && !collapsed && (
+            <div className="border-t border-sidebar-border px-3 py-2">
+              <p className="text-[10px] uppercase tracking-wider text-primary-foreground/40 mb-1.5 px-3">Switch Profile</p>
+              {availableRoles.filter(r => r !== user?.role).map(role => (
+                <button key={role} onClick={() => handleSwitchRole(role)}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground transition-colors"
+                >
+                  <ArrowRightLeft className="h-3.5 w-3.5" />
+                  Switch to {ROLE_LABELS[role]}
+                </button>
+              ))}
+            </div>
+          )}
+          {hasMultipleRoles && collapsed && (
+            <div className="border-t border-sidebar-border p-2">
+              {availableRoles.filter(r => r !== user?.role).map(role => (
+                <button key={role} onClick={() => handleSwitchRole(role)}
+                  title={`Switch to ${ROLE_LABELS[role]}`}
+                  className="flex w-full items-center justify-center rounded-lg py-2 text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground"
+                >
+                  <ArrowRightLeft className="h-4 w-4" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Collapse toggle */}
           <div className="hidden lg:block border-t border-sidebar-border p-2">
             <button onClick={() => setCollapsed(!collapsed)}
               className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground"

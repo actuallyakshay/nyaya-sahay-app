@@ -3,10 +3,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { X, Plus } from 'lucide-react';
 import type { SubscriptionPlan } from '@/types';
+
+const SUGGESTED_FEATURES = [
+  'Unlimited legal queries',
+  'Standard response time (48 hrs)',
+  'Priority response (24 hrs)',
+  'Document review (up to 5/month)',
+  'Unlimited document review',
+  'Email support',
+  'Phone consultation (2/month)',
+  'Unlimited phone & video calls',
+  'Case tracking dashboard',
+  'Dedicated case manager',
+  'Legal notice drafting',
+  'Emergency consultation (4 hrs)',
+  'On-site assistance (metro cities)',
+  'Court representation coordination',
+  'Priority case assignment',
+  'Dedicated senior advocate',
+];
 
 interface PlanFormModalProps {
   open: boolean;
@@ -19,7 +38,8 @@ export const PlanFormModal = ({ open, onClose, plan, onSave }: PlanFormModalProp
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
   const [period, setPeriod] = useState<'monthly' | 'yearly'>('yearly');
-  const [featuresRaw, setFeaturesRaw] = useState('');
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [customFeature, setCustomFeature] = useState('');
   const [isPopular, setIsPopular] = useState(false);
   const [badge, setBadge] = useState('');
 
@@ -28,16 +48,33 @@ export const PlanFormModal = ({ open, onClose, plan, onSave }: PlanFormModalProp
       setName(plan.name);
       setPrice(plan.price);
       setPeriod(plan.period);
-      setFeaturesRaw(plan.features.join(';'));
+      setSelectedFeatures([...plan.features]);
       setIsPopular(plan.isPopular || false);
       setBadge(plan.badge || '');
     } else {
       setName(''); setPrice(0); setPeriod('yearly');
-      setFeaturesRaw(''); setIsPopular(false); setBadge('');
+      setSelectedFeatures([]); setIsPopular(false); setBadge('');
     }
+    setCustomFeature('');
   }, [plan, open]);
 
-  const parsedFeatures = featuresRaw.split(';').map(f => f.trim()).filter(Boolean);
+  const toggleFeature = (feature: string) => {
+    setSelectedFeatures(prev =>
+      prev.includes(feature) ? prev.filter(f => f !== feature) : [...prev, feature]
+    );
+  };
+
+  const addCustomFeature = () => {
+    const trimmed = customFeature.trim();
+    if (trimmed && !selectedFeatures.includes(trimmed)) {
+      setSelectedFeatures(prev => [...prev, trimmed]);
+      setCustomFeature('');
+    }
+  };
+
+  const removeFeature = (feature: string) => {
+    setSelectedFeatures(prev => prev.filter(f => f !== feature));
+  };
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -45,20 +82,23 @@ export const PlanFormModal = ({ open, onClose, plan, onSave }: PlanFormModalProp
       name,
       price,
       period,
-      features: parsedFeatures,
+      features: selectedFeatures,
       isPopular,
       badge: badge || undefined,
-      featuresRaw,
+      featuresRaw: selectedFeatures.join(';'),
     });
     onClose();
   };
+
+  // Features not yet selected from suggestions
+  const availableSuggestions = SUGGESTED_FEATURES.filter(f => !selectedFeatures.includes(f));
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{plan ? 'Edit Plan' : 'Add Plan'}</DialogTitle>
-          <DialogDescription>Features are stored as semicolon-separated values.</DialogDescription>
+          <DialogDescription>Configure plan details and select features.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -91,24 +131,52 @@ export const PlanFormModal = ({ open, onClose, plan, onSave }: PlanFormModalProp
             <Label>Mark as Popular</Label>
             <Switch checked={isPopular} onCheckedChange={setIsPopular} />
           </div>
+
+          {/* Selected Features */}
           <div className="space-y-1.5">
-            <Label>Features (semicolon-separated)</Label>
-            <Textarea
-              rows={5}
-              value={featuresRaw}
-              onChange={e => setFeaturesRaw(e.target.value)}
-              placeholder="Feature 1;Feature 2;Feature 3"
-              className="font-mono text-sm"
-            />
-          </div>
-          {parsedFeatures.length > 0 && (
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Preview ({parsedFeatures.length} features)</Label>
-              <ul className="space-y-1 rounded-lg border bg-muted/30 p-3">
-                {parsedFeatures.map((f, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">• {f}</li>
+            <Label>Selected Features ({selectedFeatures.length})</Label>
+            {selectedFeatures.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {selectedFeatures.map((f, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2.5 py-1 text-xs font-medium">
+                    {f}
+                    <button onClick={() => removeFeature(f)} className="hover:text-destructive"><X className="h-3 w-3" /></button>
+                  </span>
                 ))}
-              </ul>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">No features selected yet. Pick from suggestions or add custom.</p>
+            )}
+          </div>
+
+          {/* Add custom feature */}
+          <div className="space-y-1.5">
+            <Label>Add Custom Feature</Label>
+            <div className="flex gap-2">
+              <Input
+                value={customFeature}
+                onChange={e => setCustomFeature(e.target.value)}
+                placeholder="Type a custom feature..."
+                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustomFeature())}
+              />
+              <Button type="button" size="sm" variant="outline" onClick={addCustomFeature} disabled={!customFeature.trim()}>
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Suggested Features */}
+          {availableSuggestions.length > 0 && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Suggested Features (click to add)</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {availableSuggestions.map((f, i) => (
+                  <button key={i} onClick={() => toggleFeature(f)}
+                    className="rounded-full border border-dashed px-2.5 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                    + {f}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>

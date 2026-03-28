@@ -3,7 +3,7 @@ import { mockCases, mockSubscription, mockNotifications } from '@/lib/mock-data'
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { Briefcase, CreditCard, Bell, AlertTriangle, ArrowRight, FileText, Clock } from 'lucide-react';
+import { Briefcase, CreditCard, Bell, ArrowRight, Plus, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LEGAL_CATEGORIES } from '@/types';
 
@@ -15,9 +15,19 @@ const UserDashboard = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">Welcome, {user?.name?.split(' ')[0]}</h1>
-          <p className="mt-1 text-muted-foreground">Here's an overview of your legal support account.</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">Welcome, {user?.name?.split(' ')[0]}</h1>
+            <p className="mt-1 text-muted-foreground">Here's an overview of your legal support account.</p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild size="lg" className="gap-2">
+              <Link to="/app/new-case"><Plus className="h-4 w-4" /> Raise New Query</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/app/cases">View All Cases</Link>
+            </Button>
+          </div>
         </div>
 
         {/* Stat cards */}
@@ -36,12 +46,6 @@ const UserDashboard = () => {
               <p className="mt-2 text-2xl font-bold">{s.value}</p>
             </div>
           ))}
-        </div>
-
-        {/* Quick actions */}
-        <div className="flex flex-wrap gap-3">
-          <Button asChild><Link to="/app/new-case"><FileText className="mr-2 h-4 w-4" /> Raise New Query</Link></Button>
-          <Button variant="outline" asChild><Link to="/app/cases">View All Cases</Link></Button>
         </div>
 
         {/* Active cases */}
