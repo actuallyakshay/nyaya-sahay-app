@@ -38,6 +38,8 @@ import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCaseRequests from "./pages/admin/AdminCaseRequests";
+import AdminSessionRequests from "./pages/admin/AdminSessionRequests";
 
 import NotFound from "./pages/NotFound";
 
