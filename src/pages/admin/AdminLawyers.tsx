@@ -2,18 +2,21 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockLawyers } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus, CheckCircle, XCircle } from 'lucide-react';
+import { Search, UserPlus, CheckCircle, XCircle, Edit } from 'lucide-react';
 import { useState } from 'react';
-import { LEGAL_CATEGORIES } from '@/types';
+import { LEGAL_CATEGORIES, type Lawyer } from '@/types';
 import { Link } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
+import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
 
 const AdminLawyers = () => {
   const [search, setSearch] = useState('');
   const { toast } = useToast();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingLawyer, setEditingLawyer] = useState<Lawyer | null>(null);
   const [lawyerStates, setLawyerStates] = useState<Record<string, boolean>>(
     Object.fromEntries(mockLawyers.map(l => [l.id, l.isAvailable]))
   );
@@ -39,7 +42,7 @@ const AdminLawyers = () => {
             <h1 className="text-2xl font-bold">Lawyer Management</h1>
             <p className="mt-1 text-muted-foreground">Verify, onboard, and manage lawyers.</p>
           </div>
-          <Button><UserPlus className="mr-2 h-4 w-4" />Add Lawyer</Button>
+          <Button onClick={() => { setEditingLawyer(null); setModalOpen(true); }}><UserPlus className="mr-2 h-4 w-4" />Add Lawyer</Button>
         </div>
 
         <div className="relative max-w-sm">
@@ -83,7 +86,8 @@ const AdminLawyers = () => {
                     <Switch checked={lawyerStates[l.id]} onCheckedChange={() => toggleLawyer(l.id)} />
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell">{l.rating}/5</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingLawyer(l); setModalOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
                     <Link to={`/admin/lawyers/${l.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
@@ -92,6 +96,14 @@ const AdminLawyers = () => {
           </table>
         </div>
         <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+        <LawyerFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          lawyer={editingLawyer}
+          onSave={(data) => {
+            toast({ title: editingLawyer ? 'Lawyer Updated' : 'Lawyer Added', description: `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.` });
+          }}
+        />
       </div>
     </AdminLayout>
   );

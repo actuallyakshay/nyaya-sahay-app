@@ -2,14 +2,20 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockAllUsers } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus } from 'lucide-react';
+import { Search, UserPlus, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
+import { UserFormModal } from '@/components/admin/UserFormModal';
+import { useToast } from '@/hooks/use-toast';
+import type { User } from '@/types';
 
 const AdminUsers = () => {
   const [search, setSearch] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const { toast } = useToast();
   const filtered = mockAllUsers.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
   );
@@ -23,7 +29,7 @@ const AdminUsers = () => {
             <h1 className="text-2xl font-bold">User Management</h1>
             <p className="mt-1 text-muted-foreground">Manage all registered users on the platform.</p>
           </div>
-          <Button><UserPlus className="mr-2 h-4 w-4" />Add User</Button>
+          <Button onClick={() => { setEditingUser(null); setModalOpen(true); }}><UserPlus className="mr-2 h-4 w-4" />Add User</Button>
         </div>
 
         <div className="relative max-w-sm">
@@ -57,7 +63,8 @@ const AdminUsers = () => {
                     </span>
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingUser(u); setModalOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
                     <Link to={`/admin/users/${u.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
@@ -66,6 +73,14 @@ const AdminUsers = () => {
           </table>
         </div>
         <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+        <UserFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          user={editingUser}
+          onSave={(data) => {
+            toast({ title: editingUser ? 'User Updated' : 'User Added', description: `${data.name} has been ${editingUser ? 'updated' : 'added'}.` });
+          }}
+        />
       </div>
     </AdminLayout>
   );

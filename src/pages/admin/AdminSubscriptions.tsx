@@ -1,11 +1,17 @@
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockPlans, adminStats } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Edit, Check } from 'lucide-react';
+import { Edit, Check, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { PlanFormModal } from '@/components/admin/PlanFormModal';
+import { useToast } from '@/hooks/use-toast';
+import type { SubscriptionPlan } from '@/types';
 
 const AdminSubscriptions = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
+  const { toast } = useToast();
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -13,6 +19,7 @@ const AdminSubscriptions = () => {
           <h1 className="text-2xl font-bold">Subscription Plans</h1>
           <p className="mt-1 text-muted-foreground">Manage and configure subscription plans.</p>
         </div>
+        <Button onClick={() => { setEditingPlan(null); setModalOpen(true); }}><Plus className="mr-2 h-4 w-4" />Add Plan</Button>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border bg-card p-5">
@@ -37,7 +44,7 @@ const AdminSubscriptions = () => {
                   <h3 className="text-lg font-semibold">{plan.name}</h3>
                   <p className="text-2xl font-bold text-gold mt-1">₹{plan.price.toLocaleString('en-IN')}<span className="text-sm font-normal text-muted-foreground">/{plan.period}</span></p>
                 </div>
-                <Button variant="outline" size="sm"><Edit className="mr-2 h-3.5 w-3.5" />Edit</Button>
+                <Button variant="outline" size="sm" onClick={() => { setEditingPlan(plan); setModalOpen(true); }}><Edit className="mr-2 h-3.5 w-3.5" />Edit</Button>
               </div>
               <ul className="mt-4 space-y-1.5">
                 {plan.features.map((f, i) => (
@@ -49,6 +56,14 @@ const AdminSubscriptions = () => {
             </div>
           ))}
         </div>
+        <PlanFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          plan={editingPlan}
+          onSave={(data) => {
+            toast({ title: editingPlan ? 'Plan Updated' : 'Plan Added', description: `${data.name} — features saved as: ${data.featuresRaw}` });
+          }}
+        />
       </div>
     </AdminLayout>
   );
