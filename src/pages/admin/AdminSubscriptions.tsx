@@ -56,6 +56,14 @@ const AdminSubscriptions = () => {
             </div>
           ))}
         </div>
+        <PlanFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          plan={editingPlan}
+          onSave={(data) => {
+            toast({ title: editingPlan ? 'Plan Updated' : 'Plan Added', description: `${data.name} — features saved as: ${data.featuresRaw}` });
+          }}
+        />
       </div>
     </AdminLayout>
   );

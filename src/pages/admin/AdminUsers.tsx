@@ -73,6 +73,14 @@ const AdminUsers = () => {
           </table>
         </div>
         <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+        <UserFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          user={editingUser}
+          onSave={(data) => {
+            toast({ title: editingUser ? 'User Updated' : 'User Added', description: `${data.name} has been ${editingUser ? 'updated' : 'added'}.` });
+          }}
+        />
       </div>
     </AdminLayout>
   );

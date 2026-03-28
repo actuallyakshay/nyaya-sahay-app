@@ -96,6 +96,14 @@ const AdminLawyers = () => {
           </table>
         </div>
         <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+        <LawyerFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          lawyer={editingLawyer}
+          onSave={(data) => {
+            toast({ title: editingLawyer ? 'Lawyer Updated' : 'Lawyer Added', description: `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.` });
+          }}
+        />
       </div>
     </AdminLayout>
   );
