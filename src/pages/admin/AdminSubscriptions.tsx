@@ -1,11 +1,17 @@
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockPlans, adminStats } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Edit, Check } from 'lucide-react';
+import { Edit, Check, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { PlanFormModal } from '@/components/admin/PlanFormModal';
+import { useToast } from '@/hooks/use-toast';
+import type { SubscriptionPlan } from '@/types';
 
 const AdminSubscriptions = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
+  const { toast } = useToast();
+
   return (
     <AdminLayout>
       <div className="space-y-6">
