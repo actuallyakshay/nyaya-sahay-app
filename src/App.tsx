@@ -1,60 +1,59 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { env } from "@/config/env";
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { env } from '@/config/env';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { queryClient } from '@/lib/query-client';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import Index from "./pages/Index";
-import PlansPage from "./pages/PlansPage";
-import AboutPage from "./pages/AboutPage";
-import HowItWorksPage from "./pages/HowItWorksPage";
-import FAQPage from "./pages/FAQPage";
-import ContactPage from "./pages/ContactPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import FAQPage from './pages/FAQPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import Index from './pages/Index';
+import LoginPage from './pages/LoginPage';
+import PlansPage from './pages/PlansPage';
+import RegisterPage from './pages/RegisterPage';
 
-import UserDashboard from "./pages/user/UserDashboard";
-import UserCases from "./pages/user/UserCases";
-import CaseDetail from "./pages/user/CaseDetail";
-import NewCase from "./pages/user/NewCase";
-import UserSubscription from "./pages/user/UserSubscription";
-import UserNotifications from "./pages/user/UserNotifications";
-import UserProfile from "./pages/user/UserProfile";
-import LawyersDirectory from "./pages/user/LawyersDirectory";
-import LawyerProfileView from "./pages/user/LawyerProfileView";
+import CaseDetail from './pages/user/CaseDetail';
+import LawyerProfileView from './pages/user/LawyerProfileView';
+import LawyersDirectory from './pages/user/LawyersDirectory';
+import NewCase from './pages/user/NewCase';
+import UserCases from './pages/user/UserCases';
+import UserDashboard from './pages/user/UserDashboard';
+import UserNotifications from './pages/user/UserNotifications';
+import UserProfile from './pages/user/UserProfile';
+import UserSubscription from './pages/user/UserSubscription';
 
-import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
-import LawyerCases from "./pages/lawyer/LawyerCases";
+import LawyerCases from './pages/lawyer/LawyerCases';
+import LawyerDashboard from './pages/lawyer/LawyerDashboard';
 
-import AdminLoginPage from "./pages/admin/AdminLoginPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminUserDetail from "./pages/admin/AdminUserDetail";
-import AdminLawyers from "./pages/admin/AdminLawyers";
-import AdminLawyerDetail from "./pages/admin/AdminLawyerDetail";
-import AdminCases from "./pages/admin/AdminCases";
-import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
-import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
-import AdminPayments from "./pages/admin/AdminPayments";
-import AdminSettings from "./pages/admin/AdminSettings";
+import AdminCaseDetail from './pages/admin/AdminCaseDetail';
+import AdminCases from './pages/admin/AdminCases';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLawyerDetail from './pages/admin/AdminLawyerDetail';
+import AdminLawyers from './pages/admin/AdminLawyers';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminPayments from './pages/admin/AdminPayments';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
+import AdminUserDetail from './pages/admin/AdminUserDetail';
+import AdminUsers from './pages/admin/AdminUsers';
 
-import NotFound from "./pages/NotFound";
+import NotFound from './pages/NotFound';
 
-const queryClient = new QueryClient();
-
-console.log("[App] Origin:", window.location.origin);
-console.log("[App] Full URL:", window.location.href);
-console.log("[App] Protocol:", window.location.protocol);
-console.log("[App] Hostname:", window.location.hostname);
-console.log("[App] Port:", window.location.port);
+console.log('[App] Origin:', window.location.origin);
+console.log('[App] Full URL:', window.location.href);
+console.log('[App] Protocol:', window.location.protocol);
+console.log('[App] Hostname:', window.location.hostname);
+console.log('[App] Port:', window.location.port);
 console.log(
-  "[App] VITE_GOOGLE_CLIENT_ID:",
-  import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  '[App] VITE_GOOGLE_CLIENT_ID:',
+  import.meta.env.VITE_GOOGLE_CLIENT_ID
 );
-console.log("[App] env.googleClientId:", env.googleClientId);
+console.log('[App] env.googleClientId:', env.googleClientId);
 
 const App = () => (
   <GoogleOAuthProvider clientId={env.googleClientId}>
@@ -78,7 +77,7 @@ const App = () => (
               <Route
                 path="/app/dashboard"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <UserDashboard />
                   </ProtectedRoute>
                 }
@@ -86,7 +85,7 @@ const App = () => (
               <Route
                 path="/app/cases"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <UserCases />
                   </ProtectedRoute>
                 }
@@ -94,7 +93,7 @@ const App = () => (
               <Route
                 path="/app/cases/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <CaseDetail />
                   </ProtectedRoute>
                 }
@@ -102,7 +101,7 @@ const App = () => (
               <Route
                 path="/app/new-case"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <NewCase />
                   </ProtectedRoute>
                 }
@@ -110,7 +109,7 @@ const App = () => (
               <Route
                 path="/app/subscription"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <UserSubscription />
                   </ProtectedRoute>
                 }
@@ -118,7 +117,7 @@ const App = () => (
               <Route
                 path="/app/notifications"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <UserNotifications />
                   </ProtectedRoute>
                 }
@@ -126,7 +125,7 @@ const App = () => (
               <Route
                 path="/app/profile"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <UserProfile />
                   </ProtectedRoute>
                 }
@@ -134,7 +133,7 @@ const App = () => (
               <Route
                 path="/app/lawyers"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <LawyersDirectory />
                   </ProtectedRoute>
                 }
@@ -142,7 +141,7 @@ const App = () => (
               <Route
                 path="/app/lawyers/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["user"]}>
+                  <ProtectedRoute allowedRoles={['user']}>
                     <LawyerProfileView />
                   </ProtectedRoute>
                 }
@@ -152,7 +151,7 @@ const App = () => (
               <Route
                 path="/lawyer/dashboard"
                 element={
-                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                  <ProtectedRoute allowedRoles={['lawyer']}>
                     <LawyerDashboard />
                   </ProtectedRoute>
                 }
@@ -160,7 +159,7 @@ const App = () => (
               <Route
                 path="/lawyer/cases"
                 element={
-                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                  <ProtectedRoute allowedRoles={['lawyer']}>
                     <LawyerCases />
                   </ProtectedRoute>
                 }
@@ -168,7 +167,7 @@ const App = () => (
               <Route
                 path="/lawyer/cases/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                  <ProtectedRoute allowedRoles={['lawyer']}>
                     <CaseDetail />
                   </ProtectedRoute>
                 }
@@ -176,7 +175,7 @@ const App = () => (
               <Route
                 path="/lawyer/notifications"
                 element={
-                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                  <ProtectedRoute allowedRoles={['lawyer']}>
                     <UserNotifications />
                   </ProtectedRoute>
                 }
@@ -184,7 +183,7 @@ const App = () => (
               <Route
                 path="/lawyer/profile"
                 element={
-                  <ProtectedRoute allowedRoles={["lawyer"]}>
+                  <ProtectedRoute allowedRoles={['lawyer']}>
                     <UserProfile />
                   </ProtectedRoute>
                 }
@@ -195,7 +194,7 @@ const App = () => (
               <Route
                 path="/admin/dashboard"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminDashboard />
                   </ProtectedRoute>
                 }
@@ -203,7 +202,7 @@ const App = () => (
               <Route
                 path="/admin/users"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminUsers />
                   </ProtectedRoute>
                 }
@@ -211,7 +210,7 @@ const App = () => (
               <Route
                 path="/admin/users/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminUserDetail />
                   </ProtectedRoute>
                 }
@@ -219,7 +218,7 @@ const App = () => (
               <Route
                 path="/admin/lawyers"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminLawyers />
                   </ProtectedRoute>
                 }
@@ -227,7 +226,7 @@ const App = () => (
               <Route
                 path="/admin/lawyers/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminLawyerDetail />
                   </ProtectedRoute>
                 }
@@ -235,7 +234,7 @@ const App = () => (
               <Route
                 path="/admin/cases"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminCases />
                   </ProtectedRoute>
                 }
@@ -243,7 +242,7 @@ const App = () => (
               <Route
                 path="/admin/cases/:id"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminCaseDetail />
                   </ProtectedRoute>
                 }
@@ -251,7 +250,7 @@ const App = () => (
               <Route
                 path="/admin/subscriptions"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminSubscriptions />
                   </ProtectedRoute>
                 }
@@ -259,7 +258,7 @@ const App = () => (
               <Route
                 path="/admin/payments"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminPayments />
                   </ProtectedRoute>
                 }
@@ -267,7 +266,7 @@ const App = () => (
               <Route
                 path="/admin/settings"
                 element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
+                  <ProtectedRoute allowedRoles={['admin']}>
                     <AdminSettings />
                   </ProtectedRoute>
                 }

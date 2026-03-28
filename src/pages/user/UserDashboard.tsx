@@ -1,28 +1,27 @@
-import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { StatusBadge } from '@/components/StatusBadge';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
 import {
   mockCases,
-  mockSubscription,
   mockNotifications,
-} from "@/lib/mock-data";
-import { StatusBadge } from "@/components/StatusBadge";
-import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+  mockSubscription,
+} from '@/lib/mock-data';
+import { LEGAL_CATEGORIES } from '@/types';
 import {
-  Briefcase,
-  CreditCard,
-  Bell,
-  AlertTriangle,
   ArrowRight,
-  FileText,
+  Bell,
+  Briefcase,
   Clock,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { LEGAL_CATEGORIES } from "@/types";
+  CreditCard,
+  FileText,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const UserDashboard = () => {
   const { user } = useAuth();
   const activeCases = mockCases.filter(
-    (c) => !["resolved", "closed"].includes(c.status),
+    (c) => !['resolved', 'closed'].includes(c.status)
   );
   const unreadNotifs = mockNotifications.filter((n) => !n.isRead);
 
@@ -31,7 +30,7 @@ const UserDashboard = () => {
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">
-            Welcome, {user?.name?.split(" ")[0]}
+            Welcome, {user?.fullName?.split(' ')[0]}
           </h1>
           <p className="mt-1 text-muted-foreground">
             Here's an overview of your legal support account.
@@ -42,34 +41,34 @@ const UserDashboard = () => {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
-              label: "Active Cases",
+              label: 'Active Cases',
               value: activeCases.length,
               icon: Briefcase,
-              color: "text-info",
+              color: 'text-info',
             },
             {
-              label: "Plan",
+              label: 'Plan',
               value: mockSubscription.planName,
               icon: CreditCard,
-              color: "text-gold",
+              color: 'text-gold',
             },
             {
-              label: "Unread Alerts",
+              label: 'Unread Alerts',
               value: unreadNotifs.length,
               icon: Bell,
-              color: "text-warning",
+              color: 'text-warning',
             },
             {
-              label: "Days Remaining",
+              label: 'Days Remaining',
               value: Math.max(
                 0,
                 Math.ceil(
                   (new Date(mockSubscription.endDate).getTime() - Date.now()) /
-                    86400000,
-                ),
+                    86400000
+                )
               ),
               icon: Clock,
-              color: "text-success",
+              color: 'text-success',
             },
           ].map((s) => (
             <div
@@ -116,18 +115,18 @@ const UserDashboard = () => {
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-mono text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">
                           {c.caseNumber}
                         </span>
                         <StatusBadge status={c.status} />
                       </div>
-                      <p className="mt-1 font-medium truncate">{c.title}</p>
+                      <p className="mt-1 truncate font-medium">{c.title}</p>
                       <p className="text-sm text-muted-foreground">
                         {LEGAL_CATEGORIES[c.category]}
                       </p>
                     </div>
-                    <ArrowRight className="hidden sm:block h-4 w-4 shrink-0 text-muted-foreground" />
+                    <ArrowRight className="hidden h-4 w-4 shrink-0 text-muted-foreground sm:block" />
                   </div>
                 </Link>
               ))}

@@ -1,7 +1,18 @@
 import axios from "axios";
 import { env } from "@/config/env";
-import { getCookie, setCookie, removeCookie } from "@/lib/cookies";
+import { getCookie } from "@/lib/helpers";
+import { queryClient } from "@/lib/query-client";
 import routes from "./routes";
+
+const ACCESS_TOKEN_COOKIE = "access-token";
+const REFRESH_TOKEN_COOKIE = "refresh-token";
+
+/** Paths where we do not attach Bearer (login/register/refresh). */
+const skipAccessTokenPaths = new Set([
+  routes.REFRESH_TOKEN.URL,
+  routes.GOOGLE_AUTH_LOGIN.URL,
+  routes.LOGIN.URL,
+]);
 
 // --- Axios instance ---
 
@@ -46,9 +57,8 @@ const isRefreshRequest = (config) => {
 };
 
 const redirectToLogin = () => {
-  removeCookie("auth_user");
-  removeCookie("access_token");
-  removeCookie("refresh_token");
+  queryClient.clear();
+  localStorage.removeItem("auth_user");
   window.location.href = "/login";
 };
 
@@ -72,14 +82,25 @@ const attemptTokenRefresh = async () => {
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getCookie("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const url = config.url ?? "";
+
+    if (url === routes.REFRESH_TOKEN.URL) {
+      const refreshToken = getCookie(REFRESH_TOKEN_COOKIE);
+      if (refreshToken) {
+        config.headers.set("X-Refresh-Token", refreshToken);
+      }
+      return config;
     }
-    const role = getStoredRole();
-    if (role) {
-      config.headers["x-active-role"] = role;
+
+    if (skipAccessTokenPaths.has(url)) {
+      return config;
     }
+
+    const accessToken = getCookie(ACCESS_TOKEN_COOKIE);
+    if (accessToken) {
+      config.headers.set("Authorization", `Bearer ${accessToken}`);
+    }
+
     return config;
   },
   (error) => Promise.reject(error),

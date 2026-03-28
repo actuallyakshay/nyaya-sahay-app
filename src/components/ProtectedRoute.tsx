@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import type { UserRole } from "@/types";
-import { getCookie } from "@/lib/cookies";
-import { useEffect } from "react";
+import { getCurrentUser } from '@/api-client';
+import { useAuth } from '@/contexts/AuthContext';
+import { getCookie, setCookie } from '@/lib/helpers';
+import { Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   children: React.ReactNode;
@@ -10,30 +11,51 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
-  const { user, isAuthenticated } = useAuth();
-  const activeRole = getCookie("x-active-role");
+  const { user, setUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const activeRole = getCookie('x-active-role');
+  const accessToken = getCookie('access-token');
+  const refreshToken = getCookie('refresh-token');
+  const navigate = useNavigate();
+  const isAuthenticated = !!accessToken && !!refreshToken && !!activeRole;
 
+  const getUser = useCallback(async () => {
+    setIsLoading(true);
+    const { data } = await getCurrentUser();
+    setUser(data);
+    setCookie('auth-user', JSON.stringify(data));
+    setIsLoading(false);
+  }, [setUser]);
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!user && accessToken && refreshToken && activeRole) {
+      void getUser();
+    }
+  }, [
+    isAuthenticated,
+    navigate,
+    getUser,
+    user,
+    accessToken,
+    refreshToken,
+    activeRole,
+  ]);
 
-  if (!allowedRoles.includes(activeRole)) {
-    const redirectMap: Record<UserRole, string> = {
-      user: "/app/dashboard",
-      lawyer: "/lawyer/dashboard",
-      admin: "/admin/dashboard",
-    };
-    return <Navigate to={redirectMap[user.role]} replace />;
-  }
-
-
-
-
-
-
-  return <>{children}</>;
+  return (
+    <>
+      {isLoading ? (
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="size-10 animate-spin text-primary" />
+        </div>
+      ) : (
+        children
+      )}
+    </>
+  );
 };
 
 export default ProtectedRoute;

@@ -1,104 +1,64 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { Scale, Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { login } from "@/api-client";
-import { setCookie } from "@/lib/cookies";
-import type { UserRole } from "@/types";
-import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
-import {
-  validateLoginForm,
-  hasFormErrors,
-  getApiErrorMessage,
-  type LoginErrors,
-} from "@/lib/utils";
+import { login } from '@/api-client';
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { getCookie, setCookie } from '@/lib/helpers';
+import { Eye, EyeOff, Scale } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  const [role, setRole] = useState<"user" | "lawyer">("user");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<'user' | 'lawyer'>('user');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [errors, setErrors] = useState<LoginErrors>({});
-  const { setAuthUser } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const activeRole = getCookie('x-active-role');
+  const authUser = getCookie('auth-user');
   const { toast } = useToast();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (payload: Record<string, string>) => login(payload),
-    onSuccess: (response: {
-      data: {
-        user: {
-          id: string;
-          fullName: string;
-          email: string;
-          validRoles: string[];
-          avatar?: string;
-        };
-        accessToken: string;
-        refreshToken: string;
-      };
-    }) => {
-      const { user: apiUser, accessToken, refreshToken } = response.data;
-      setAuthUser({
-        id: apiUser.id,
-        name: apiUser.fullName,
-        email: apiUser.email,
-        validRoles: apiUser.validRoles,
-        avatar: apiUser.avatar,
-      });
-      setCookie("access_token", accessToken);
-      setCookie("refresh_token", refreshToken);
-      setCookie("x-active-role", role);
-      toast({ title: "Welcome back!", description: `Logged in as ${role}.` });
-      navigate(role === "lawyer" ? "/lawyer/dashboard" : "/app/dashboard");
-    },
-    onError: (err: unknown) => {
-      toast({
-        title: "Login failed",
-        description: getApiErrorMessage(err, "Please check your credentials."),
-        variant: "destructive",
-      });
-    },
-  });
+  useEffect(() => {
+    if (authUser) {
+      navigate(
+        activeRole === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard'
+      );
+    }
+  }, [user, navigate, activeRole, authUser]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formErrors = validateLoginForm({ email, password });
-    setErrors(formErrors);
-    if (hasFormErrors(formErrors)) return;
-
-    const payload = {
-      email: email.trim(),
-      password,
-      role,
-    };
-    mutate(payload);
-  };
-
-  const clearFieldError = (field: keyof LoginErrors) => {
-    if (errors[field]) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
+    try {
+      setLoading(true);
+      const { data } = await login({ email, password, role });
+      setCookie('x-active-role', role as string);
+      setCookie('access-token', data.accessToken);
+      setCookie('refresh-token', data.refreshToken);
+      toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
+      navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
+    } catch {
+      toast({
+        title: 'Login failed',
+        description: 'Please check your credentials.',
+        variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSuccess = () => {
-    navigate(role === "lawyer" ? "/lawyer/dashboard" : "/app/dashboard");
+    navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen">
       {/* Left branding panel */}
-      <div className="hidden lg:flex lg:w-2/5 bg-navy flex-col justify-between p-10">
+      <div className="hidden flex-col justify-between bg-navy p-10 lg:flex lg:w-2/5">
         <Link to="/" className="flex items-center gap-2.5">
           <Scale className="h-6 w-6 text-gold" />
           <span className="font-serif text-xl font-bold text-primary-foreground">
@@ -111,7 +71,7 @@ const LoginPage = () => {
             <br />
             <span className="text-gold">protected.</span>
           </h2>
-          <p className="mt-4 text-sm text-primary-foreground/60 max-w-sm">
+          <p className="mt-4 max-w-sm text-sm text-primary-foreground/60">
             Access verified legal advocates, track your cases, and resolve
             disputes — all from one platform.
           </p>
@@ -122,9 +82,9 @@ const LoginPage = () => {
       </div>
 
       {/* Login form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+      <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="mb-8 lg:hidden flex items-center gap-2.5">
+          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
             <Scale className="h-6 w-6 text-gold" />
             <span className="font-serif text-xl font-bold">NyayaSetu</span>
           </div>
@@ -136,13 +96,13 @@ const LoginPage = () => {
 
           {/* Role toggle */}
           <div className="mt-6 flex rounded-lg border bg-muted p-1">
-            {(["user", "lawyer"] as const).map((r) => (
+            {(['user', 'lawyer'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRole(r)}
-                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                {r === "user" ? "User" : "Lawyer"}
+                {r === 'user' ? 'User' : 'Lawyer'}
               </button>
             ))}
           </div>
@@ -166,15 +126,9 @@ const LoginPage = () => {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  clearFieldError("email");
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email}</p>
-              )}
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -189,13 +143,10 @@ const LoginPage = () => {
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPw ? "text" : "password"}
+                  type={showPw ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    clearFieldError("password");
-                  }}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <button
@@ -210,17 +161,14 @@ const LoginPage = () => {
                   )}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-xs text-destructive">{errors.password}</p>
-              )}
             </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Signing in..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 
-          {/* <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Don't have an account?{' '}
             <Link
               to="/register"
               state={{ role }}
@@ -228,7 +176,7 @@ const LoginPage = () => {
             >
               Create one
             </Link>
-          </p> */}
+          </p>
           {/* <p className="mt-3 text-center text-xs text-muted-foreground">
             <Link to="/admin/login" className="hover:underline">
               Admin Login →

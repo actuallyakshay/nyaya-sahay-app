@@ -1,5 +1,5 @@
-import apiClient from "./axios";
-import routes from "./routes";
+import apiClient from './axios';
+import routes from './routes';
 
 export const googleAuthLogin = (body) => {
   return apiClient({
@@ -36,6 +36,15 @@ export const register = (body) => {
     method: routes.REGISTER.METHOD,
     url: routes.REGISTER.URL,
     data: body,
+  });
+};
+
+
+
+export const getCurrentUser = () => {
+  return apiClient({
+    method: routes.USERS_ME.METHOD,
+    url: routes.USERS_ME.URL,
   });
 };
 
