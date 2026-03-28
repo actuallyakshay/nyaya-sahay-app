@@ -2,14 +2,20 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockAllUsers } from '@/lib/mock-data';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus } from 'lucide-react';
+import { Search, UserPlus, Edit } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePagination } from '@/hooks/usePagination';
 import { PaginationControls } from '@/components/PaginationControls';
+import { UserFormModal } from '@/components/admin/UserFormModal';
+import { useToast } from '@/hooks/use-toast';
+import type { User } from '@/types';
 
 const AdminUsers = () => {
   const [search, setSearch] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const { toast } = useToast();
   const filtered = mockAllUsers.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
   );
