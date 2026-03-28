@@ -1,6 +1,6 @@
 import { getCases } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
-import { StatusBadge } from '@/components/StatusBadge';
+import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -244,10 +244,14 @@ const UserCases = () => {
                     <td className="px-4 py-3">
                       <StatusBadge status={c.status} />
                     </td>
+                    <td className="px-4 py-3">
+                      <PracticeAreaBadge
+                        practiceArea={c.practiceArea?.name as string}
+                      />
+                    </td>
                     <td className="hidden px-4 py-3 lg:table-cell">
                       {c.assignedLawyer?.fullName || '—'}
                     </td>
-                    <td className="px-4 py-3">{c.practiceArea?.name}</td>
                     <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                       {new Date(c.createdAt).toLocaleDateString('en-IN')}
                     </td>
