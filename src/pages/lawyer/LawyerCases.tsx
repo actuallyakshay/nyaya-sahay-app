@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { mockCases } from '@/lib/mock-data';
+import { CASE_STATUS_FILTERS, mockCases } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Link } from 'react-router-dom';
 import { LEGAL_CATEGORIES } from '@/types';
@@ -9,17 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
-
-const STATUS_FILTERS = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'new', label: 'New' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'in_consultation', label: 'In Consultation' },
-  { value: 'waiting_for_user', label: 'Waiting for User' },
-  { value: 'resolved', label: 'Resolved' },
-  { value: 'closed', label: 'Closed' },
-  { value: 'emergency', label: 'Emergency' },
-];
 
 const LawyerCases = () => {
   const [search, setSearch] = useState('');
@@ -54,7 +43,7 @@ const LawyerCases = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_FILTERS.map(s => (
+              {CASE_STATUS_FILTERS.map(s => (
                 <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
               ))}
             </SelectContent>

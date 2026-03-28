@@ -12,25 +12,12 @@ import {
 } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { CASE_STATUS_FILTERS, PAGE_SIZE } from '@/lib/mock-data';
 import type { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const PAGE_SIZE = 10;
-
-const STATUS_FILTERS: { value: string; label: string }[] = [
-  { value: 'all', label: 'All Statuses' },
-  { value: 'new', label: 'New' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'lawyer_assigned', label: 'Lawyer Assigned' },
-  { value: 'in_consultation', label: 'In Consultation' },
-  { value: 'waiting_for_user', label: 'Waiting for User' },
-  { value: 'resolved', label: 'Resolved' },
-  { value: 'closed', label: 'Closed' },
-  { value: 'emergency', label: 'Emergency' },
-];
 
 const buildQueryParams = (
   page: number,
@@ -100,7 +87,7 @@ const UserCases = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_FILTERS.map((s) => (
+              {CASE_STATUS_FILTERS.map((s) => (
                 <SelectItem key={s.value} value={s.value}>
                   {s.label}
                 </SelectItem>

@@ -1,5 +1,6 @@
 import type {
   Case,
+  ConsultationNotification,
   Lawyer,
   Notification,
   Payment,
@@ -408,4 +409,62 @@ export const mockAllUsers: User[] = [
     createdAt: '2024-11-01',
     isActive: true,
   },
+];
+
+// ─── Shared filter options & constants ───────────────────────────
+
+export const PAGE_SIZE = 10;
+export const MAX_FILES = 5;
+export const MAX_SIZE_MB = 10;
+
+export const CASE_STATUS_FILTERS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All Statuses' },
+  { value: 'new', label: 'New' },
+  { value: 'under_review', label: 'Under Review' },
+  { value: 'lawyer_assigned', label: 'Lawyer Assigned' },
+  { value: 'in_consultation', label: 'In Consultation' },
+  { value: 'waiting_for_user', label: 'Waiting for User' },
+  { value: 'resolved', label: 'Resolved' },
+  { value: 'closed', label: 'Closed' },
+  { value: 'emergency', label: 'Emergency' },
+];
+
+export const NOTIFICATION_FILTER_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'unread', label: 'Unread' },
+  { value: 'consultation', label: 'Consultation' },
+  { value: 'info', label: 'Info' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+];
+
+export const CATEGORY_SKELETON_WIDTHS = [
+  'w-3/4',
+  'w-full',
+  'w-2/3',
+  'w-5/6',
+  'w-4/5',
+  'w-full',
+  'w-3/5',
+  'w-11/12',
+];
+
+// ─── Mock notification data ──────────────────────────────────────
+
+export const mockLawyerNotifications: ConsultationNotification[] = [
+  { id: 'ln1', title: 'Consultation Request', message: 'Rajesh Kumar has requested a video consultation for case LSP-2024-001.', type: 'consultation', isRead: false, createdAt: '2024-09-06T10:00:00', link: '/lawyer/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-10', time: '14:00', userName: 'Rajesh Kumar', caseNumber: 'LSP-2024-001', status: 'pending' } },
+  { id: 'ln2', title: 'Consultation Accepted', message: 'You accepted the consultation with Rajesh Kumar. Google Meet link is ready.', type: 'success', isRead: true, createdAt: '2024-09-05T16:00:00', link: '/lawyer/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-08', time: '11:00', userName: 'Rajesh Kumar', caseNumber: 'LSP-2024-001', status: 'accepted', meetLink: 'https://meet.google.com/abc-defg-hij' } },
+  { id: 'ln3', title: 'New Case Assigned', message: 'You have been assigned to a new property dispute case.', type: 'info', isRead: false, createdAt: '2024-09-02T09:00:00', link: '/lawyer/cases/c1' },
+  { id: 'ln4', title: 'New Message', message: 'Rajesh Kumar sent a new message on case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-09-01T10:30:00', link: '/lawyer/cases/c1' },
+  { id: 'ln5', title: 'Document Uploaded', message: 'Client uploaded Sale Deed Copy for case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-08-30T09:00:00', link: '/lawyer/cases/c1' },
+  { id: 'ln6', title: 'Case Update', message: 'Case LSP-2024-001 status changed to In Consultation.', type: 'info', isRead: true, createdAt: '2024-08-28T14:00:00', link: '/lawyer/cases/c1' },
+];
+
+export const mockUserNotifications: ConsultationNotification[] = [
+  { id: 'un1', title: 'Consultation Accepted', message: 'Adv. Priya Sharma accepted your consultation request. Join via the link below.', type: 'success', isRead: false, createdAt: '2024-09-06T16:00:00', link: '/app/cases/c1', consultationDetails: { sessionType: 'Video Call', date: '2024-09-10', time: '14:00', userName: 'Adv. Priya Sharma', caseNumber: 'LSP-2024-001', status: 'accepted', meetLink: 'https://meet.google.com/abc-defg-hij' } },
+  { id: 'un2', title: 'Lawyer Assigned', message: 'Adv. Priya Sharma has been assigned to your property case.', type: 'success', isRead: false, createdAt: '2024-09-02T09:00:00', link: '/app/cases/c1' },
+  { id: 'un3', title: 'New Message', message: 'You have a new message from your lawyer regarding case LSP-2024-001.', type: 'info', isRead: true, createdAt: '2024-09-03T11:30:00', link: '/app/cases/c1' },
+  { id: 'un4', title: 'Subscription Active', message: 'Your Professional plan is now active until August 2025.', type: 'success', isRead: true, createdAt: '2024-08-15T10:00:00' },
+  { id: 'un5', title: 'Case Created', message: 'Your case LSP-2024-002 has been submitted for review.', type: 'info', isRead: true, createdAt: '2024-10-10T09:00:00', link: '/app/cases/c2' },
+  { id: 'un6', title: 'Reminder', message: 'Your subscription expires in 30 days.', type: 'warning', isRead: true, createdAt: '2024-07-15T10:00:00' },
 ];

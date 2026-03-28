@@ -8,27 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { CATEGORY_SKELETON_WIDTHS, MAX_FILES, MAX_SIZE_MB } from '@/lib/mock-data';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UploadedDoc } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const SKELETON_WIDTHS = [
-  'w-3/4',
-  'w-full',
-  'w-2/3',
-  'w-5/6',
-  'w-4/5',
-  'w-full',
-  'w-3/5',
-  'w-11/12',
-];
-
-const MAX_FILES = 5;
-
-const MAX_SIZE_MB = 10;
 
 const uploadFiles = async (files: File[]): Promise<UploadedDoc[]> => {
   const results = await Promise.all(
@@ -117,7 +103,7 @@ const NewCase = () => {
             <Label>Category</Label>
             {categoriesLoading && (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {SKELETON_WIDTHS.map((w, i) => (
+                {CATEGORY_SKELETON_WIDTHS.map((w, i) => (
                   <div
                     key={i}
                     className="rounded-lg border bg-card px-3 py-2.5"
