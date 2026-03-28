@@ -42,7 +42,7 @@ const AdminLawyers = () => {
             <h1 className="text-2xl font-bold">Lawyer Management</h1>
             <p className="mt-1 text-muted-foreground">Verify, onboard, and manage lawyers.</p>
           </div>
-          <Button><UserPlus className="mr-2 h-4 w-4" />Add Lawyer</Button>
+          <Button onClick={() => { setEditingLawyer(null); setModalOpen(true); }}><UserPlus className="mr-2 h-4 w-4" />Add Lawyer</Button>
         </div>
 
         <div className="relative max-w-sm">
