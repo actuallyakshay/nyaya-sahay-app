@@ -3,7 +3,7 @@ import { FileUpload } from '@/components/FileUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
+import WithShimmer from '@/components/WithShimmer';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
@@ -125,7 +125,7 @@ const NewCase = () => {
                     key={i}
                     className="rounded-lg border bg-card px-3 py-2.5"
                   >
-                    <Skeleton className={`h-4 ${w} rounded`} />
+                    <WithShimmer loading className={`h-4 ${w} rounded`} />
                   </div>
                 ))}
               </div>

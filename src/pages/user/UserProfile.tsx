@@ -3,7 +3,7 @@ import PasswordResetModal from '@/components/PasswordResetModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
+import WithShimmer from '@/components/WithShimmer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
@@ -135,97 +135,88 @@ const UserProfile = () => {
         <h1 className="text-2xl font-bold">Profile & Settings</h1>
 
         <div className="space-y-5 rounded-xl border bg-card p-6">
-          {isLoading ? (
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-16 w-16 rounded-full" />
-                <div>
-                  <Skeleton className="h-6 w-32" />
-                  <Skeleton className="mt-1 h-4 w-48" />
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-12" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-12" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              </div>
-              <Skeleton className="h-10 w-32" />
-            </div>
-          ) : (
             <>
               <div className="flex items-center gap-4">
-                <div className="group relative">
-                  {avatar || currentUser?.avatarUrl ? (
-                    <img
-                      src={avatar || currentUser?.avatarUrl}
-                      alt="Profile"
-                      className="h-16 w-16 rounded-full object-cover"
+                <WithShimmer loading={isLoading} className="h-16 w-16 rounded-full">
+                  <div className="group relative">
+                    {avatar || currentUser?.avatarUrl ? (
+                      <img
+                        src={avatar || currentUser?.avatarUrl}
+                        alt="Profile"
+                        className="h-16 w-16 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
+                        {currentUser?.fullName?.charAt(0) ||
+                          user?.fullName?.charAt(0)}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => fileRef.current?.click()}
+                      disabled={isUploading}
+                      className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 transition-opacity disabled:cursor-not-allowed group-hover:opacity-100"
+                    >
+                      <Camera className="h-5 w-5 text-white" />
+                    </button>
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                      disabled={isUploading}
                     />
-                  ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
-                      {currentUser?.fullName?.charAt(0) ||
-                        user?.fullName?.charAt(0)}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => fileRef.current?.click()}
-                    disabled={isUploading}
-                    className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 transition-opacity disabled:cursor-not-allowed group-hover:opacity-100"
-                  >
-                    <Camera className="h-5 w-5 text-white" />
-                  </button>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                    disabled={isUploading}
-                  />
-                </div>
+                  </div>
+                </WithShimmer>
                 <div>
-                  <p className="text-lg font-semibold">
-                    {currentUser?.fullName || user?.fullName}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {currentUser?.email || user?.email}
-                  </p>
+                  <WithShimmer loading={isLoading} className="h-6 w-32">
+                    <p className="text-lg font-semibold">
+                      {currentUser?.fullName || user?.fullName}
+                    </p>
+                  </WithShimmer>
+                  <WithShimmer loading={isLoading} className="mt-1 h-4 w-48">
+                    <p className="text-sm text-muted-foreground">
+                      {currentUser?.email || user?.email}
+                    </p>
+                  </WithShimmer>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Full Name</Label>
-                  <Input
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                  />
+                  <WithShimmer loading={isLoading} className="h-4 w-16">
+                    <Label>Full Name</Label>
+                  </WithShimmer>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
+                    />
+                  </WithShimmer>
                 </div>
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input value={currentUser?.email || user?.email} disabled />
+                  <WithShimmer loading={isLoading} className="h-4 w-12">
+                    <Label>Email</Label>
+                  </WithShimmer>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input value={currentUser?.email || user?.email} disabled />
+                  </WithShimmer>
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Enter your phone number"
-                  />
+                  <WithShimmer loading={isLoading} className="h-4 w-12">
+                    <Label>Phone</Label>
+                  </WithShimmer>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Enter your phone number"
+                    />
+                  </WithShimmer>
                 </div>
               </div>
             </>
-          )}
 
           {/* Lawyer-specific fields */}
           {isLawyer && lawyerData && (
@@ -277,14 +268,16 @@ const UserProfile = () => {
           )}
 
           {!isLoading && (
-            <Button
-              onClick={handleSaveChanges}
-              disabled={
-                updateProfileMutation.isPending || isUploading || !hasChanges()
-              }
-            >
-              {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <WithShimmer loading={isLoading} className="h-10 w-32">
+              <Button
+                onClick={handleSaveChanges}
+                disabled={
+                  updateProfileMutation.isPending || isUploading || !hasChanges()
+                }
+              >
+                {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </WithShimmer>
           )}
         </div>
 

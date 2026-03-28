@@ -1,6 +1,6 @@
 import { getLawyersList } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
-import { Skeleton } from '@/components/ui/skeleton';
+import WithShimmer from '@/components/WithShimmer';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
 import { Award, Briefcase, CheckCircle } from 'lucide-react';
@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const LawyersDirectory = () => {
   const [page, setPage] = useState(1);
-  const [limit] = useState(3);
+  const [limit] = useState(10);
   const [orderBy] = useState('createdAt');
   const [order] = useState('ASC');
 
@@ -71,22 +71,24 @@ const LawyersDirectory = () => {
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="rounded-xl border bg-card p-5">
                 <div className="flex items-start gap-3">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <div className="min-w-0 flex-1">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="mt-1 h-3 w-1/2" />
+                  <WithShimmer loading className="h-12 w-12 shrink-0 rounded-full" />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <WithShimmer loading className="h-5 w-3/4" />
+                    <WithShimmer loading className="h-4 w-1/2" />
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                  <Skeleton className="h-5 w-20 rounded-full" />
+                  <WithShimmer loading className="h-5 w-16 rounded-full" />
+                  <WithShimmer loading className="h-5 w-20 rounded-full" />
                 </div>
                 <div className="mt-3 flex items-center gap-4">
-                  <Skeleton className="h-3 w-16" />
-                  <Skeleton className="h-3 w-12" />
+                  <WithShimmer loading className="h-4 w-20" />
+                  <WithShimmer loading className="h-4 w-14" />
                 </div>
-                <Skeleton className="mt-2 h-8 w-full" />
-                <Skeleton className="mt-3 h-8 w-full" />
+                <div className="mt-2 space-y-1">
+                  <WithShimmer loading className="h-3 w-full" />
+                  <WithShimmer loading className="h-3 w-4/5" />
+                </div>
               </div>
             ))
           ) : error ? (
@@ -168,6 +170,8 @@ const LawyersDirectory = () => {
           <PaginationControls
             page={page}
             totalPages={totalPages}
+            total={lawyersData?.pagination?.total}
+            pageSize={limit}
             onNext={handleNextPage}
             onPrev={handlePrevPage}
           />

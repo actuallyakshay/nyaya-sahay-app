@@ -1,5 +1,6 @@
 import { getCases } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
+import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import type { CaseStatus } from '@/types';
@@ -69,46 +69,6 @@ const buildQueryParams = (
   if (statusFilter !== 'all') params.status = statusFilter;
   return params;
 };
-
-const SKELETON_WIDTHS = [
-  ['w-24', 'w-44', 'w-20', 'w-20', 'w-32', 'w-16'],
-  ['w-20', 'w-36', 'w-24', 'w-16', 'w-28', 'w-20'],
-  ['w-28', 'w-48', 'w-16', 'w-24', 'w-24', 'w-14'],
-  ['w-22', 'w-40', 'w-28', 'w-20', 'w-36', 'w-18'],
-  ['w-24', 'w-32', 'w-20', 'w-16', 'w-28', 'w-20'],
-  ['w-20', 'w-44', 'w-24', 'w-24', 'w-32', 'w-16'],
-  ['w-28', 'w-36', 'w-16', 'w-20', 'w-24', 'w-14'],
-  ['w-24', 'w-48', 'w-28', 'w-16', 'w-36', 'w-20'],
-  ['w-20', 'w-40', 'w-20', 'w-24', 'w-28', 'w-18'],
-  ['w-28', 'w-32', 'w-24', 'w-20', 'w-32', 'w-16'],
-];
-
-const TableSkeleton = () => (
-  <>
-    {SKELETON_WIDTHS.map((widths, i) => (
-      <tr key={i} className="border-b last:border-0">
-        <td className="px-4 py-3">
-          <Skeleton className={`h-4 ${widths[0]} rounded`} />
-        </td>
-        <td className="px-4 py-3">
-          <Skeleton className={`h-4 ${widths[1]} rounded`} />
-        </td>
-        <td className="hidden px-4 py-3 md:table-cell">
-          <Skeleton className={`h-4 ${widths[2]} rounded`} />
-        </td>
-        <td className="px-4 py-3">
-          <Skeleton className={`h-5 ${widths[3]} rounded-full`} />
-        </td>
-        <td className="hidden px-4 py-3 lg:table-cell">
-          <Skeleton className={`h-4 ${widths[4]} rounded`} />
-        </td>
-        <td className="hidden px-4 py-3 sm:table-cell">
-          <Skeleton className={`h-4 ${widths[5]} rounded`} />
-        </td>
-      </tr>
-    ))}
-  </>
-);
 
 const UserCases = () => {
   const [page, setPage] = useState(1);
@@ -199,7 +159,7 @@ const UserCases = () => {
               </tr>
             </thead>
             <tbody>
-              {isLoading && <TableSkeleton />}
+              {isLoading && <CasesTableSkeleton />}
               {isError && (
                 <tr>
                   <td

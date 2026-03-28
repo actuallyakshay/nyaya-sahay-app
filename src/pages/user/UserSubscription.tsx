@@ -1,6 +1,6 @@
 import { getSubscriptionPlans } from '@/api-client';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import WithShimmer from '@/components/WithShimmer';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { mockPlans, mockSubscription } from '@/lib/mock-data';
 import { useQuery } from '@tanstack/react-query';
@@ -71,16 +71,16 @@ const UserSubscription = () => {
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="rounded-xl border bg-card p-5">
-                  <Skeleton className="h-5 w-3/4" />
+                  <WithShimmer loading className="h-5 w-3/4" />
                   <div className="mt-1 flex items-baseline gap-1">
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-4 w-12" />
+                    <WithShimmer loading className="h-6 w-16" />
+                    <WithShimmer loading className="h-4 w-12" />
                   </div>
                   <div className="mt-2 space-y-1">
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-4/5" />
+                    <WithShimmer loading className="h-3 w-full" />
+                    <WithShimmer loading className="h-3 w-4/5" />
                   </div>
-                  <Skeleton className="mt-4 h-8 w-full" />
+                  <WithShimmer loading className="mt-4 h-8 w-full" />
                 </div>
               ))
             ) : error ? (

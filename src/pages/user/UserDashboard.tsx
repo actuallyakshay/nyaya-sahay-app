@@ -2,7 +2,7 @@ import { getUserAnalytics } from '@/api-client';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import WithShimmer from '@/components/WithShimmer';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
@@ -63,58 +63,51 @@ const UserDashboard = () => {
 
         {/* Stat cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl border bg-card p-5 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-20" />
-                    <Skeleton className="h-4 w-4" />
-                  </div>
-                  <Skeleton className="mt-2 h-8 w-16" />
-                </div>
-              ))
-            : [
-                {
-                  label: 'Total Cases',
-                  value: totalCases,
-                  icon: Briefcase,
-                  color: 'text-info',
-                },
-                {
-                  label: 'Active Cases',
-                  value: activeCasesCount,
-                  icon: FileText,
-                  color: 'text-success',
-                },
-                {
-                  label: 'Plan',
-                  value: analyticsData?.subscriptionPlan?.planName || 'Free',
-                  icon: CreditCard,
-                  color: 'text-gold',
-                },
-                {
-                  label: 'Emergency Cases',
-                  value: emergencyCases,
-                  icon: Bell,
-                  color: 'text-warning',
-                },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-xl border bg-card p-5 shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {s.label}
-                    </span>
-                    <s.icon className={`h-4 w-4 ${s.color}`} />
-                  </div>
-                  <p className="mt-2 text-2xl font-bold">{s.value}</p>
-                </div>
-              ))}
+          {[
+            {
+              label: 'Total Cases',
+              value: totalCases,
+              icon: Briefcase,
+              color: 'text-info',
+            },
+            {
+              label: 'Active Cases',
+              value: activeCasesCount,
+              icon: FileText,
+              color: 'text-success',
+            },
+            {
+              label: 'Plan',
+              value: analyticsData?.subscriptionPlan?.planName || 'Free',
+              icon: CreditCard,
+              color: 'text-gold',
+            },
+            {
+              label: 'Emergency Cases',
+              value: emergencyCases,
+              icon: Bell,
+              color: 'text-warning',
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className="rounded-xl border bg-card p-5 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <WithShimmer loading={isLoading} className="h-4 w-20">
+                  <span className="text-sm text-muted-foreground">
+                    {s.label}
+                  </span>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-4 w-4">
+                  <s.icon className={`h-4 w-4 ${s.color}`} />
+                </WithShimmer>
+              </div>
+              <WithShimmer loading={isLoading} className="mt-2 h-8 w-16">
+                <p className="mt-2 text-2xl font-bold">{s.value}</p>
+              </WithShimmer>
+            </div>
+          ))}
         </div>
 
         {/* Active cases */}

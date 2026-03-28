@@ -1,20 +1,20 @@
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Props {
   page: number;
   totalPages: number;
   total?: number;
+  pageSize?: number;
   onNext: () => void;
   onPrev: () => void;
   onPageChange?: (page: number) => void;
 }
 
 const getPageNumbers = (current: number, total: number): (number | '...')[] => {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
 
   const pages: (number | '...')[] = [1];
-
   if (current > 3) pages.push('...');
 
   const start = Math.max(2, current - 1);
@@ -22,77 +22,96 @@ const getPageNumbers = (current: number, total: number): (number | '...')[] => {
   for (let i = start; i <= end; i++) pages.push(i);
 
   if (current < total - 2) pages.push('...');
-
   pages.push(total);
   return pages;
 };
 
-export const PaginationControls = ({ page, totalPages, total, onNext, onPrev, onPageChange }: Props) => {
+export const PaginationControls = ({
+  page,
+  totalPages,
+  total,
+  pageSize = 10,
+  onNext,
+  onPrev,
+  onPageChange,
+}: Props) => {
   if (totalPages <= 1) return null;
+  if (total !== undefined && total <= pageSize) return null;
 
   const pages = getPageNumbers(page, totalPages);
 
   const handlePageClick = (target: number) => {
     if (target === page) return;
-    if (onPageChange) {
-      onPageChange(target);
-    } else if (target > page) {
-      onNext();
-    } else {
-      onPrev();
-    }
+    onPageChange ? onPageChange(target) : target > page ? onNext() : onPrev();
   };
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-4">
-      {total !== undefined && (
-        <p className="text-sm text-muted-foreground">
-          Showing page {page} of {totalPages} ({total} total)
+    <div className="flex flex-col items-center gap-3 pt-4 sm:flex-row sm:justify-between">
+      {total !== undefined ? (
+        <p className="text-xs text-muted-foreground">
+          Showing{' '}
+          <span className="font-medium text-foreground">
+            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}
+          </span>{' '}
+          of <span className="font-medium text-foreground">{total}</span>
         </p>
-      )}
-      {total === undefined && (
-        <p className="text-sm text-muted-foreground">
-          Page {page} of {totalPages}
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Page <span className="font-medium text-foreground">{page}</span> of{' '}
+          <span className="font-medium text-foreground">{totalPages}</span>
         </p>
       )}
 
       <div className="flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-8 w-8"
+        <button
           onClick={onPrev}
           disabled={page <= 1}
+          className={cn(
+            'flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors',
+            page <= 1
+              ? 'cursor-not-allowed text-muted-foreground/40'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          )}
         >
           <ChevronLeft className="h-4 w-4" />
-        </Button>
+        </button>
 
         {pages.map((p, i) =>
           p === '...' ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-sm text-muted-foreground">…</span>
+            <span
+              key={`ellipsis-${i}`}
+              className="flex h-8 w-8 items-center justify-center text-xs text-muted-foreground"
+            >
+              …
+            </span>
           ) : (
-            <Button
+            <button
               key={p}
-              variant={p === page ? 'default' : 'outline'}
-              size="icon"
-              className={`h-8 w-8 text-xs ${p === page ? 'bg-navy text-primary-foreground hover:bg-navy/90' : ''}`}
               onClick={() => handlePageClick(p)}
-              disabled={p === page}
+              className={cn(
+                'flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-xs font-medium transition-colors',
+                p === page
+                  ? 'bg-gold text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
             >
               {p}
-            </Button>
+            </button>
           )
         )}
 
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-8 w-8"
+        <button
           onClick={onNext}
           disabled={page >= totalPages}
+          className={cn(
+            'flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-colors',
+            page >= totalPages
+              ? 'cursor-not-allowed text-muted-foreground/40'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          )}
         >
           <ChevronRight className="h-4 w-4" />
-        </Button>
+        </button>
       </div>
     </div>
   );
