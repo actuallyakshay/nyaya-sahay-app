@@ -86,7 +86,8 @@ const AdminLawyers = () => {
                     <Switch checked={lawyerStates[l.id]} onCheckedChange={() => toggleLawyer(l.id)} />
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell">{l.rating}/5</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => { setEditingLawyer(l); setModalOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
                     <Link to={`/admin/lawyers/${l.id}`}><Button variant="ghost" size="sm">View</Button></Link>
                   </td>
                 </tr>
