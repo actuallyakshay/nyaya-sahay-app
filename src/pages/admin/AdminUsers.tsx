@@ -29,7 +29,7 @@ const AdminUsers = () => {
             <h1 className="text-2xl font-bold">User Management</h1>
             <p className="mt-1 text-muted-foreground">Manage all registered users on the platform.</p>
           </div>
-          <Button><UserPlus className="mr-2 h-4 w-4" />Add User</Button>
+          <Button onClick={() => { setEditingUser(null); setModalOpen(true); }}><UserPlus className="mr-2 h-4 w-4" />Add User</Button>
         </div>
 
         <div className="relative max-w-sm">
