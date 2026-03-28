@@ -15,6 +15,8 @@ import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
 const AdminLawyers = () => {
   const [search, setSearch] = useState('');
   const { toast } = useToast();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingLawyer, setEditingLawyer] = useState<Lawyer | null>(null);
   const [lawyerStates, setLawyerStates] = useState<Record<string, boolean>>(
     Object.fromEntries(mockLawyers.map(l => [l.id, l.isAvailable]))
   );
