@@ -94,18 +94,18 @@ export const getUserAnalytics = () => {
   });
 };
 
+export const getLawyerAnalytics = () => {
+  return apiClient({
+    method: routes.LAWYER_ANALYTICS.METHOD,
+    url: routes.LAWYER_ANALYTICS.URL,
+  });
+};
+
 export const getCaseDetails = (params) => {
   return apiClient({
     method: routes.CASE_DETAILS.METHOD,
     url: routes.CASE_DETAILS.URL,
     params: params,
-  });
-};
-
-export const getLawyerAnalytics = () => {
-  return apiClient({
-    method: routes.LAWYER_ANALYTICS.METHOD,
-    url: routes.LAWYER_ANALYTICS.URL,
   });
 };
 

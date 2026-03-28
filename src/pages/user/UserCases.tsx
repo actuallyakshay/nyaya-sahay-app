@@ -38,7 +38,7 @@ interface CaseItem {
   title: string;
   status: CaseStatus;
   practiceArea: { id: string; name: string } | null;
-  assignedLawyer: { fullName: string } | null;
+  assignedLawyer: { user: { fullName: string } } | null;
   createdAt: string;
 }
 
@@ -250,7 +250,7 @@ const UserCases = () => {
                       />
                     </td>
                     <td className="hidden px-4 py-3 lg:table-cell">
-                      {c.assignedLawyer?.fullName || '—'}
+                      {c.assignedLawyer?.user?.fullName || '—'}
                     </td>
                     <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                       {new Date(c.createdAt).toLocaleDateString('en-IN')}

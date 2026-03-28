@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCookie } from '@/lib/helpers';
+import { getCookie, setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
   ArrowRightLeft,
@@ -57,13 +57,20 @@ export const DashboardLayout = ({
   const roleName = activeRole === 'lawyer' ? 'Advocate' : 'User';
 
   // Check if user has multiple roles (both user and lawyer)
-  const hasMultipleRoles = user?.roles && Array.isArray(user.roles) && user.roles.length > 1;
+  const hasMultipleRoles = user?.roles?.length > 1;
   const otherRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
-  const switchToText = activeRole === 'lawyer' ? 'Switch to User' : 'Switch to Lawyer';
+  const switchToText =
+    activeRole === 'lawyer' ? 'Switch to User' : 'Switch to Lawyer';
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const handleSwitchRole = () => {
+    const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
+    setCookie('x-active-role', newRole);
+    navigate(newRole === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
   };
 
   return (
@@ -201,10 +208,7 @@ export const DashboardLayout = ({
                   </div>
                 )}
                 <button
-                  onClick={() => {
-                    // TODO: Add role switching functionality
-                    console.log('Switch to:', otherRole);
-                  }}
+                  onClick={handleSwitchRole}
                   title={collapsed ? switchToText : undefined}
                   className={cn(
                     'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',

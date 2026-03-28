@@ -33,6 +33,7 @@ const UserDashboard = () => {
   const activeCases = analyticsData?.activeCases || [];
   const totalCases = analyticsData?.totalCasesCount || 0;
   const activeCasesCount = analyticsData?.activeCasesCount || 0;
+  const emergencyCases = analyticsData?.emergencyCasesCount || 0;
 
   return (
     <DashboardLayout>
@@ -96,7 +97,7 @@ const UserDashboard = () => {
                 },
                 {
                   label: 'Emergency Cases',
-                  value: activeCases.filter((c) => c.isEmergency).length,
+                  value: emergencyCases,
                   icon: Bell,
                   color: 'text-warning',
                 },
@@ -118,7 +119,17 @@ const UserDashboard = () => {
 
         {/* Active cases */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">Active Cases</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="mb-4 text-lg font-semibold">Active Cases</h2>
+            <div className="mb-4 flex items-center justify-end">
+              <Link
+                to="/app/cases"
+                className="text-sm text-gold hover:underline"
+              >
+                View all →
+              </Link>
+            </div>
+          </div>
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -139,7 +150,7 @@ const UserDashboard = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {activeCases.slice(0, 3).map((c) => (
+              {activeCases.map((c) => (
                 <Link
                   key={c.id}
                   to={`/app/cases/${c.id}`}
@@ -160,7 +171,7 @@ const UserDashboard = () => {
                       </div>
                       <p className="mt-1 truncate font-medium">{c.title}</p>
                       <p className="text-sm text-muted-foreground">
-                        {c.description}
+                        {c.practiceArea?.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Created: {new Date(c.createdAt).toLocaleDateString()}

@@ -35,15 +35,18 @@ const LoginPage = () => {
     try {
       setLoading(true);
       const { data } = await login({ email, password, role });
+      if (!data.status) throw new Error(data.message);
+
       setCookie('x-active-role', role as string);
       setCookie('access-token', data.accessToken);
       setCookie('refresh-token', data.refreshToken);
       toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
       navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
-    } catch {
+    } catch (e) {
       toast({
         title: 'Login failed',
-        description: 'Please check your credentials.',
+        description:
+          e instanceof Error ? e.message : 'Please check your credentials.',
         variant: 'destructive',
       });
     } finally {

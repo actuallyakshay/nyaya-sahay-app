@@ -6,6 +6,7 @@ import routes from './routes';
 
 const ACCESS_TOKEN_COOKIE = 'access-token';
 const REFRESH_TOKEN_COOKIE = 'refresh-token';
+const ACTIVE_ROLE_COOKIE = 'x-active-role';
 
 /** Paths where we do not attach Bearer (login/register/refresh). */
 const skipAccessTokenPaths = new Set([
@@ -99,6 +100,11 @@ apiClient.interceptors.request.use(
     const accessToken = getCookie(ACCESS_TOKEN_COOKIE);
     if (accessToken) {
       config.headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const activeRole = getCookie(ACTIVE_ROLE_COOKIE);
+    if (activeRole) {
+      config.headers.set('X-Active-Role', activeRole);
     }
 
     return config;
