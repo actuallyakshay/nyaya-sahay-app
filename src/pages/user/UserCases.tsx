@@ -54,7 +54,7 @@ const UserCases = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const debouncedSearch = useDebounce(search, 500);
 
-  const { data, isLoading, isError } = useQuery<CasesResponse>({
+  const { data, isFetching, isError } = useQuery<CasesResponse>({
     queryKey: ['cases', page, debouncedSearch, statusFilter],
     queryFn: async () => {
       const params = buildQueryParams(page, debouncedSearch, statusFilter);
@@ -137,7 +137,7 @@ const UserCases = () => {
               </tr>
             </thead>
             <tbody>
-              {isLoading && <CasesTableSkeleton />}
+              {isFetching && <CasesTableSkeleton />}
               {isError && (
                 <tr>
                   <td
@@ -148,7 +148,7 @@ const UserCases = () => {
                   </td>
                 </tr>
               )}
-              {!isLoading && !isError && cases.length === 0 && (
+              {!isFetching && !isError && cases.length === 0 && (
                 <tr>
                   <td
                     colSpan={6}
@@ -158,7 +158,7 @@ const UserCases = () => {
                   </td>
                 </tr>
               )}
-              {!isLoading &&
+              {!isFetching &&
                 !isError &&
                 cases.map((c) => (
                   <tr
