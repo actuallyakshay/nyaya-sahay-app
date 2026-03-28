@@ -1,13 +1,10 @@
 import { getLawyersList } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { LEGAL_CATEGORIES } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { Award, Briefcase, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const LawyersDirectory = () => {
   const [page, setPage] = useState(1);
@@ -19,15 +16,19 @@ const LawyersDirectory = () => {
     if (!careerStartDate) {
       return 'Experience not specified';
     }
-    
+
     const startYear = new Date(careerStartDate).getFullYear();
     const currentYear = new Date().getFullYear();
     const experience = Math.max(0, currentYear - startYear);
-    
+
     return `${experience} yrs exp`;
   };
 
-  const { data: lawyersData, isLoading, error } = useQuery({
+  const {
+    data: lawyersData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['lawyersList', page, limit, orderBy, order],
     queryFn: async () => {
       const response = await getLawyersList({
@@ -109,12 +110,16 @@ const LawyersDirectory = () => {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="truncate text-sm font-medium">{l.user?.fullName || 'Unknown Lawyer'}</p>
+                      <p className="truncate text-sm font-medium">
+                        {l.user?.fullName || 'Unknown Lawyer'}
+                      </p>
                       {l.barCouncilId && (
                         <CheckCircle className="h-3.5 w-3.5 shrink-0 text-green-600" />
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{l.degree || 'Degree not specified'}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {l.degree || 'Degree not specified'}
+                    </p>
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -150,7 +155,7 @@ const LawyersDirectory = () => {
                     {l.bio}
                   </p>
                 ) : (
-                  <p className="mt-2 text-xs text-muted-foreground italic">
+                  <p className="mt-2 text-xs italic text-muted-foreground">
                     No bio available
                   </p>
                 )}
@@ -158,8 +163,6 @@ const LawyersDirectory = () => {
             ))
           )}
         </div>
-
-
 
         {!isLoading && !error && (
           <PaginationControls
