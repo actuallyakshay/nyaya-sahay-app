@@ -9,13 +9,14 @@ interface Category {
 const CATEGORIES_QUERY_KEY = ["categories"] as const;
 const THIRTY_MINUTES = 30 * 60 * 1000;
 
-export const useCategories = () => {
+export const useCategories = (enabled = true) => {
   return useQuery<Category[]>({
     queryKey: CATEGORIES_QUERY_KEY,
     queryFn: async () => {
       const { data } = await getCasesCategories();
       return data;
     },
+    enabled,
     staleTime: Infinity,
     gcTime: THIRTY_MINUTES,
     refetchOnMount: false,

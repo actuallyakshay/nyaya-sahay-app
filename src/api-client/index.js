@@ -139,3 +139,26 @@ export const updateUserProfile = (data) => {
     data,
   });
 };
+
+export const getLawyersCases = (params) => {
+  return apiClient({
+    method: routes.LAWYERS_CASES.METHOD,
+    url: routes.LAWYERS_CASES.URL,
+    params,
+  });
+};
+
+export const getLawyerProfile = () => {
+  return apiClient({
+    method: routes.LAWYERS_ME.METHOD,
+    url: routes.LAWYERS_ME.URL,
+  });
+};
+
+export const updateLawyerProfile = (data) => {
+  return apiClient({
+    method: routes.UPDATE_LAWYER_PROFILE.METHOD,
+    url: routes.UPDATE_LAWYER_PROFILE.URL,
+    data,
+  });
+};

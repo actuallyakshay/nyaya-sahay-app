@@ -1,21 +1,34 @@
-import { getCurrentUser, updateUserProfile, uploadAsset } from '@/api-client';
+import {
+  getCurrentUser,
+  updateLawyerProfile,
+  updateUserProfile,
+  uploadAsset,
+} from '@/api-client';
 import PasswordResetModal from '@/components/PasswordResetModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import WithShimmer from '@/components/WithShimmer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getCookie } from '@/lib/helpers';
-import { mockLawyers, mockPlans, mockSubscription } from '@/lib/mock-data';
-import { LEGAL_CATEGORIES, LegalCategory } from '@/types';
+import { mockPlans, mockSubscription } from '@/lib/mock-data';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar,
   Camera,
   CheckCircle2,
   CreditCard,
+  MapPin,
   Shield,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -32,10 +45,24 @@ const UserProfile = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   const isLawyer = getCookie('x-active-role') === 'lawyer';
-  const lawyerData = isLawyer ? mockLawyers[0] : null;
-  const [specializations, setSpecializations] = useState<LegalCategory[]>(
-    lawyerData?.specializations || []
-  );
+  const [selectedSpecializations, setSelectedSpecializations] = useState<
+    string[]
+  >([]);
+
+  // Lawyer-specific form state
+  const [gender, setGender] = useState('');
+  const [dob, setDob] = useState('');
+  const [degree, setDegree] = useState('');
+  const [barCouncilId, setBarCouncilId] = useState('');
+  const [careerStartDate, setCareerStartDate] = useState('');
+  const [bio, setBio] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [lawyerState, setLawyerState] = useState('');
+  const [pincode, setPincode] = useState('');
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories(isLawyer);
 
   // Fetch current user data
   const { data: currentUser, isLoading } = useQuery({
@@ -53,6 +80,27 @@ const UserProfile = () => {
       setFullName(currentUser?.fullName || '');
       setPhone(currentUser?.phone || '');
       setAvatar(currentUser?.avatarUrl || null);
+
+      // Populate lawyer fields from API response
+      const lp = currentUser?.lawyerProfile;
+      if (lp) {
+        setDegree(lp.degree || '');
+        setBarCouncilId(lp.barCouncilId || '');
+        setCareerStartDate(lp.careerStartDate?.split('T')[0] || '');
+        setGender(lp.gender || '');
+        setDob(lp.dob?.split('T')[0] || '');
+        setBio(lp.bio || '');
+        setAddressLine1(lp.addressLine1 || '');
+        setAddressLine2(lp.addressLine2 || '');
+        setCity(lp.city || '');
+        setLawyerState(lp.state || '');
+        setPincode(lp.pincode || '');
+        setSelectedSpecializations(
+          lp.lawyerPracticeAreas?.map(
+            (a: { practiceAreaId: string }) => a.practiceAreaId
+          ) || []
+        );
+      }
     }
   }, [currentUser]);
 
@@ -75,6 +123,25 @@ const UserProfile = () => {
     },
     onSettled: () => {
       setIsUploading(false);
+    },
+  });
+
+  // Update lawyer profile mutation
+  const updateLawyerMutation = useMutation({
+    mutationFn: updateLawyerProfile,
+    onSuccess: (response) => {
+      console.log('Lawyer profile updated:', response.data);
+      toast({
+        title: 'Profile updated',
+        description: 'Your lawyer profile has been updated successfully.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Update failed',
+        description: 'Failed to update lawyer profile. Please try again.',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -108,6 +175,23 @@ const UserProfile = () => {
 
   const handleSaveChanges = () => {
     updateProfileMutation.mutate({ fullName, phone });
+    if (isLawyer) {
+      const lawyerPayload = {
+        userProfile: { fullName, phone, avatarUrl: avatar },
+        gender,
+        dob,
+        degree,
+        barCouncilId,
+        addressLine1,
+        addressLine2,
+        city,
+        state: lawyerState,
+        pincode,
+        lawyerPracticeAreas: selectedSpecializations,
+      };
+      console.log('Updating lawyer profile with:', lawyerPayload);
+      updateLawyerMutation.mutate(lawyerPayload);
+    }
   };
 
   // Check if form has changes to enable/disable save button
@@ -123,9 +207,9 @@ const UserProfile = () => {
     );
   };
 
-  const toggleSpecialization = (cat: LegalCategory) => {
-    setSpecializations((prev) =>
-      prev.includes(cat) ? prev.filter((s) => s !== cat) : [...prev, cat]
+  const toggleSpecialization = (id: string) => {
+    setSelectedSpecializations((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     );
   };
 
@@ -135,134 +219,258 @@ const UserProfile = () => {
         <h1 className="text-2xl font-bold">Profile & Settings</h1>
 
         <div className="space-y-5 rounded-xl border bg-card p-6">
-            <>
-              <div className="flex items-center gap-4">
-                <WithShimmer loading={isLoading} className="h-16 w-16 rounded-full">
-                  <div className="group relative">
-                    {avatar || currentUser?.avatarUrl ? (
-                      <img
-                        src={avatar || currentUser?.avatarUrl}
-                        alt="Profile"
-                        className="h-16 w-16 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
-                        {currentUser?.fullName?.charAt(0) ||
-                          user?.fullName?.charAt(0)}
-                      </div>
-                    )}
-                    <button
-                      onClick={() => fileRef.current?.click()}
-                      disabled={isUploading}
-                      className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 transition-opacity disabled:cursor-not-allowed group-hover:opacity-100"
-                    >
-                      <Camera className="h-5 w-5 text-white" />
-                    </button>
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
-                      disabled={isUploading}
+          <>
+            <div className="flex items-center gap-4">
+              <WithShimmer
+                loading={isLoading || isUploading}
+                className="h-16 w-16 rounded-full"
+              >
+                <div className="group relative">
+                  {avatar || currentUser?.avatarUrl ? (
+                    <img
+                      src={avatar || currentUser?.avatarUrl}
+                      alt="Profile"
+                      className="h-16 w-16 rounded-full object-cover"
                     />
-                  </div>
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-bold text-primary-foreground">
+                      {currentUser?.fullName?.charAt(0) ||
+                        user?.fullName?.charAt(0)}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={isUploading}
+                    className="absolute inset-0 flex items-center justify-center rounded-full bg-foreground/50 opacity-0 transition-opacity disabled:cursor-not-allowed group-hover:opacity-100"
+                  >
+                    <Camera className="h-5 w-5 text-white" />
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                    disabled={isUploading}
+                  />
+                </div>
+              </WithShimmer>
+              <div>
+                <WithShimmer loading={isLoading} className="h-6 w-32">
+                  <p className="text-lg font-semibold">
+                    {currentUser?.fullName || user?.fullName}
+                  </p>
                 </WithShimmer>
-                <div>
-                  <WithShimmer loading={isLoading} className="h-6 w-32">
-                    <p className="text-lg font-semibold">
-                      {currentUser?.fullName || user?.fullName}
-                    </p>
-                  </WithShimmer>
-                  <WithShimmer loading={isLoading} className="mt-1 h-4 w-48">
-                    <p className="text-sm text-muted-foreground">
-                      {currentUser?.email || user?.email}
-                    </p>
-                  </WithShimmer>
-                </div>
+                <WithShimmer loading={isLoading} className="mt-1 h-4 w-48">
+                  <p className="text-sm text-muted-foreground">
+                    {currentUser?.email || user?.email}
+                  </p>
+                </WithShimmer>
               </div>
+            </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <WithShimmer loading={isLoading} className="h-4 w-16">
-                    <Label>Full Name</Label>
-                  </WithShimmer>
-                  <WithShimmer loading={isLoading} className="h-10 w-full">
-                    <Input
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                    />
-                  </WithShimmer>
-                </div>
-                <div className="space-y-2">
-                  <WithShimmer loading={isLoading} className="h-4 w-12">
-                    <Label>Email</Label>
-                  </WithShimmer>
-                  <WithShimmer loading={isLoading} className="h-10 w-full">
-                    <Input value={currentUser?.email || user?.email} disabled />
-                  </WithShimmer>
-                </div>
-                <div className="space-y-2">
-                  <WithShimmer loading={isLoading} className="h-4 w-12">
-                    <Label>Phone</Label>
-                  </WithShimmer>
-                  <WithShimmer loading={isLoading} className="h-10 w-full">
-                    <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Enter your phone number"
-                    />
-                  </WithShimmer>
-                </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <WithShimmer loading={isLoading} className="h-4 w-16">
+                  <Label>Full Name</Label>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-10 w-full">
+                  <Input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                </WithShimmer>
               </div>
-            </>
+              <div className="space-y-2">
+                <WithShimmer loading={isLoading} className="h-4 w-12">
+                  <Label>Email</Label>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-10 w-full">
+                  <Input value={currentUser?.email || user?.email} disabled />
+                </WithShimmer>
+              </div>
+              <div className="space-y-2">
+                <WithShimmer loading={isLoading} className="h-4 w-12">
+                  <Label>Phone</Label>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-10 w-full">
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Enter your phone number"
+                  />
+                </WithShimmer>
+              </div>
+            </div>
+          </>
 
           {/* Lawyer-specific fields */}
-          {isLawyer && lawyerData && (
+          {isLawyer && (
             <div className="mt-3 border-t pt-5">
               <h3 className="mb-4 font-semibold">Professional Details</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Degree / Qualification</Label>
-                  <Input defaultValue={lawyerData.degree} />
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={degree}
+                      onChange={(e) => setDegree(e.target.value)}
+                      placeholder="Enter degree / qualification"
+                    />
+                  </WithShimmer>
                 </div>
                 <div className="space-y-2">
                   <Label>Career Started From</Label>
-                  <Input type="date" defaultValue="2015-07-01" />
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      type="date"
+                      value={careerStartDate}
+                      onChange={(e) => setCareerStartDate(e.target.value)}
+                    />
+                  </WithShimmer>
                 </div>
                 <div className="space-y-2">
                   <Label>Bar Council ID</Label>
-                  <Input defaultValue={lawyerData.barCouncilId} />
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={barCouncilId}
+                      onChange={(e) => setBarCouncilId(e.target.value)}
+                      placeholder="Enter Bar Council ID"
+                    />
+                  </WithShimmer>
+                </div>
+                <div className="space-y-2">
+                  <Label>Gender</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Select value={gender} onValueChange={setGender}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </WithShimmer>
+                </div>
+                <div className="space-y-2">
+                  <Label>Date of Birth</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      type="date"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                    />
+                  </WithShimmer>
                 </div>
                 <div className="space-y-2">
                   <Label>Specializations</Label>
                   <div className="flex flex-wrap gap-1.5 rounded-lg border p-2.5">
-                    {(
-                      Object.entries(LEGAL_CATEGORIES) as [
-                        LegalCategory,
-                        string,
-                      ][]
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => toggleSpecialization(key)}
-                        className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                          specializations.includes(key)
-                            ? 'bg-gold text-primary-foreground'
-                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                    {categoriesLoading
+                      ? Array.from({ length: 6 }).map((_, i) => (
+                          <WithShimmer
+                            key={i}
+                            loading
+                            className="h-7 w-20 rounded-full"
+                          />
+                        ))
+                      : categories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => toggleSpecialization(cat.id)}
+                            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+                              selectedSpecializations.includes(cat.id)
+                                ? 'bg-gold text-primary-foreground'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                            }`}
+                          >
+                            {cat.name}
+                          </button>
+                        ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Address Details — Lawyer only */}
+          {isLawyer && (
+            <div className="mt-3 border-t pt-5">
+              <div className="mb-4 flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gold" />
+                <h3 className="font-semibold">Address Details</h3>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label>Bio</Label>
-                  <Input defaultValue={lawyerData.bio} />
+                  <Label>Address Line 1</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={addressLine1}
+                      onChange={(e) => setAddressLine1(e.target.value)}
+                      placeholder="Street address, building name"
+                    />
+                  </WithShimmer>
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Address Line 2</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={addressLine2}
+                      onChange={(e) => setAddressLine2(e.target.value)}
+                      placeholder="Apartment, suite, floor (optional)"
+                    />
+                  </WithShimmer>
+                </div>
+                <div className="space-y-2">
+                  <Label>City</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Enter city"
+                    />
+                  </WithShimmer>
+                </div>
+                <div className="space-y-2">
+                  <Label>State</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={lawyerState}
+                      onChange={(e) => setLawyerState(e.target.value)}
+                      placeholder="Enter state"
+                    />
+                  </WithShimmer>
+                </div>
+                <div className="space-y-2">
+                  <Label>Pincode</Label>
+                  <WithShimmer loading={isLoading} className="h-10 w-full">
+                    <Input
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      placeholder="Enter pincode"
+                      maxLength={6}
+                    />
+                  </WithShimmer>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Bio — Lawyer only */}
+          {isLawyer && (
+            <div className="mt-3 border-t pt-5">
+              <div className="space-y-2">
+                <Label>Bio</Label>
+                <WithShimmer loading={isLoading} className="h-10 w-full">
+                  <Input
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell us about yourself"
+                  />
+                </WithShimmer>
               </div>
             </div>
           )}
@@ -272,10 +480,16 @@ const UserProfile = () => {
               <Button
                 onClick={handleSaveChanges}
                 disabled={
-                  updateProfileMutation.isPending || isUploading || !hasChanges()
+                  updateProfileMutation.isPending ||
+                  updateLawyerMutation.isPending ||
+                  isUploading ||
+                  !hasChanges()
                 }
               >
-                {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+                {updateProfileMutation.isPending ||
+                updateLawyerMutation.isPending
+                  ? 'Saving...'
+                  : 'Save Changes'}
               </Button>
             </WithShimmer>
           )}

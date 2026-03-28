@@ -1,5 +1,7 @@
 import { getLawyerAnalytics } from '@/api-client';
+import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
+import WithShimmer from '@/components/WithShimmer';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
@@ -64,10 +66,18 @@ const LawyerDashboard = () => {
               className="rounded-xl border bg-card p-5 shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{s.label}</span>
-                <s.icon className={`h-4 w-4 ${s.color}`} />
+                <WithShimmer loading={isLoading} className="h-4 w-20">
+                  <span className="text-sm text-muted-foreground">
+                    {s.label}
+                  </span>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-4 w-4">
+                  <s.icon className={`h-4 w-4 ${s.color}`} />
+                </WithShimmer>
               </div>
-              <p className="mt-2 text-2xl font-bold">{s.value}</p>
+              <WithShimmer loading={isLoading} className="mt-2 h-8 w-16">
+                <p className="mt-2 text-2xl font-bold">{s.value}</p>
+              </WithShimmer>
             </div>
           ))}
         </div>
@@ -85,37 +95,51 @@ const LawyerDashboard = () => {
             </div>
           </div>
           <div className="space-y-3">
-            {assignedCases.map((c) => (
-              <Link
-                key={c.id}
-                to={`/lawyer/cases/${c.id}`}
-                className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
-              >
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {c.caseCode}
-                      </span>
-                      <StatusBadge status={c.status} />
-                      {c.priority === 'urgent' && (
-                        <span className="flex items-center gap-1 text-xs text-destructive">
-                          <AlertTriangle className="h-3 w-3" />
-                          Urgent
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+            ) : error ? (
+              <div className="rounded-xl border bg-card p-8 text-center">
+                <p className="text-destructive">
+                  Failed to load cases. Please try again.
+                </p>
+              </div>
+            ) : assignedCases.length === 0 ? (
+              <div className="rounded-xl border bg-card p-8 text-center">
+                <p className="text-muted-foreground">No assigned cases yet.</p>
+              </div>
+            ) : (
+              assignedCases.map((c) => (
+                <Link
+                  key={c.id}
+                  to={`/lawyer/cases/${c.id}`}
+                  className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {c.caseCode}
                         </span>
-                      )}
+                        <StatusBadge status={c.status} />
+                        {c.priority === 'urgent' && (
+                          <span className="flex items-center gap-1 text-xs text-destructive">
+                            <AlertTriangle className="h-3 w-3" />
+                            Urgent
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 font-medium">{c.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {c?.user?.fullName} • {c.practiceArea?.name}
+                      </p>
                     </div>
-                    <p className="mt-1 font-medium">{c.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {c?.user?.fullName} • {c.practiceArea?.name}
-                    </p>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {new Date(c.createdAt).toLocaleDateString('en-IN')}
+                    </span>
                   </div>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {new Date(c.createdAt).toLocaleDateString('en-IN')}
-                  </span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </div>

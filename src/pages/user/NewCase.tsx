@@ -3,12 +3,16 @@ import { FileUpload } from '@/components/FileUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import WithShimmer from '@/components/WithShimmer';
 import { Textarea } from '@/components/ui/textarea';
+import WithShimmer from '@/components/WithShimmer';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { CATEGORY_SKELETON_WIDTHS, MAX_FILES, MAX_SIZE_MB } from '@/lib/mock-data';
+import {
+  CATEGORY_SKELETON_WIDTHS,
+  MAX_FILES,
+  MAX_SIZE_MB,
+} from '@/lib/mock-data';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UploadedDoc } from '@/types';
 import { useMutation } from '@tanstack/react-query';

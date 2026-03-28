@@ -75,6 +75,18 @@ const routes = {
     URL: '/api/lawyers',
     METHOD: 'GET',
   },
+  LAWYERS_CASES: {
+    URL: '/api/lawyers/cases',
+    METHOD: 'GET',
+  },
+  LAWYERS_ME: {
+    URL: '/api/lawyers',
+    METHOD: 'GET',
+  },
+  UPDATE_LAWYER_PROFILE: {
+    URL: '/api/lawyers',
+    METHOD: 'PATCH',
+  },
 };
 
 export default routes;
