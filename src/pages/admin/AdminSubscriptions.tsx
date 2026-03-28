@@ -44,7 +44,7 @@ const AdminSubscriptions = () => {
                   <h3 className="text-lg font-semibold">{plan.name}</h3>
                   <p className="text-2xl font-bold text-gold mt-1">₹{plan.price.toLocaleString('en-IN')}<span className="text-sm font-normal text-muted-foreground">/{plan.period}</span></p>
                 </div>
-                <Button variant="outline" size="sm"><Edit className="mr-2 h-3.5 w-3.5" />Edit</Button>
+                <Button variant="outline" size="sm" onClick={() => { setEditingPlan(plan); setModalOpen(true); }}><Edit className="mr-2 h-3.5 w-3.5" />Edit</Button>
               </div>
               <ul className="mt-4 space-y-1.5">
                 {plan.features.map((f, i) => (
