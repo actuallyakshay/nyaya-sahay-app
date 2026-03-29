@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
