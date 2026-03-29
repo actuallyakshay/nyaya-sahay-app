@@ -104,6 +104,9 @@ const AdminCaseDetail = () => {
                 </Button>
               </>
             )}
+            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
+              <StickyNote className="mr-1.5 h-3.5 w-3.5" />Notes ({internalNotes.length})
+            </Button>
           </div>
         </div>
 
