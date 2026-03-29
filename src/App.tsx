@@ -40,6 +40,7 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminCaseRequests from "./pages/admin/AdminCaseRequests";
 import AdminSessionRequests from "./pages/admin/AdminSessionRequests";
+import AdminLawyerVerifications from "./pages/admin/AdminLawyerVerifications";
 
 import NotFound from "./pages/NotFound";
 
@@ -88,6 +89,7 @@ const App = () => (
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><AdminUsers /></ProtectedRoute>} />
             <Route path="/admin/users/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminUserDetail /></ProtectedRoute>} />
             <Route path="/admin/lawyers" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyers /></ProtectedRoute>} />
+            <Route path="/admin/lawyer-verifications" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyerVerifications /></ProtectedRoute>} />
             <Route path="/admin/lawyers/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyerDetail /></ProtectedRoute>} />
             <Route path="/admin/cases" element={<ProtectedRoute allowedRoles={['admin']}><AdminCases /></ProtectedRoute>} />
             <Route path="/admin/cases/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminCaseDetail /></ProtectedRoute>} />

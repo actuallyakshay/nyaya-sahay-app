@@ -100,31 +100,6 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </button>
           </div>
 
-          {/* Role indicator */}
-          {!collapsed && (
-            <div className="mx-4 mb-1.5">
-              <div className={cn(
-                "rounded-md px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wider",
-                user?.role === 'lawyer'
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-              )}>
-                Logged in as {roleName}
-              </div>
-            </div>
-          )}
-          {collapsed && (
-            <div className="mx-auto mb-1.5">
-              <div className={cn(
-                "h-7 w-7 rounded-md flex items-center justify-center text-[10px] font-bold",
-                user?.role === 'lawyer'
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'bg-sky-500/20 text-sky-400'
-              )}>
-                {user?.role === 'lawyer' ? 'A' : 'U'}
-              </div>
-            </div>
-          )}
 
           {/* Profile section */}
           {!collapsed && (
@@ -220,11 +195,6 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
       {/* Main content */}
       <main className="flex-1 min-h-screen">
-        <div className="hidden lg:flex h-14 items-center border-b bg-card px-6">
-          <Button variant="ghost" size="sm" asChild className="gap-1 text-muted-foreground">
-            <Link to="/"><ChevronLeft className="h-4 w-4" /> Back to site</Link>
-          </Button>
-        </div>
         <div className="p-4 md:p-6 lg:p-8">
           {children}
         </div>

@@ -36,6 +36,7 @@ export type LegalCategory =
   | 'property'
   | 'corporate'
   | 'consumer'
+  | 'labor'
   | 'documentation'
   | 'other';
 
@@ -46,6 +47,7 @@ export const LEGAL_CATEGORIES: Record<LegalCategory, string> = {
   property: 'Property Dispute',
   corporate: 'Corporate Law',
   consumer: 'Consumer Complaint',
+  labor: 'Labour & Employment',
   documentation: 'Documentation / Legal Notice',
   other: 'Other',
 };

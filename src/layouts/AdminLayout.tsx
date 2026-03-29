@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft, FilePlus, CalendarCheck, ArrowRightLeft } from 'lucide-react';
+import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft, FilePlus, CalendarCheck, ArrowRightLeft, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
 
@@ -11,6 +11,7 @@ const adminNav = [
   { label: 'Session Requests', to: '/admin/session-requests', icon: CalendarCheck },
   { label: 'Users', to: '/admin/users', icon: Users },
   { label: 'Lawyers', to: '/admin/lawyers', icon: UserCheck },
+  { label: 'Verifications', to: '/admin/lawyer-verifications', icon: ShieldCheck },
   { label: 'Cases', to: '/admin/cases', icon: Briefcase },
   { label: 'Subscriptions', to: '/admin/subscriptions', icon: FileText },
   { label: 'Payments', to: '/admin/payments', icon: CreditCard },

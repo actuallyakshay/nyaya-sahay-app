@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
@@ -20,7 +21,7 @@ const AdminCaseDetail = () => {
   const [selectedLawyer, setSelectedLawyer] = useState(caseData?.lawyerId || '');
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
-  const [internalNote, setInternalNote] = useState('');
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
     { text: 'Ancestral property — multiple legal heirs involved', by: 'Platform Admin', at: '2024-09-03T14:00:00' },
   ]);
@@ -59,11 +60,8 @@ const AdminCaseDetail = () => {
     toast({ title: 'Case Reset', description: `Case ${caseData.caseNumber} has been reset to New status.` });
   };
 
-  const handleAddNote = () => {
-    if (!internalNote.trim()) return;
-    setInternalNotes(prev => [...prev, { text: internalNote.trim(), by: 'Platform Admin', at: new Date().toISOString() }]);
-    setInternalNote('');
-    toast({ title: 'Note Added' });
+  const handleAddNote = (note: { text: string; by: string; at: string }) => {
+    setInternalNotes(prev => [...prev, note]);
   };
 
   return (
@@ -106,6 +104,9 @@ const AdminCaseDetail = () => {
                 </Button>
               </>
             )}
+            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
+              <StickyNote className="mr-1.5 h-3.5 w-3.5" />Notes ({internalNotes.length})
+            </Button>
           </div>
         </div>
 
@@ -180,32 +181,6 @@ const AdminCaseDetail = () => {
               <DocumentList documents={caseData.documents} />
             </div>
 
-            {/* Internal Notes */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                <StickyNote className="h-3.5 w-3.5" /> Internal Notes
-              </h3>
-              <div className="max-h-[200px] overflow-y-auto space-y-2 mb-3">
-                {internalNotes.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No notes yet.</p>
-                ) : internalNotes.map((n, i) => (
-                  <div key={i} className="rounded-lg bg-muted/50 p-2.5 text-xs">
-                    <p>{n.text}</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground">{n.by} • {new Date(n.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-1.5">
-                <Input
-                  placeholder="Add a note..."
-                  value={internalNote}
-                  onChange={e => setInternalNote(e.target.value)}
-                  className="text-xs h-8"
-                  onKeyDown={e => e.key === 'Enter' && handleAddNote()}
-                />
-                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleAddNote}>Add</Button>
-              </div>
-            </div>
 
             <div className="rounded-xl border bg-card p-5">
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Dates</h3>
@@ -239,6 +214,14 @@ const AdminCaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <InternalNotesDrawer
+        open={notesDrawerOpen}
+        onOpenChange={setNotesDrawerOpen}
+        notes={internalNotes}
+        onAddNote={handleAddNote}
+        currentUserName="Platform Admin"
+      />
     </AdminLayout>
   );
 };

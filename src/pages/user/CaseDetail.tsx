@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 
 const CaseDetail = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const CaseDetail = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [sessionType, setSessionType] = useState('video');
-  const [internalNote, setInternalNote] = useState('');
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
     { text: 'Ancestral property — multiple legal heirs involved', by: 'Adv. Priya Sharma', at: '2024-09-03T14:00:00' },
     { text: 'Mutation pending since 2019, recommend civil suit', by: 'Platform Admin', at: '2024-09-04T10:00:00' },
@@ -46,11 +47,8 @@ const CaseDetail = () => {
     setBookingOpen(false);
   };
 
-  const handleAddNote = () => {
-    if (!internalNote.trim()) return;
-    setInternalNotes(prev => [...prev, { text: internalNote.trim(), by: user?.name || 'Unknown', at: new Date().toISOString() }]);
-    setInternalNote('');
-    toast({ title: 'Note Added' });
+  const handleAddNote = (note: { text: string; by: string; at: string }) => {
+    setInternalNotes(prev => [...prev, note]);
   };
 
   if (!caseData) return (
@@ -103,6 +101,11 @@ const CaseDetail = () => {
           )}
           <span className="text-xs text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</span>
           <div className="flex-1" />
+          {canSeeNotes && (
+            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
+              <StickyNote className="mr-1.5 h-3.5 w-3.5" /> Notes ({internalNotes.length})
+            </Button>
+          )}
           {caseData.lawyerName && (
             <Button variant="outline" size="sm" onClick={() => setBookingOpen(true)}>
               <Video className="mr-1.5 h-3.5 w-3.5" /> Book Session
@@ -174,34 +177,6 @@ const CaseDetail = () => {
               </div>
             </div>
 
-            {/* Internal Notes — only for lawyer & admin */}
-            {canSeeNotes && (
-              <div className="rounded-xl border bg-card p-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                  <StickyNote className="h-3 w-3" /> Internal Notes
-                </h3>
-                <div className="max-h-[180px] overflow-y-auto space-y-2 mb-2">
-                  {internalNotes.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No internal notes.</p>
-                  ) : internalNotes.map((n, i) => (
-                    <div key={i} className="rounded-lg bg-muted/50 p-2.5 text-xs">
-                      <p>{n.text}</p>
-                      <p className="mt-1 text-[10px] text-muted-foreground">{n.by} • {new Date(n.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-1.5">
-                  <Input
-                    placeholder="Add a note..."
-                    value={internalNote}
-                    onChange={e => setInternalNote(e.target.value)}
-                    className="text-xs h-8"
-                    onKeyDown={e => e.key === 'Enter' && handleAddNote()}
-                  />
-                  <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleAddNote}>Add</Button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -237,6 +212,16 @@ const CaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {canSeeNotes && (
+        <InternalNotesDrawer
+          open={notesDrawerOpen}
+          onOpenChange={setNotesDrawerOpen}
+          notes={internalNotes}
+          onAddNote={handleAddNote}
+          currentUserName={user?.name || 'Unknown'}
+        />
+      )}
     </DashboardLayout>
   );
 };
