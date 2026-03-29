@@ -164,18 +164,20 @@ const LawyerCases = () => {
                       </Link>
                     </td>
                     <td className="hidden px-4 py-3 sm:table-cell">
-                      {c.assignedLawyer?.user?.fullName || '—'}
+                      {c.user?.fullName || '—'}
                     </td>
                     <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
-                      {c.practiceArea?.name || '—'}
+                      <PracticeAreaBadge
+                        practiceArea={c.practiceArea?.name as string}
+                      />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={c.status} />
                     </td>
                     <td className="hidden px-4 py-3 lg:table-cell">
-                      <PracticeAreaBadge
-                        practiceArea={c.practiceArea?.name as string}
-                      />
+                      <span className={c.isEmergency ? 'font-semibold text-red-600' : 'text-green-600'}>
+                        {c.isEmergency ? 'Emergency' : 'Normal'}
+                      </span>
                     </td>
                     <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                       {new Date(c.createdAt).toLocaleDateString('en-IN')}

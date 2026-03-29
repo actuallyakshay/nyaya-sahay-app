@@ -217,6 +217,8 @@ export interface CaseItem {
   status: CaseStatus;
   practiceArea: { id: string; name: string } | null;
   assignedLawyer: { user: { fullName: string } } | null;
+  user?: { fullName: string };
+  isEmergency?: boolean;
   createdAt: string;
 }
 

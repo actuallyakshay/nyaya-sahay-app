@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/api-client';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCookie, setCookie } from '@/lib/helpers';
-import { Loader2 } from 'lucide-react';
+import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -48,9 +48,7 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   return (
     <>
       {isLoading ? (
-        <div className="flex h-screen items-center justify-center">
-          <Loader2 className="size-10 animate-spin text-primary" />
-        </div>
+        <DashboardSkeleton />
       ) : (
         children
       )}

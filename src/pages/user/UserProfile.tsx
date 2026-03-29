@@ -176,12 +176,13 @@ const UserProfile = () => {
   const handleSaveChanges = () => {
     updateProfileMutation.mutate({ fullName, phone });
     if (isLawyer) {
-      const lawyerPayload = {
+      const lawyerPayload: Record<string, unknown> = {
         userProfile: { fullName, phone, avatarUrl: avatar },
         gender,
         dob,
         degree,
         barCouncilId,
+        bio,
         addressLine1,
         addressLine2,
         city,
@@ -189,6 +190,9 @@ const UserProfile = () => {
         pincode,
         lawyerPracticeAreas: selectedSpecializations,
       };
+      if (careerStartDate) {
+        lawyerPayload.careerStartDate = new Date(careerStartDate).toISOString();
+      }
       console.log('Updating lawyer profile with:', lawyerPayload);
       updateLawyerMutation.mutate(lawyerPayload);
     }
@@ -196,15 +200,35 @@ const UserProfile = () => {
 
   // Check if form has changes to enable/disable save button
   const hasChanges = () => {
-    const currentFullName = currentUser?.fullName || '';
-    const currentPhone = currentUser?.phone || '';
-    const currentAvatar = currentUser?.avatarUrl;
+    const cu = currentUser;
+    if (!cu) return false;
 
-    return (
-      fullName !== currentFullName ||
-      phone !== currentPhone ||
-      avatar !== currentAvatar
-    );
+    const basicChanged =
+      fullName !== (cu.fullName || '') ||
+      phone !== (cu.phone || '') ||
+      avatar !== cu.avatarUrl;
+
+    if (!isLawyer) return basicChanged;
+
+    const lp = cu.lawyerProfile;
+    const lawyerChanged =
+      degree !== (lp?.degree || '') ||
+      barCouncilId !== (lp?.barCouncilId || '') ||
+      careerStartDate !== (lp?.careerStartDate?.split('T')[0] || '') ||
+      gender !== (lp?.gender || '') ||
+      dob !== (lp?.dob?.split('T')[0] || '') ||
+      bio !== (lp?.bio || '') ||
+      addressLine1 !== (lp?.addressLine1 || '') ||
+      addressLine2 !== (lp?.addressLine2 || '') ||
+      city !== (lp?.city || '') ||
+      lawyerState !== (lp?.state || '') ||
+      pincode !== (lp?.pincode || '') ||
+      JSON.stringify(selectedSpecializations.slice().sort()) !==
+        JSON.stringify(
+          (lp?.lawyerPracticeAreas?.map((a: { practiceAreaId: string }) => a.practiceAreaId) || []).slice().sort()
+        );
+
+    return basicChanged || lawyerChanged;
   };
 
   const toggleSpecialization = (id: string) => {
@@ -271,9 +295,7 @@ const UserProfile = () => {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <WithShimmer loading={isLoading} className="h-4 w-16">
-                  <Label>Full Name</Label>
-                </WithShimmer>
+                <Label>Full Name</Label>
                 <WithShimmer loading={isLoading} className="h-10 w-full">
                   <Input
                     value={fullName}
@@ -283,22 +305,23 @@ const UserProfile = () => {
                 </WithShimmer>
               </div>
               <div className="space-y-2">
-                <WithShimmer loading={isLoading} className="h-4 w-12">
-                  <Label>Email</Label>
-                </WithShimmer>
+                <Label>Email</Label>
                 <WithShimmer loading={isLoading} className="h-10 w-full">
                   <Input value={currentUser?.email || user?.email} disabled />
                 </WithShimmer>
               </div>
               <div className="space-y-2">
-                <WithShimmer loading={isLoading} className="h-4 w-12">
-                  <Label>Phone</Label>
-                </WithShimmer>
+                <Label>Phone</Label>
                 <WithShimmer loading={isLoading} className="h-10 w-full">
                   <Input
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setPhone(val);
+                    }}
                     placeholder="Enter your phone number"
+                    maxLength={10}
+                    inputMode="numeric"
                   />
                 </WithShimmer>
               </div>
