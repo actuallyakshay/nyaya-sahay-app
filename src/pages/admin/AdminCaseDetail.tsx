@@ -214,6 +214,14 @@ const AdminCaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <InternalNotesDrawer
+        open={notesDrawerOpen}
+        onOpenChange={setNotesDrawerOpen}
+        notes={internalNotes}
+        onAddNote={handleAddNote}
+        currentUserName="Platform Admin"
+      />
     </AdminLayout>
   );
 };
