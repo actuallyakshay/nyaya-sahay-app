@@ -195,11 +195,6 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
 
       {/* Main content */}
       <main className="flex-1 min-h-screen">
-        <div className="hidden lg:flex h-14 items-center border-b bg-card px-6">
-          <Button variant="ghost" size="sm" asChild className="gap-1 text-muted-foreground">
-            <Link to="/"><ChevronLeft className="h-4 w-4" /> Back to site</Link>
-          </Button>
-        </div>
         <div className="p-4 md:p-6 lg:p-8">
           {children}
         </div>
