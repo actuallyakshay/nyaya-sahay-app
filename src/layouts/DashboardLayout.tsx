@@ -100,6 +100,32 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             </button>
           </div>
 
+          {/* Role indicator */}
+          {!collapsed && (
+            <div className="mx-4 mb-1.5">
+              <div className={cn(
+                "rounded-md px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wider",
+                user?.role === 'lawyer'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+              )}>
+                Logged in as {roleName}
+              </div>
+            </div>
+          )}
+          {collapsed && (
+            <div className="mx-auto mb-1.5">
+              <div className={cn(
+                "h-7 w-7 rounded-md flex items-center justify-center text-[10px] font-bold",
+                user?.role === 'lawyer'
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-sky-500/20 text-sky-400'
+              )}>
+                {user?.role === 'lawyer' ? 'A' : 'U'}
+              </div>
+            </div>
+          )}
+
           {/* Profile section */}
           {!collapsed && (
             <div className="mx-4 mb-4 rounded-lg bg-sidebar-accent px-3 py-2.5 flex items-center gap-3">
@@ -107,8 +133,8 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 {user?.name?.charAt(0)}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium text-gold">{roleName} Panel</p>
                 <p className="truncate text-sm font-semibold text-primary-foreground">{user?.name}</p>
+                <p className="text-xs text-primary-foreground/50">{user?.email}</p>
               </div>
             </div>
           )}
