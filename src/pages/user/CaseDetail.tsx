@@ -101,6 +101,11 @@ const CaseDetail = () => {
           )}
           <span className="text-xs text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</span>
           <div className="flex-1" />
+          {canSeeNotes && (
+            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
+              <StickyNote className="mr-1.5 h-3.5 w-3.5" /> Notes ({internalNotes.length})
+            </Button>
+          )}
           {caseData.lawyerName && (
             <Button variant="outline" size="sm" onClick={() => setBookingOpen(true)}>
               <Video className="mr-1.5 h-3.5 w-3.5" /> Book Session
