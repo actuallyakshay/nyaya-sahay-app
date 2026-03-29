@@ -33,7 +33,7 @@ const LawyerDashboard = () => {
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">
-            Welcome, {user?.fullName?.split?.(' ')?.[0]}
+            Welcome, Adv. {user?.fullName?.split?.(' ')?.[0]}
           </h1>
           <p className="mt-1 text-muted-foreground">
             Your case assignments and tasks at a glance.

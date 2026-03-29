@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCookie, setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
@@ -6,7 +5,6 @@ import {
   ArrowRightLeft,
   Bell,
   Briefcase,
-  ChevronLeft,
   CreditCard,
   LayoutDashboard,
   LogOut,
@@ -257,18 +255,6 @@ export const DashboardLayout = ({
 
       {/* Main content */}
       <main className="min-h-screen flex-1">
-        <div className="hidden h-14 items-center border-b bg-card px-6 lg:flex">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="gap-1 text-muted-foreground"
-          >
-            <Link to="/">
-              <ChevronLeft className="h-4 w-4" /> Back to site
-            </Link>
-          </Button>
-        </div>
         <div className="p-4 md:p-6 lg:p-8">{children}</div>
       </main>
     </div>
