@@ -212,6 +212,16 @@ const CaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {canSeeNotes && (
+        <InternalNotesDrawer
+          open={notesDrawerOpen}
+          onOpenChange={setNotesDrawerOpen}
+          notes={internalNotes}
+          onAddNote={handleAddNote}
+          currentUserName={user?.name || 'Unknown'}
+        />
+      )}
     </DashboardLayout>
   );
 };
