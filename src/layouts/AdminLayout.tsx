@@ -11,6 +11,7 @@ const adminNav = [
   { label: 'Session Requests', to: '/admin/session-requests', icon: CalendarCheck },
   { label: 'Users', to: '/admin/users', icon: Users },
   { label: 'Lawyers', to: '/admin/lawyers', icon: UserCheck },
+  { label: 'Verifications', to: '/admin/lawyer-verifications', icon: ShieldCheck },
   { label: 'Cases', to: '/admin/cases', icon: Briefcase },
   { label: 'Subscriptions', to: '/admin/subscriptions', icon: FileText },
   { label: 'Payments', to: '/admin/payments', icon: CreditCard },
