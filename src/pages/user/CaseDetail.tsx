@@ -47,11 +47,8 @@ const CaseDetail = () => {
     setBookingOpen(false);
   };
 
-  const handleAddNote = () => {
-    if (!internalNote.trim()) return;
-    setInternalNotes(prev => [...prev, { text: internalNote.trim(), by: user?.name || 'Unknown', at: new Date().toISOString() }]);
-    setInternalNote('');
-    toast({ title: 'Note Added' });
+  const handleAddNote = (note: { text: string; by: string; at: string }) => {
+    setInternalNotes(prev => [...prev, note]);
   };
 
   if (!caseData) return (
