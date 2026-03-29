@@ -36,6 +36,7 @@ export type LegalCategory =
   | 'property'
   | 'corporate'
   | 'consumer'
+  | 'labor'
   | 'documentation'
   | 'other';
 
