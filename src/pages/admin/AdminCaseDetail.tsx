@@ -60,11 +60,8 @@ const AdminCaseDetail = () => {
     toast({ title: 'Case Reset', description: `Case ${caseData.caseNumber} has been reset to New status.` });
   };
 
-  const handleAddNote = () => {
-    if (!internalNote.trim()) return;
-    setInternalNotes(prev => [...prev, { text: internalNote.trim(), by: 'Platform Admin', at: new Date().toISOString() }]);
-    setInternalNote('');
-    toast({ title: 'Note Added' });
+  const handleAddNote = (note: { text: string; by: string; at: string }) => {
+    setInternalNotes(prev => [...prev, note]);
   };
 
   return (
