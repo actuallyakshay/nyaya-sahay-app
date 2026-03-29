@@ -21,7 +21,7 @@ const AdminCaseDetail = () => {
   const [selectedLawyer, setSelectedLawyer] = useState(caseData?.lawyerId || '');
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
-  const [internalNote, setInternalNote] = useState('');
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
     { text: 'Ancestral property — multiple legal heirs involved', by: 'Platform Admin', at: '2024-09-03T14:00:00' },
   ]);
