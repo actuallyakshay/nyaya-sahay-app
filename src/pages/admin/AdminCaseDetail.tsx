@@ -181,32 +181,6 @@ const AdminCaseDetail = () => {
               <DocumentList documents={caseData.documents} />
             </div>
 
-            {/* Internal Notes */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                <StickyNote className="h-3.5 w-3.5" /> Internal Notes
-              </h3>
-              <div className="max-h-[200px] overflow-y-auto space-y-2 mb-3">
-                {internalNotes.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No notes yet.</p>
-                ) : internalNotes.map((n, i) => (
-                  <div key={i} className="rounded-lg bg-muted/50 p-2.5 text-xs">
-                    <p>{n.text}</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground">{n.by} • {new Date(n.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-1.5">
-                <Input
-                  placeholder="Add a note..."
-                  value={internalNote}
-                  onChange={e => setInternalNote(e.target.value)}
-                  className="text-xs h-8"
-                  onKeyDown={e => e.key === 'Enter' && handleAddNote()}
-                />
-                <Button size="sm" variant="outline" className="h-8 text-xs" onClick={handleAddNote}>Add</Button>
-              </div>
-            </div>
 
             <div className="rounded-xl border bg-card p-5">
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Dates</h3>
