@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft, FilePlus, CalendarCheck, ArrowRightLeft } from 'lucide-react';
+import { Scale, LayoutDashboard, Users, Briefcase, UserCheck, CreditCard, Settings, LogOut, Menu, X, FileText, PanelLeftClose, PanelLeft, FilePlus, CalendarCheck, ArrowRightLeft, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
 
