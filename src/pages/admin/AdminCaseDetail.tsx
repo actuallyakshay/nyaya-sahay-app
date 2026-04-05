@@ -25,6 +25,8 @@ const AdminCaseDetail = () => {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
+  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
+  const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
     { text: 'Ancestral property — multiple legal heirs involved', by: 'Platform Admin', at: '2024-09-03T14:00:00' },
   ]);
