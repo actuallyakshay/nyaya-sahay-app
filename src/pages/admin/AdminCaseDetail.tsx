@@ -207,10 +207,6 @@ const AdminCaseDetail = () => {
               </div>
             )}
 
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Documents</h3>
-              <DocumentList documents={caseData.documents} />
-            </div>
 
 
             <div className="rounded-xl border bg-card p-5">
