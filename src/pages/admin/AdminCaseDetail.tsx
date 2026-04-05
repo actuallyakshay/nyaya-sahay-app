@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { DocumentList } from '@/components/DocumentList';
 import { SearchableSelect } from '@/components/SearchableSelect';
 import { LEGAL_CATEGORIES } from '@/types';
-import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw, StickyNote } from 'lucide-react';
+import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw, StickyNote, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
