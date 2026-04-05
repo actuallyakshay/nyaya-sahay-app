@@ -1,19 +1,58 @@
-import { AdminLayout } from '@/layouts/AdminLayout';
-import { mockAllUsers } from '@/lib/mock-data';
-import { Input } from '@/components/ui/input';
+import { getAdminUsers } from '@/api-client';
+import { PaginationControls } from '@/components/PaginationControls';
+import { UserFormModal } from '@/components/admin/UserFormModal';
+import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/useDebounce';
+import { AdminLayout } from '@/layouts/AdminLayout';
+import { PAGE_SIZE } from '@/lib/mock-data';
+import { User, UsersListResponse } from '@/types';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Search, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { usePagination } from '@/hooks/usePagination';
-import { PaginationControls } from '@/components/PaginationControls';
+
+const buildQueryParams = (page: number, search: string) => {
+  const params: Record<string, string | number> = {
+    page,
+    limit: PAGE_SIZE,
+    orderBy: 'createdAt',
+    order: 'DESC',
+  };
+  if (search.trim()) params.search = search.trim();
+  return params;
+};
 
 const AdminUsers = () => {
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
-  const filtered = mockAllUsers.filter(u =>
-    u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
-  );
-  const { paginated, page, totalPages, next, prev } = usePagination(filtered, 10);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<Partial<User> | null>(null);
+  const [page, setPage] = useState(1);
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data, isFetching } = useQuery<UsersListResponse>({
+    queryKey: ['admin-users', page, debouncedSearch],
+    queryFn: async () => {
+      const params = buildQueryParams(page, debouncedSearch);
+      const response = await getAdminUsers(params);
+      return response.data;
+    },
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const users = data?.data ?? [];
+  const pagination = data?.pagination;
+  const totalPages = pagination?.totalPages ?? 1;
+  const total = pagination?.total ?? 0;
 
   return (
     <AdminLayout>
@@ -21,51 +60,131 @@ const AdminUsers = () => {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold">User Management</h1>
-            <p className="mt-1 text-muted-foreground">Manage all registered users on the platform.</p>
+            <p className="mt-1 text-muted-foreground">
+              Manage all registered users on the platform.
+            </p>
           </div>
-          <Button><UserPlus className="mr-2 h-4 w-4" />Add User</Button>
+          <Button
+            onClick={() => {
+              setEditingUser(null);
+              setModalOpen(true);
+            }}
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
         </div>
 
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search users..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+          <Input
+            placeholder="Search users..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
         </div>
 
         <div className="overflow-x-auto rounded-xl border bg-card">
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Email</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Phone</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Joined</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Avatar
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Name
+                </th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
+                  Email
+                </th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
+                  Phone
+                </th>
+
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">
+                  Joined
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {paginated.map(u => (
-                <tr key={u.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3 font-medium">
-                    <Link to={`/admin/users/${u.id}`} className="hover:text-gold hover:underline">{u.name}</Link>
-                  </td>
-                  <td className="px-4 py-3 hidden sm:table-cell text-muted-foreground">{u.email}</td>
-                  <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{u.phone}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${u.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                      {u.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
-                  <td className="px-4 py-3">
-                    <Link to={`/admin/users/${u.id}`}><Button variant="ghost" size="sm">View</Button></Link>
-                  </td>
-                </tr>
-              ))}
+              {!isFetching &&
+                users.map((u) => (
+                  <tr
+                    key={u.id}
+                    className="border-b last:border-0 hover:bg-muted/30"
+                  >
+                    <td className="px-4 py-3 font-medium">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
+                        {u.avatarUrl && (
+                          <img
+                            src={u.avatarUrl}
+                            alt={u.fullName}
+                            className="h-9 w-9 rounded-full object-cover"
+                          />
+                        )}
+                        {!u.avatarUrl && (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
+                            {u.fullName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link
+                        to={`/admin/users/${u.id}`}
+                        className="hover:text-gold hover:underline"
+                      >
+                        {u.fullName}
+                      </Link>
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
+                      {u.email}
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
+                      {u.phone || '-'}
+                    </td>
+
+                    <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">
+                      {new Date(u.createdAt).toLocaleDateString('en-IN')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link to={`/admin/users/${u.id}`}>
+                        <Button variant="ghost" size="sm">
+                          View
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              {isFetching && <CasesTableSkeleton />}
             </tbody>
           </table>
         </div>
-        <PaginationControls page={page} totalPages={totalPages} onNext={next} onPrev={prev} />
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          total={total}
+          pageSize={PAGE_SIZE}
+          onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
+          onPrev={() => setPage((p) => Math.max(p - 1, 1))}
+          onPageChange={setPage}
+        />
+        <UserFormModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          user={editingUser as User | undefined}
+          onSave={(data) => {
+            toast({
+              title: 'User Added',
+              description: `${data.name} has been ${editingUser ? 'updated' : 'added'}.`,
+            });
+            setModalOpen(false);
+          }}
+        />
       </div>
     </AdminLayout>
   );

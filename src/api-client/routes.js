@@ -87,6 +87,34 @@ const routes = {
     URL: '/api/lawyers',
     METHOD: 'PATCH',
   },
+  ADMIN_CASE_REQUESTS: {
+    URL: '/api/admin/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_CASE_STATUS: {
+    URL: '/api/admin/cases/:caseId/update-status',
+    METHOD: 'PATCH',
+  },
+  ADMIN_LAWYER_VERIFICATIONS: {
+    URL: '/api/admin/lawyers',
+    METHOD: 'GET',
+  },
+  UPDATE_LAWYER_ROLE_STATUS: {
+    URL: '/api/admin/users/:userId/roles/:roleCode',
+    METHOD: 'PATCH',
+  },
+  ADMIN_CASES: {
+    URL: '/api/admin/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_USERS: {
+    URL: '/api/admin/users',
+    METHOD: 'GET',
+  },
+  CREATE_ADMIN_USER: {
+    URL: '/api/admin/users/create',
+    METHOD: 'POST',
+  },
 };
 
 export default routes;

@@ -9,6 +9,15 @@ export interface User {
   avatar?: string;
   createdAt: string;
   isActive: boolean;
+  password: string;
+  fullName: string;
+  avatarUrl: string | null;
+  accountStatus?: 'active' | 'inactive' | 'pending' | 'blocked';
+}
+
+export interface UsersListResponse {
+  data: User[];
+  pagination: Pagination;
 }
 
 export interface Lawyer {
@@ -167,10 +176,12 @@ export interface LawyersListUser {
   id: string;
   fullName: string;
   avatarUrl: string | null;
+  email?: string;
+  phone?: string;
 }
 
 export interface LawyerPracticeAreaRow {
-  practiceArea?: LegalCategory | string;
+  practiceArea?: { id: string; name: string };
 }
 
 export interface LawyerListItem {
@@ -215,6 +226,7 @@ export interface CaseItem {
   caseCode: string;
   title: string;
   status: CaseStatus;
+  description?: string;
   practiceArea: { id: string; name: string } | null;
   assignedLawyer: { user: { fullName: string } } | null;
   user?: { fullName: string };
@@ -241,7 +253,12 @@ export interface UploadedDoc {
 }
 
 // Notification types
-export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'consultation';
+export type NotificationType =
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'consultation';
 
 export type ConsultationStatus = 'pending' | 'accepted' | 'declined';
 

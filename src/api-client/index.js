@@ -80,6 +80,57 @@ export const getCases = (params) => {
   });
 };
 
+export const getAdminCaseRequests = (params) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_REQUESTS.METHOD,
+    url: routes.ADMIN_CASE_REQUESTS.URL,
+    params,
+  });
+};
+
+export const getAdminLawyerVerifications = (params, body) => {
+  return apiClient({
+    method: routes.ADMIN_LAWYER_VERIFICATIONS.METHOD,
+    url: routes.ADMIN_LAWYER_VERIFICATIONS.URL,
+    params,
+  });
+};
+
+export const createAdminUser = (body) => {
+  return apiClient({
+    method: routes.CREATE_ADMIN_USER.METHOD,
+    url: routes.CREATE_ADMIN_USER.URL,
+    data: body,
+  });
+};
+
+export const getAdminUsers = (params) => {
+  return apiClient({
+    method: routes.ADMIN_USERS.METHOD,
+    url: routes.ADMIN_USERS.URL,
+    params,
+  });
+};
+
+export const updateAdminCaseStatus = (caseId, status) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_STATUS.METHOD,
+    url: routes.ADMIN_CASE_STATUS.URL.replace(':caseId', caseId),
+    data: { status },
+  });
+};
+
+export const updateLawyerRoleStatus = (userId, roleCode, status) => {
+  return apiClient({
+    method: routes.UPDATE_LAWYER_ROLE_STATUS.METHOD,
+    url: routes.UPDATE_LAWYER_ROLE_STATUS.URL.replace(
+      ':userId',
+      userId
+    ).replace(':roleCode', roleCode),
+    data: { status },
+  });
+};
+
 export const getUserRole = () => {
   return apiClient({
     method: routes.CHECK_ROLE.METHOD,
@@ -144,6 +195,14 @@ export const getLawyersCases = (params) => {
   return apiClient({
     method: routes.LAWYERS_CASES.METHOD,
     url: routes.LAWYERS_CASES.URL,
+    params,
+  });
+};
+
+export const getAdminCases = (params) => {
+  return apiClient({
+    method: routes.ADMIN_CASES.METHOD,
+    url: routes.ADMIN_CASES.URL,
     params,
   });
 };

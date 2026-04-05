@@ -61,7 +61,6 @@ export const PaginationControls = ({
           <span className="font-medium text-foreground">{totalPages}</span>
         </p>
       )}
-
       <div className="flex items-center gap-1">
         <button
           onClick={onPrev}
