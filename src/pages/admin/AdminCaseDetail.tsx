@@ -242,6 +242,18 @@ const AdminCaseDetail = () => {
         </DialogContent>
       </Dialog>
 
+      <DocumentsDrawer
+        open={docsDrawerOpen}
+        onOpenChange={setDocsDrawerOpen}
+        documents={caseData.documents}
+      />
+
+      <TimelineDrawer
+        open={timelineDrawerOpen}
+        onOpenChange={setTimelineDrawerOpen}
+        events={caseData.timeline}
+      />
+
       <InternalNotesDrawer
         open={notesDrawerOpen}
         onOpenChange={setNotesDrawerOpen}
