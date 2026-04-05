@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
+import { DocumentsDrawer } from '@/components/DocumentsDrawer';
+import { TimelineDrawer } from '@/components/TimelineDrawer';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
