@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { DocumentList } from '@/components/DocumentList';
 import { SearchableSelect } from '@/components/SearchableSelect';
 import { LEGAL_CATEGORIES } from '@/types';
-import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw, StickyNote } from 'lucide-react';
+import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw, StickyNote, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
+import { DocumentsDrawer } from '@/components/DocumentsDrawer';
+import { TimelineDrawer } from '@/components/TimelineDrawer';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
@@ -22,6 +25,8 @@ const AdminCaseDetail = () => {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
+  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
+  const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const [internalNotes, setInternalNotes] = useState<{ text: string; by: string; at: string }[]>([
     { text: 'Ancestral property — multiple legal heirs involved', by: 'Platform Admin', at: '2024-09-03T14:00:00' },
   ]);
@@ -88,7 +93,7 @@ const AdminCaseDetail = () => {
             <h1 className="mt-1.5 text-xl font-bold sm:text-2xl">{caseData.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {caseData.status !== 'closed' && caseData.status !== 'resolved' && (
               <>
                 <Button variant="outline" size="sm" onClick={() => {
@@ -100,13 +105,39 @@ const AdminCaseDetail = () => {
                   <RotateCcw className="mr-1.5 h-3.5 w-3.5" />Reset
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => setCloseDialogOpen(true)}>
-                  <XCircle className="mr-1.5 h-3.5 w-3.5" />Close Case
+                  <XCircle className="mr-1.5 h-3.5 w-3.5" />Close
                 </Button>
               </>
             )}
-            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
-              <StickyNote className="mr-1.5 h-3.5 w-3.5" />Notes ({internalNotes.length})
-            </Button>
+            <div className="h-5 w-px bg-border" />
+            <TooltipProvider delayDuration={300}>
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDocsDrawerOpen(true)}>
+                      <FileText className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Documents ({caseData.documents.length})</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setTimelineDrawerOpen(true)}>
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Timeline</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setNotesDrawerOpen(true)}>
+                      <StickyNote className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Notes ({internalNotes.length})</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
           </div>
         </div>
 
@@ -176,10 +207,6 @@ const AdminCaseDetail = () => {
               </div>
             )}
 
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Documents</h3>
-              <DocumentList documents={caseData.documents} />
-            </div>
 
 
             <div className="rounded-xl border bg-card p-5">
@@ -214,6 +241,18 @@ const AdminCaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <DocumentsDrawer
+        open={docsDrawerOpen}
+        onOpenChange={setDocsDrawerOpen}
+        documents={caseData.documents}
+      />
+
+      <TimelineDrawer
+        open={timelineDrawerOpen}
+        onOpenChange={setTimelineDrawerOpen}
+        events={caseData.timeline}
+      />
 
       <InternalNotesDrawer
         open={notesDrawerOpen}
