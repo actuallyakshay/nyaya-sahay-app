@@ -164,7 +164,7 @@ const AdminCases = () => {
                     </td>
                     <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                       <Link
-                        to={`/lawyer/cases/${c.id}`}
+                        to={`/app/cases/c1`}
                         className="hover:text-gold hover:underline"
                       >
                         {c.title}

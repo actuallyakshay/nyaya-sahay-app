@@ -23,20 +23,21 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const adminNav = [
   { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Users', to: '/admin/users', icon: Users },
+  { label: 'Lawyers', to: '/admin/lawyers', icon: UserCheck },
+  {
+    label: 'Lawyer Verifications',
+    to: '/admin/lawyer-verifications',
+    icon: ShieldCheck,
+  },
+  { label: 'Cases', to: '/admin/cases', icon: Briefcase },
   { label: 'Case Requests', to: '/admin/case-requests', icon: FilePlus },
+
   {
     label: 'Session Requests',
     to: '/admin/session-requests',
     icon: CalendarCheck,
   },
-  { label: 'Users', to: '/admin/users', icon: Users },
-  { label: 'Lawyers', to: '/admin/lawyers', icon: UserCheck },
-  {
-    label: 'Verifications',
-    to: '/admin/lawyer-verifications',
-    icon: ShieldCheck,
-  },
-  { label: 'Cases', to: '/admin/cases', icon: Briefcase },
   { label: 'Subscriptions', to: '/admin/subscriptions', icon: FileText },
   { label: 'Payments', to: '/admin/payments', icon: CreditCard },
   { label: 'Settings', to: '/admin/settings', icon: Settings },

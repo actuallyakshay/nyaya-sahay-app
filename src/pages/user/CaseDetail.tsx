@@ -1,6 +1,7 @@
-import { CaseTimeline } from '@/components/CaseTimeline';
-import { DocumentList } from '@/components/DocumentList';
+import { DocumentsDrawer } from '@/components/DocumentsDrawer';
+import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { StatusBadge } from '@/components/StatusBadge';
+import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,18 +19,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { getCookie } from '@/lib/helpers';
 import { mockCases } from '@/lib/mock-data';
 import { LEGAL_CATEGORIES } from '@/types';
 import {
   Calendar,
+  Clock,
   ExternalLink,
+  FileText,
   Phone,
   Scale,
   Send,
+  StickyNote,
   Upload,
   User,
   Video,
@@ -39,28 +48,33 @@ import { Link, useParams } from 'react-router-dom';
 
 const CaseDetail = () => {
   const { id } = useParams();
-  console.log('Case ID from URL:', id);
-  console.log(
-    'Available mock case IDs:',
-    mockCases.map((c) => c.id)
-  );
-
   const caseData = mockCases.find((c) => c.id === id);
-  console.log('Found case data:', caseData);
-
-  // Temporary fallback - use first case if no match found
-  const fallbackCaseData = caseData || mockCases[0];
-
   const [message, setMessage] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [sessionType, setSessionType] = useState('video');
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
+  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
+  const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
+  const [internalNotes, setInternalNotes] = useState<
+    { text: string; by: string; at: string }[]
+  >([
+    {
+      text: 'Ancestral property — multiple legal heirs involved',
+      by: 'Adv. Priya Sharma',
+      at: '2024-09-03T14:00:00',
+    },
+    {
+      text: 'Mutation pending since 2019, recommend civil suit',
+      by: 'Platform Admin',
+      at: '2024-09-04T10:00:00',
+    },
+  ]);
 
-  // Mock meeting link (shows when consultation is booked)
   const [meetingLink] = useState('https://meet.google.com/abc-defg-hij');
-  const hasMeeting = fallbackCaseData?.status === 'in_consultation';
+  const hasMeeting = caseData?.status === 'in_consultation';
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -75,65 +89,60 @@ const CaseDetail = () => {
   const handleBookSession = () => {
     toast({
       title: 'Session Booked',
-      description: `Your ${sessionType} consultation request has been sent to the lawyer.`,
+      description: `Your ${sessionType} consultation request has been sent for admin approval.`,
     });
     setBookingOpen(false);
   };
 
-  if (!fallbackCaseData)
+  const handleAddNote = (note: { text: string; by: string; at: string }) => {
+    setInternalNotes((prev) => [...prev, note]);
+  };
+
+  if (!caseData)
     return (
       <DashboardLayout>
         <div className="py-16 text-center">
           <p className="text-muted-foreground">Case not found.</p>
-          <p className="mt-2 text-xs text-muted-foreground">ID: {id}</p>
         </div>
       </DashboardLayout>
     );
 
-  const isLawyer = getCookie('x-active-role') === 'lawyer';
-  const isUser = getCookie('x-active-role') === 'user';
+  const isLawyer = user?.roles.includes('lawyer');
+  const isUser = user?.roles.includes('user');
+  const isAdmin = user?.roles.includes('admin');
+  const canSeeNotes = isLawyer || isAdmin;
   const lawyerProfileLink =
-    isUser && fallbackCaseData.lawyerId
-      ? `/app/lawyers/${fallbackCaseData.lawyerId}`
+    isUser && caseData.lawyerId
+      ? `/app/lawyers/${caseData.lawyerId}`
       : undefined;
 
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        {/* Header — compact */}
+        {/* Header */}
         <div>
-          {!caseData && (
-            <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-              <p className="text-sm text-yellow-800">
-                Debug: Using fallback case data (ID mismatch: {id} vs{' '}
-                {fallbackCaseData.id})
-              </p>
-            </div>
-          )}
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-muted-foreground">
-              {fallbackCaseData.caseNumber}
+              {caseData.caseNumber}
             </span>
-            <StatusBadge status={fallbackCaseData.status} />
-            {fallbackCaseData.priority === 'urgent' && (
+            <StatusBadge status={caseData.status} />
+            {caseData.priority === 'urgent' && (
               <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
                 Urgent
               </span>
             )}
           </div>
           <h1 className="mt-1 text-xl font-bold sm:text-2xl">
-            {fallbackCaseData.title}
+            {caseData.title}
           </h1>
           <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-            {fallbackCaseData.description}
-            ''{' '}
+            {caseData.description}
           </p>
         </div>
 
-        {/* Action bar — compact */}
+        {/* Action bar */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Assigned lawyer — small chip */}
-          {fallbackCaseData.lawyerName &&
+          {caseData.lawyerName &&
             !isLawyer &&
             (lawyerProfileLink ? (
               <Link
@@ -141,38 +150,92 @@ const CaseDetail = () => {
                 className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20"
               >
                 <Scale className="h-3 w-3" />
-                {fallbackCaseData.lawyerName}
+                {caseData.lawyerName}
               </Link>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold">
                 <Scale className="h-3 w-3" />
-                {fallbackCaseData.lawyerName}
+                {caseData.lawyerName}
               </span>
             ))}
-
-          {/* Client name — for lawyer view */}
           {isLawyer && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
               <User className="h-3 w-3" />
-              Client: {fallbackCaseData.userName}
+              Client: {caseData.userName}
             </span>
           )}
-
           <span className="text-xs text-muted-foreground">
-            {LEGAL_CATEGORIES[fallbackCaseData.category]}
+            {LEGAL_CATEGORIES[caseData.category]}
           </span>
-
           <div className="flex-1" />
 
-          {fallbackCaseData.lawyerName && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setBookingOpen(true)}
-            >
-              <Video className="mr-1.5 h-3.5 w-3.5" /> Book Session
-            </Button>
-          )}
+          <TooltipProvider delayDuration={300}>
+            <div className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setDocsDrawerOpen(true)}
+                  >
+                    <FileText className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Documents ({caseData.documents.length})
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setTimelineDrawerOpen(true)}
+                  >
+                    <Clock className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Timeline</TooltipContent>
+              </Tooltip>
+
+              {canSeeNotes && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setNotesDrawerOpen(true)}
+                    >
+                      <StickyNote className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Internal Notes ({internalNotes.length})
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
+              {caseData.lawyerName && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setBookingOpen(true)}
+                    >
+                      <Video className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Book Session</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </TooltipProvider>
         </div>
 
         {/* Meeting link banner */}
@@ -193,113 +256,82 @@ const CaseDetail = () => {
           </div>
         )}
 
-        <div className="grid gap-4 lg:grid-cols-4">
-          {/* Chat — main focus, takes 3 cols */}
-          <div
-            className="flex flex-col rounded-xl border bg-card lg:col-span-3"
-            style={{ height: '600px' }}
-          >
-            <div className="flex shrink-0 items-center justify-between border-b p-3">
-              <h3 className="text-sm font-semibold">Case Communication</h3>
-              <span className="text-xs text-muted-foreground">
-                {fallbackCaseData.messages.length} messages
-              </span>
-            </div>
-            <div className="flex-1 space-y-3 overflow-y-auto p-4">
-              {fallbackCaseData.messages.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">
-                  No messages yet. Start the conversation.
-                </p>
-              ) : (
-                fallbackCaseData.messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}
-                  >
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}
-                    >
-                      {m.senderRole === 'lawyer' ? (
-                        <Scale className="h-3.5 w-3.5" />
-                      ) : (
-                        <User className="h-3.5 w-3.5" />
-                      )}
-                    </div>
-                    <div
-                      className={`max-w-[75%] rounded-xl px-4 py-2.5 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}
-                    >
-                      <p className="mb-0.5 text-xs font-medium opacity-70">
-                        {m.senderName}
-                      </p>
-                      <p>{m.content}</p>
-                      <p className="mt-1 text-[10px] opacity-50">
-                        {new Date(m.timestamp).toLocaleString('en-IN', {
-                          day: 'numeric',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            <div className="flex shrink-0 gap-2 border-t p-3">
-              <Input
-                placeholder="Type a message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="flex-1"
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                className="hidden"
-                onChange={handleUpload}
-              />
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="h-4 w-4" />
-              </Button>
-              <Button size="icon">
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+        {/* Chat — full width now */}
+        <div
+          className="flex flex-col rounded-xl border bg-card"
+          style={{ height: '600px' }}
+        >
+          <div className="flex shrink-0 items-center justify-between border-b p-3">
+            <h3 className="text-sm font-semibold">Case Communication</h3>
+            <span className="text-xs text-muted-foreground">
+              {caseData.messages.length} messages
+            </span>
           </div>
-
-          {/* Sidebar — compact, 1 col */}
-          <div className="space-y-4">
-            {/* Documents */}
-            <div className="rounded-xl border bg-card p-4">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Documents
-              </h3>
-              <DocumentList documents={fallbackCaseData.documents} />
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 w-full text-xs"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="mr-1.5 h-3 w-3" /> Upload
-              </Button>
-            </div>
-
-            {/* Timeline — compact */}
-            <div className="rounded-xl border bg-card p-4">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Timeline
-              </h3>
-              <div className="max-h-[200px] overflow-y-auto">
-                <CaseTimeline events={fallbackCaseData.timeline} />
-              </div>
-            </div>
+          <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            {caseData.messages.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No messages yet. Start the conversation.
+              </p>
+            ) : (
+              caseData.messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}
+                >
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}
+                  >
+                    {m.senderRole === 'lawyer' ? (
+                      <Scale className="h-3.5 w-3.5" />
+                    ) : (
+                      <User className="h-3.5 w-3.5" />
+                    )}
+                  </div>
+                  <div
+                    className={`max-w-[75%] rounded-xl px-4 py-2.5 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}
+                  >
+                    <p className="mb-0.5 text-xs font-medium opacity-70">
+                      {m.senderName}
+                    </p>
+                    <p>{m.content}</p>
+                    <p className="mt-1 text-[10px] opacity-50">
+                      {new Date(m.timestamp).toLocaleString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="flex shrink-0 gap-2 border-t p-3">
+            <Input
+              placeholder="Type a message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="flex-1"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              className="hidden"
+              onChange={handleUpload}
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="h-4 w-4" />
+            </Button>
+            <Button size="icon">
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
@@ -310,8 +342,8 @@ const CaseDetail = () => {
           <DialogHeader>
             <DialogTitle>Book Consultation</DialogTitle>
             <DialogDescription>
-              Schedule a session with {fallbackCaseData.lawyerName}. The lawyer
-              will receive a notification.
+              Schedule a session with {caseData.lawyerName}. The request will be
+              sent to admin for approval.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
@@ -354,6 +386,33 @@ const CaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Drawers */}
+      <DocumentsDrawer
+        open={docsDrawerOpen}
+        onOpenChange={setDocsDrawerOpen}
+        documents={caseData.documents}
+        onUploadClick={() => {
+          setDocsDrawerOpen(false);
+          fileInputRef.current?.click();
+        }}
+      />
+
+      <TimelineDrawer
+        open={timelineDrawerOpen}
+        onOpenChange={setTimelineDrawerOpen}
+        events={caseData.timeline}
+      />
+
+      {canSeeNotes && (
+        <InternalNotesDrawer
+          open={notesDrawerOpen}
+          onOpenChange={setNotesDrawerOpen}
+          notes={internalNotes}
+          onAddNote={handleAddNote}
+          currentUserName={user?.fullName || 'Unknown'}
+        />
+      )}
     </DashboardLayout>
   );
 };

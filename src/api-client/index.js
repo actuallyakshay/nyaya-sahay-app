@@ -145,6 +145,13 @@ export const getUserAnalytics = () => {
   });
 };
 
+export const getAdminAnalytics = () => {
+  return apiClient({
+    method: routes.ADMIN_ANALYTICS.METHOD,
+    url: routes.ADMIN_ANALYTICS.URL,
+  });
+};
+
 export const getLawyerAnalytics = () => {
   return apiClient({
     method: routes.LAWYER_ANALYTICS.METHOD,
@@ -214,10 +221,55 @@ export const getLawyerProfile = () => {
   });
 };
 
+export const getAdminLawyerDetails = (id) => {
+  return apiClient({
+    method: routes.ADMIN_LAWYER_DETAILS.METHOD,
+    url: routes.ADMIN_LAWYER_DETAILS.URL.replace(':id', id),
+  });
+};
+
 export const updateLawyerProfile = (data) => {
   return apiClient({
     method: routes.UPDATE_LAWYER_PROFILE.METHOD,
     url: routes.UPDATE_LAWYER_PROFILE.URL,
+    data,
+  });
+};
+
+export const getAdminUserDetails = (id) => {
+  return apiClient({
+    method: routes.ADMIN_USER_DETAILS.METHOD,
+    url: routes.ADMIN_USER_DETAILS.URL.replace(':id', id),
+  });
+};
+
+export const getAdminUserCases = (id, params) => {
+  return apiClient({
+    method: routes.ADMIN_USER_CASES.METHOD,
+    url: routes.ADMIN_USER_CASES.URL.replace(':id', id),
+    params,
+  });
+};
+
+export const getAdminLawyerCases = (lawyerId, params) => {
+  return apiClient({
+    method: routes.ADMIN_LAWYER_CASES.METHOD,
+    url: routes.ADMIN_LAWYER_CASES.URL.replace(':lawyerId', lawyerId),
+    params,
+  });
+};
+
+export const getAdminSettings = () => {
+  return apiClient({
+    method: routes.ADMIN_SETTINGS.METHOD,
+    url: routes.ADMIN_SETTINGS.URL,
+  });
+};
+
+export const updateAdminSettings = (data) => {
+  return apiClient({
+    method: routes.UPDATE_ADMIN_SETTINGS.METHOD,
+    url: routes.UPDATE_ADMIN_SETTINGS.URL,
     data,
   });
 };

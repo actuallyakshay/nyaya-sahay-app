@@ -45,6 +45,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import NotFound from './pages/NotFound';
 import AdminCaseRequests from './pages/admin/AdminCaseRequests';
 import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
+import AdminSessionRequests from './pages/admin/AdminSessionRequests';
 
 console.log('[App] Origin:', window.location.origin);
 console.log('[App] Full URL:', window.location.href);
@@ -95,9 +96,9 @@ const App = () => (
               <Route
                 path="/app/cases/:id"
                 element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <CaseDetail />
-                  </ProtectedRoute>
+                  // <ProtectedRoute allowedRoles={['user']}>
+                  <CaseDetail />
+                  // </ProtectedRoute>
                 }
               />
               <Route
@@ -210,6 +211,15 @@ const App = () => (
                   // </ProtectedRoute>
                 }
               />
+
+              <Route
+                path="/admin/session-requests"
+                element={
+                  // <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminSessionRequests />
+                  // </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin/users"
                 element={
@@ -283,11 +293,29 @@ const App = () => (
                   // </ProtectedRoute>
                 }
               />
+
+              <Route
+                path="/admin/users/:id"
+                element={
+                  // <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminUserDetail />
+                  // </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin/settings"
                 element={
                   // <ProtectedRoute allowedRoles={['admin']}>
                   <AdminSettings />
+                  // </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/lawyers/:id"
+                element={
+                  // <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminLawyerDetail />
                   // </ProtectedRoute>
                 }
               />

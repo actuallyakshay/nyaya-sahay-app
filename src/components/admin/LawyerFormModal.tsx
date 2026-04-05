@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { LEGAL_CATEGORIES, type Lawyer, type LegalCategory } from '@/types';
 import { useEffect, useState } from 'react';
 
@@ -38,9 +37,7 @@ export const LawyerFormModal = ({
   const [experience, setExperience] = useState(0);
   const [bio, setBio] = useState('');
   const [specializations, setSpecializations] = useState<LegalCategory[]>([]);
-  const [isVerified, setIsVerified] = useState(false);
-  const [isAvailable, setIsAvailable] = useState(true);
-
+  const [password, setPassword] = useState('');
   useEffect(() => {
     if (lawyer) {
       setName(lawyer.name);
@@ -51,8 +48,6 @@ export const LawyerFormModal = ({
       setExperience(lawyer.experience);
       setBio(lawyer.bio);
       setSpecializations(lawyer.specializations);
-      setIsVerified(lawyer.isVerified);
-      setIsAvailable(lawyer.isAvailable);
     } else {
       setName('');
       setEmail('');
@@ -62,8 +57,6 @@ export const LawyerFormModal = ({
       setExperience(0);
       setBio('');
       setSpecializations([]);
-      setIsVerified(false);
-      setIsAvailable(true);
     }
   }, [lawyer, open]);
 
@@ -84,8 +77,6 @@ export const LawyerFormModal = ({
       experience,
       bio,
       specializations,
-      isVerified,
-      isAvailable,
     });
     onClose();
   };
@@ -114,6 +105,14 @@ export const LawyerFormModal = ({
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Password</Label>
+            <Input
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -171,14 +170,6 @@ export const LawyerFormModal = ({
                 </button>
               ))}
             </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <Label>Verified</Label>
-            <Switch checked={isVerified} onCheckedChange={setIsVerified} />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label>Available</Label>
-            <Switch checked={isAvailable} onCheckedChange={setIsAvailable} />
           </div>
         </div>
         <DialogFooter>

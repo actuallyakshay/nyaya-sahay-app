@@ -13,9 +13,13 @@ const SKELETON_WIDTHS = [
   ['w-28', 'w-32', 'w-24', 'w-20', 'w-32', 'w-16'],
 ];
 
-export const CasesTableSkeleton = () => (
+export const CasesTableSkeleton = ({
+  length = SKELETON_WIDTHS.length,
+}: {
+  length?: number;
+}) => (
   <>
-    {SKELETON_WIDTHS.map((widths, i) => (
+    {SKELETON_WIDTHS.slice(0, length).map((widths, i) => (
       <tr key={i} className="border-b last:border-0">
         <td className="px-4 py-3">
           <Skeleton className={`h-4 ${widths[0]} rounded`} />

@@ -51,8 +51,8 @@ const routes = {
     URL: '/api/users/analytics',
     METHOD: 'GET',
   },
-  USER_ANALYTICS: {
-    URL: '/api/users/analytics',
+  ADMIN_ANALYTICS: {
+    URL: '/api/admin/analytics',
     METHOD: 'GET',
   },
   CASE_DETAILS: {
@@ -114,6 +114,30 @@ const routes = {
   CREATE_ADMIN_USER: {
     URL: '/api/admin/users/create',
     METHOD: 'POST',
+  },
+  ADMIN_USER_DETAILS: {
+    URL: '/api/admin/users/:id',
+    METHOD: 'GET',
+  },
+  ADMIN_USER_CASES: {
+    URL: '/api/admin/users/:id/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_LAWYER_DETAILS: {
+    URL: '/api/admin/lawyers/:id',
+    METHOD: 'GET',
+  },
+  ADMIN_LAWYER_CASES: {
+    URL: '/api/admin/lawyers/:lawyerId/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_SETTINGS: {
+    URL: '/api/admin/settings',
+    METHOD: 'GET',
+  },
+  UPDATE_ADMIN_SETTINGS: {
+    URL: '/api/admin/settings',
+    METHOD: 'PATCH',
   },
 };
 

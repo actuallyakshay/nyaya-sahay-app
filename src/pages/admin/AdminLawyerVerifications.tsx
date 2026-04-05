@@ -176,7 +176,7 @@ const AdminLawyerVerifications = () => {
                                 onClick={() =>
                                   handleUpdateLawyerRoleStatus(
                                     l.id,
-                                    l.user.id,
+                                    l.user?.id,
                                     'lawyer',
                                     'active'
                                   )
@@ -197,7 +197,7 @@ const AdminLawyerVerifications = () => {
                                 onClick={() =>
                                   handleUpdateLawyerRoleStatus(
                                     l.id,
-                                    l.id,
+                                    l.user?.id,
                                     'lawyer',
                                     'rejected'
                                   )

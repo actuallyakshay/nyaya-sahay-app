@@ -178,6 +178,10 @@ export interface LawyersListUser {
   avatarUrl: string | null;
   email?: string;
   phone?: string;
+  userRole?: {
+    id: string;
+    status: 'active' | 'inactive' | 'pending' | 'blocked';
+  };
 }
 
 export interface LawyerPracticeAreaRow {
