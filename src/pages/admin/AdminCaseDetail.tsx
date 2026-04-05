@@ -93,7 +93,7 @@ const AdminCaseDetail = () => {
             <h1 className="mt-1.5 text-xl font-bold sm:text-2xl">{caseData.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {caseData.status !== 'closed' && caseData.status !== 'resolved' && (
               <>
                 <Button variant="outline" size="sm" onClick={() => {
@@ -105,13 +105,39 @@ const AdminCaseDetail = () => {
                   <RotateCcw className="mr-1.5 h-3.5 w-3.5" />Reset
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => setCloseDialogOpen(true)}>
-                  <XCircle className="mr-1.5 h-3.5 w-3.5" />Close Case
+                  <XCircle className="mr-1.5 h-3.5 w-3.5" />Close
                 </Button>
               </>
             )}
-            <Button variant="outline" size="sm" onClick={() => setNotesDrawerOpen(true)}>
-              <StickyNote className="mr-1.5 h-3.5 w-3.5" />Notes ({internalNotes.length})
-            </Button>
+            <div className="h-5 w-px bg-border" />
+            <TooltipProvider delayDuration={300}>
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDocsDrawerOpen(true)}>
+                      <FileText className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Documents ({caseData.documents.length})</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setTimelineDrawerOpen(true)}>
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Timeline</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setNotesDrawerOpen(true)}>
+                      <StickyNote className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Notes ({internalNotes.length})</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
           </div>
         </div>
 
