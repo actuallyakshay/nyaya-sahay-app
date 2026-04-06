@@ -19,8 +19,7 @@ const userNav = [
 const lawyerNav = [
   { label: 'Dashboard', to: '/lawyer/dashboard', icon: LayoutDashboard },
   { label: 'Cases', to: '/lawyer/cases', icon: Briefcase },
-  { label: 'Messages', to: '/lawyer/cases', icon: MessageSquare },
-  { label: 'Notifications', to: '/lawyer/notifications', icon: Bell },
+  { label: 'Sessions', to: '/lawyer/sessions', icon: CalendarCheck },
   { label: 'Profile', to: '/lawyer/profile', icon: User },
 ];
 
