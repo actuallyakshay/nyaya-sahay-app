@@ -42,7 +42,7 @@ const AdminCases = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isFetching, isError } = useQuery<CasesResponse>({
-    queryKey: ['adminCases', page, debouncedSearch, statusFilter],
+    queryKey: ['admin-cases', page, debouncedSearch, statusFilter],
     queryFn: async () => {
       const params = buildQueryParams(page, debouncedSearch, statusFilter);
       const response = await getAdminCases(params);
