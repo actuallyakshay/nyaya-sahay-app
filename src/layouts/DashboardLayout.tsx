@@ -11,8 +11,8 @@ const userNav = [
   { label: 'My Cases', to: '/app/cases', icon: Briefcase },
   { label: 'New Case', to: '/app/new-case', icon: Plus },
   { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
+  { label: 'Sessions', to: '/app/sessions', icon: CalendarCheck },
   { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
-  { label: 'Notifications', to: '/app/notifications', icon: Bell },
   { label: 'Profile', to: '/app/profile', icon: User },
 ];
 
