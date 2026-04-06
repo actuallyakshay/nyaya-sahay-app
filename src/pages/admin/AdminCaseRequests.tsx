@@ -9,7 +9,7 @@ import { PAGE_SIZE } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
 import { CaseStatus, CasesResponse, LEGAL_CATEGORIES } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { CheckCircle, Eye, XCircle } from 'lucide-react';
+import { CheckCircle, Eye, Loader2, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -27,6 +27,13 @@ const buildQueryParams = (page: number) => {
 const AdminCaseRequests = () => {
   const { toast } = useToast();
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState<{
+    caseId: string | null;
+    action: 'accept' | 'reject' | null;
+  }>({
+    caseId: null,
+    action: null,
+  });
 
   const { data, isFetching } = useQuery<CasesResponse>({
     queryKey: ['case-requests', page],
@@ -48,21 +55,34 @@ const AdminCaseRequests = () => {
     caseId: string,
     status: CaseStatus
   ) => {
+    const action = status === 'under_review' ? 'accept' : 'reject';
+    setLoading({
+      caseId,
+      action,
+    });
     try {
       await updateAdminCaseStatus(caseId, status);
       toast({
         title: 'Case Status Updated',
         description: `Case ${caseId} has been updated to ${status}.`,
       });
-      await queryClient.invalidateQueries({
-        queryKey: ['case-requests', page],
-      });
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ['case-requests', page],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ['admin-cases'],
+        }),
+      ]);
     } catch (error) {
       toast({
         title: 'Error Updating Case Status',
         description: error.message,
         variant: 'destructive',
       });
+    } finally {
+      setLoading({ caseId: null, action: null });
     }
   };
 
@@ -87,76 +107,93 @@ const AdminCaseRequests = () => {
         ) : (
           <div className="space-y-3">
             {!isFetching &&
-              cases.map((c) => (
-                <div key={c.id} className="rounded-xl border bg-card p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {c.caseCode}
-                        </span>
-                        <StatusBadge status={c.status} />
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                            c.isEmergency
-                              ? 'bg-destructive/10 text-destructive'
-                              : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          {c.isEmergency ? 'Emergency' : 'Normal Priority'}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold">{c.title}</h3>
-                      <p className="mt-0.5 text-sm text-muted-foreground">
-                        {c.description}
-                      </p>
-                      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>
-                          By:{' '}
-                          <span className="font-medium text-foreground">
-                            {c.user?.fullName}
+              cases.map((c) => {
+                const isAcceptLoading =
+                  loading.caseId === c.id && loading.action === 'accept';
+                const isRejectLoading =
+                  loading.caseId === c.id && loading.action === 'reject';
+                const isRowLoading = loading.caseId === c.id;
+                return (
+                  <div key={c.id} className="rounded-xl border bg-card p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {c.caseCode}
                           </span>
-                        </span>
-                        <span>{LEGAL_CATEGORIES[c.practiceArea?.name]}</span>
-                        <span>
-                          {new Date(c.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
+                          <StatusBadge status={c.status} />
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                              c.isEmergency
+                                ? 'bg-destructive/10 text-destructive'
+                                : 'bg-muted text-muted-foreground'
+                            }`}
+                          >
+                            {c.isEmergency ? 'Emergency' : 'Normal Priority'}
+                          </span>
+                        </div>
+                        <h3 className="font-semibold">{c.title}</h3>
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                          {c.description}
+                        </p>
+                        <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                          <span>
+                            By:{' '}
+                            <span className="font-medium text-foreground">
+                              {c.user?.fullName}
+                            </span>
+                          </span>
+                          <span>{LEGAL_CATEGORIES[c.practiceArea?.name]}</span>
+                          <span>
+                            {new Date(c.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      <Button size="sm" variant="outline" asChild>
-                        <Link to={`/admin/cases/${c.id}`}>
-                          <Eye className="mr-1.5 h-3.5 w-3.5" />
-                          View
-                        </Link>
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          handleUpdateAdminCaseStatus(c.id, 'under_review')
-                        }
-                      >
-                        <CheckCircle className="mr-1.5 h-3.5 w-3.5" />
-                        Accept
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() =>
-                          handleUpdateAdminCaseStatus(c.id, 'closed')
-                        }
-                      >
-                        <XCircle className="mr-1.5 h-3.5 w-3.5" />
-                        Reject
-                      </Button>
+                      <div className="flex shrink-0 gap-2">
+                        <Button size="sm" variant="outline" asChild>
+                          <Link to={`/admin/cases/${c.id}`}>
+                            <Eye className="mr-1.5 h-3.5 w-3.5" />
+                            View
+                          </Link>
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            handleUpdateAdminCaseStatus(c.id, 'under_review')
+                          }
+                          disabled={isRowLoading}
+                        >
+                          {isAcceptLoading ? (
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle className="mr-1.5 h-3.5 w-3.5" />
+                          )}
+                          Accept
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() =>
+                            handleUpdateAdminCaseStatus(c.id, 'closed')
+                          }
+                          disabled={isRowLoading}
+                        >
+                          {isRejectLoading ? (
+                            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                          )}
+                          Reject
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             <PaginationControls
               page={page}
               totalPages={totalPages}
