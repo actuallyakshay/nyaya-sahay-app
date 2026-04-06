@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, Bell, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft, Users, ArrowRightLeft } from 'lucide-react';
+import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, LogOut, Menu, X, ChevronLeft, MessageSquare, PanelLeftClose, PanelLeft, Users, ArrowRightLeft, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
@@ -11,16 +11,15 @@ const userNav = [
   { label: 'My Cases', to: '/app/cases', icon: Briefcase },
   { label: 'New Case', to: '/app/new-case', icon: Plus },
   { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
+  { label: 'Sessions', to: '/app/sessions', icon: CalendarCheck },
   { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
-  { label: 'Notifications', to: '/app/notifications', icon: Bell },
   { label: 'Profile', to: '/app/profile', icon: User },
 ];
 
 const lawyerNav = [
   { label: 'Dashboard', to: '/lawyer/dashboard', icon: LayoutDashboard },
   { label: 'Cases', to: '/lawyer/cases', icon: Briefcase },
-  { label: 'Messages', to: '/lawyer/cases', icon: MessageSquare },
-  { label: 'Notifications', to: '/lawyer/notifications', icon: Bell },
+  { label: 'Sessions', to: '/lawyer/sessions', icon: CalendarCheck },
   { label: 'Profile', to: '/lawyer/profile', icon: User },
 ];
 

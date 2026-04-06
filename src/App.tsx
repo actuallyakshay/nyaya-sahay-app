@@ -23,6 +23,7 @@ import UserNotifications from "./pages/user/UserNotifications";
 import UserProfile from "./pages/user/UserProfile";
 import LawyersDirectory from "./pages/user/LawyersDirectory";
 import LawyerProfileView from "./pages/user/LawyerProfileView";
+import UpcomingSessions from "./pages/user/UpcomingSessions";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
@@ -69,7 +70,7 @@ const App = () => (
             <Route path="/app/cases/:id" element={<ProtectedRoute allowedRoles={['user']}><CaseDetail /></ProtectedRoute>} />
             <Route path="/app/new-case" element={<ProtectedRoute allowedRoles={['user']}><NewCase /></ProtectedRoute>} />
             <Route path="/app/subscription" element={<ProtectedRoute allowedRoles={['user']}><UserSubscription /></ProtectedRoute>} />
-            <Route path="/app/notifications" element={<ProtectedRoute allowedRoles={['user']}><UserNotifications /></ProtectedRoute>} />
+            <Route path="/app/sessions" element={<ProtectedRoute allowedRoles={['user']}><UpcomingSessions /></ProtectedRoute>} />
             <Route path="/app/profile" element={<ProtectedRoute allowedRoles={['user']}><UserProfile /></ProtectedRoute>} />
             <Route path="/app/lawyers" element={<ProtectedRoute allowedRoles={['user']}><LawyersDirectory /></ProtectedRoute>} />
             <Route path="/app/lawyers/:id" element={<ProtectedRoute allowedRoles={['user']}><LawyerProfileView /></ProtectedRoute>} />
@@ -78,7 +79,7 @@ const App = () => (
             <Route path="/lawyer/dashboard" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} />
             <Route path="/lawyer/cases" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerCases /></ProtectedRoute>} />
             <Route path="/lawyer/cases/:id" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseDetail /></ProtectedRoute>} />
-            <Route path="/lawyer/notifications" element={<ProtectedRoute allowedRoles={['lawyer']}><UserNotifications /></ProtectedRoute>} />
+            <Route path="/lawyer/sessions" element={<ProtectedRoute allowedRoles={['lawyer']}><UpcomingSessions /></ProtectedRoute>} />
             <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><UserProfile /></ProtectedRoute>} />
 
             {/* Admin */}

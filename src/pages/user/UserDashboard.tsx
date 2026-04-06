@@ -1,16 +1,19 @@
+import { useState } from 'react';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { mockCases, mockSubscription, mockNotifications } from '@/lib/mock-data';
+import { mockCases, mockSubscription } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { Briefcase, CreditCard, Bell, ArrowRight, Plus, Clock } from 'lucide-react';
+import { Briefcase, CreditCard, ArrowRight, Plus, Clock, Crown, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LEGAL_CATEGORIES } from '@/types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const UserDashboard = () => {
   const { user } = useAuth();
   const activeCases = mockCases.filter((c) => !['resolved', 'closed'].includes(c.status));
-  const unreadNotifs = mockNotifications.filter((n) => !n.isRead);
+  const hasSubscription = mockSubscription.status === 'active';
+  const [paywallOpen, setPaywallOpen] = useState(!hasSubscription);
 
   return (
     <DashboardLayout>
@@ -35,7 +38,7 @@ const UserDashboard = () => {
           {[
             { label: 'Active Cases', value: activeCases.length, icon: Briefcase, color: 'text-info' },
             { label: 'Plan', value: mockSubscription.planName, icon: CreditCard, color: 'text-gold' },
-            { label: 'Unread Alerts', value: unreadNotifs.length, icon: Bell, color: 'text-warning' },
+            { label: 'Sessions', value: '2 upcoming', icon: CalendarCheck, color: 'text-warning' },
             { label: 'Days Remaining', value: Math.max(0, Math.ceil((new Date(mockSubscription.endDate).getTime() - Date.now()) / 86400000)), icon: Clock, color: 'text-success' },
           ].map((s) => (
             <div key={s.label} className="rounded-xl border bg-card p-5 shadow-sm">
@@ -76,6 +79,40 @@ const UserDashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Subscription Paywall Modal */}
+      <Dialog open={paywallOpen} onOpenChange={setPaywallOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center sm:text-center">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gold/10">
+              <Crown className="h-7 w-7 text-gold" />
+            </div>
+            <DialogTitle className="text-xl">Subscribe to Get Started</DialogTitle>
+            <DialogDescription className="text-base">
+              An active subscription is required to raise legal queries and connect with advocates.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="rounded-xl border bg-muted/30 p-4 space-y-2">
+              <p className="text-sm font-medium">What you get with a plan:</p>
+              <ul className="text-sm text-muted-foreground space-y-1.5">
+                <li className="flex items-center gap-2">✓ Unlimited legal queries</li>
+                <li className="flex items-center gap-2">✓ Expert lawyer matching</li>
+                <li className="flex items-center gap-2">✓ Video & phone consultations</li>
+                <li className="flex items-center gap-2">✓ Document review & drafting</li>
+              </ul>
+            </div>
+            <div className="flex gap-2">
+              <Button className="flex-1 gap-2" asChild>
+                <Link to="/app/subscription"><CreditCard className="h-4 w-4" /> View Plans</Link>
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => setPaywallOpen(false)}>
+                Browse First
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
