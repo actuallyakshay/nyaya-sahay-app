@@ -8,12 +8,15 @@ import { Briefcase, CreditCard, ArrowRight, Plus, Clock, Crown, CalendarCheck } 
 import { Button } from '@/components/ui/button';
 import { LEGAL_CATEGORIES } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 
 const UserDashboard = () => {
   const { user } = useAuth();
   const activeCases = mockCases.filter((c) => !['resolved', 'closed'].includes(c.status));
   const hasSubscription = mockSubscription.status === 'active';
-  const [paywallOpen, setPaywallOpen] = useState(!hasSubscription);
+  const isProfileComplete = localStorage.getItem('profile_completed') === 'true';
+  const [profileModalOpen, setProfileModalOpen] = useState(!isProfileComplete);
+  const [paywallOpen, setPaywallOpen] = useState(!hasSubscription && isProfileComplete);
 
   return (
     <DashboardLayout>
