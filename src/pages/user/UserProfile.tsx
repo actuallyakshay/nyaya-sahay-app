@@ -76,7 +76,10 @@ const UserProfile = () => {
             </div>
             <div className="space-y-2">
               <Label>Phone</Label>
-              <Input defaultValue="+91 98765 43210" />
+              <div className="flex">
+                <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">+91</span>
+                <Input className="rounded-l-none" defaultValue="9876543210" maxLength={10} />
+              </div>
             </div>
           </div>
 
