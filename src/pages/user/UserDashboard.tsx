@@ -116,6 +116,15 @@ const UserDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Profile Completion Modal */}
+      <ProfileCompletionModal
+        open={profileModalOpen}
+        onComplete={() => {
+          setProfileModalOpen(false);
+          if (!hasSubscription) setPaywallOpen(true);
+        }}
+      />
     </DashboardLayout>
   );
 };
