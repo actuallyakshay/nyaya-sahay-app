@@ -1,5 +1,18 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { RegistrationFields } from '@/types';
+
+export interface FormErrors {
+  name?: string;
+  email?: string;
+  phone?: string;
+  password?: string[];
+}
+
+export interface LoginErrors {
+  email?: string;
+  password?: string;
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,25 +39,6 @@ export const validatePhone = (phone: string): string | null => {
   }
   return null;
 };
-
-interface RegistrationFields {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-}
-
-export interface FormErrors {
-  name?: string;
-  email?: string;
-  phone?: string;
-  password?: string[];
-}
-
-export interface LoginErrors {
-  email?: string;
-  password?: string;
-}
 
 export const validateRegistrationForm = (fields: RegistrationFields): FormErrors => {
   const errors: FormErrors = {};

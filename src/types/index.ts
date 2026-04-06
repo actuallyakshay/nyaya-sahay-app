@@ -286,3 +286,17 @@ export interface ConsultationNotification {
   link?: string;
   consultationDetails?: ConsultationDetails;
 }
+
+// Form validation types
+export interface FieldErrors {
+  email?: string;
+  phone?: string;
+  password?: string;
+}
+
+export interface RegistrationFields {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
