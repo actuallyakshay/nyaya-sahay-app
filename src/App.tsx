@@ -70,7 +70,7 @@ const App = () => (
             <Route path="/app/cases/:id" element={<ProtectedRoute allowedRoles={['user']}><CaseDetail /></ProtectedRoute>} />
             <Route path="/app/new-case" element={<ProtectedRoute allowedRoles={['user']}><NewCase /></ProtectedRoute>} />
             <Route path="/app/subscription" element={<ProtectedRoute allowedRoles={['user']}><UserSubscription /></ProtectedRoute>} />
-            <Route path="/app/notifications" element={<ProtectedRoute allowedRoles={['user']}><UserNotifications /></ProtectedRoute>} />
+            <Route path="/app/sessions" element={<ProtectedRoute allowedRoles={['user']}><UpcomingSessions /></ProtectedRoute>} />
             <Route path="/app/profile" element={<ProtectedRoute allowedRoles={['user']}><UserProfile /></ProtectedRoute>} />
             <Route path="/app/lawyers" element={<ProtectedRoute allowedRoles={['user']}><LawyersDirectory /></ProtectedRoute>} />
             <Route path="/app/lawyers/:id" element={<ProtectedRoute allowedRoles={['user']}><LawyerProfileView /></ProtectedRoute>} />
