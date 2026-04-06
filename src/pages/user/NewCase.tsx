@@ -13,6 +13,7 @@ import {
   MAX_FILES,
   MAX_SIZE_MB,
 } from '@/lib/mock-data';
+import { queryClient } from '@/lib/query-client';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UploadedDoc } from '@/types';
 import { useMutation } from '@tanstack/react-query';
@@ -65,7 +66,6 @@ const NewCase = () => {
         description:
           'Your legal query has been filed. We will assign a lawyer shortly.',
       });
-      navigate('/app/cases');
     },
     onError: (err: unknown) => {
       toast({
@@ -79,6 +79,8 @@ const NewCase = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await mutateAsync();
+    await queryClient.invalidateQueries({ queryKey: ['user-cases'] });
+    navigate('/app/cases');
   };
 
   const handleFileError = (message: string) => {

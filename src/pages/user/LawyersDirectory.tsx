@@ -128,7 +128,7 @@ const LawyersDirectory = () => {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {l.lawyerPracticeAreas?.length > 0 ? (
+                  {l.lawyerPracticeAreas.length > 0 &&
                     l.lawyerPracticeAreas.map((area) => (
                       <span
                         key={area.id}
@@ -136,12 +136,7 @@ const LawyersDirectory = () => {
                       >
                         {area.practiceArea?.name}
                       </span>
-                    ))
-                  ) : (
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                      No specializations listed
-                    </span>
-                  )}
+                    ))}
                 </div>
                 <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
@@ -155,15 +150,9 @@ const LawyersDirectory = () => {
                     </span>
                   )}
                 </div>
-                {l.bio ? (
-                  <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                    {l.bio}
-                  </p>
-                ) : (
-                  <p className="mt-2 text-xs italic text-muted-foreground">
-                    No bio available
-                  </p>
-                )}
+                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                  {l?.bio}
+                </p>
               </div>
             ))
           )}

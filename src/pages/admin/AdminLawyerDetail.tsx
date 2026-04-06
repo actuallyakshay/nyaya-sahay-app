@@ -104,7 +104,7 @@ const AdminLawyerDetail = () => {
                 </span>
                 <span className="flex items-center gap-1">
                   <Phone className="h-3.5 w-3.5" />
-                  {lawyerData?.user?.phone}
+                  +91-{lawyerData?.user?.phone}
                 </span>
                 <span className="flex items-center gap-1">
                   <Award className="h-3.5 w-3.5" />

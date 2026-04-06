@@ -30,7 +30,7 @@ const UserCases = () => {
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isFetching, isError } = useQuery<CasesResponse>({
-    queryKey: ['cases', page, debouncedSearch, statusFilter],
+    queryKey: ['user-cases', page, debouncedSearch, statusFilter],
     queryFn: async () => {
       const params = buildUserCasesQueryParams(
         page,
