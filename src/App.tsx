@@ -23,6 +23,7 @@ import UserNotifications from "./pages/user/UserNotifications";
 import UserProfile from "./pages/user/UserProfile";
 import LawyersDirectory from "./pages/user/LawyersDirectory";
 import LawyerProfileView from "./pages/user/LawyerProfileView";
+import UpcomingSessions from "./pages/user/UpcomingSessions";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
