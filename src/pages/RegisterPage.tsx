@@ -11,11 +11,16 @@ const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!phone.trim() || !/^[6-9]\d{9}$/.test(phone.trim())) {
+      setPhoneError('Enter a valid 10-digit Indian mobile number');
+      return;
+    }
     toast({ title: 'Account created!', description: 'Please log in to continue.' });
     navigate('/login');
   };
@@ -40,8 +45,20 @@ const RegisterPage = () => {
             <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="flex">
+              <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">+91</span>
+              <Input
+                id="phone"
+                className="rounded-l-none"
+                placeholder="9876543210"
+                maxLength={10}
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setPhoneError(''); }}
+                required
+              />
+            </div>
+            {phoneError && <p className="text-sm text-destructive">{phoneError}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
