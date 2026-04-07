@@ -119,12 +119,52 @@ const UserDashboard = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Create First Case Modal */}
+      <Dialog open={firstCaseOpen} onOpenChange={setFirstCaseOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center sm:text-center">
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+              <FileText className="h-7 w-7 text-primary" />
+            </div>
+            <DialogTitle className="text-xl">Create Your First Case</DialogTitle>
+            <DialogDescription className="text-base">
+              You're all set! Raise your first legal query and we'll match you with the right advocate.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="rounded-xl border bg-muted/30 p-4 space-y-2">
+              <p className="text-sm font-medium">How it works:</p>
+              <ul className="text-sm text-muted-foreground space-y-1.5">
+                <li className="flex items-center gap-2">1️⃣ Describe your legal issue</li>
+                <li className="flex items-center gap-2">2️⃣ Upload relevant documents</li>
+                <li className="flex items-center gap-2">3️⃣ Get matched with an expert lawyer</li>
+                <li className="flex items-center gap-2">4️⃣ Consult via chat, call, or video</li>
+              </ul>
+            </div>
+            <div className="flex gap-2">
+              <Button className="flex-1 gap-2" asChild onClick={() => {
+                localStorage.setItem('first_case_created', 'true');
+              }}>
+                <Link to="/app/new-case"><Plus className="h-4 w-4" /> Raise a Query</Link>
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => {
+                localStorage.setItem('first_case_created', 'true');
+                setFirstCaseOpen(false);
+              }}>
+                Later
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Profile Completion Modal */}
       <ProfileCompletionModal
         open={profileModalOpen}
         onComplete={() => {
           setProfileModalOpen(false);
           if (!hasSubscription) setPaywallOpen(true);
+          else if (!hasCreatedCase) setFirstCaseOpen(true);
         }}
       />
     </DashboardLayout>
