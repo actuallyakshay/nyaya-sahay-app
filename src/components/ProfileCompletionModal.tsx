@@ -47,8 +47,8 @@ const ProfileCompletionModal = ({ open, onComplete }: ProfileCompletionModalProp
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onComplete(); }}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center sm:text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
             <UserCircle className="h-7 w-7 text-primary" />
