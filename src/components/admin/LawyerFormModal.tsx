@@ -1,4 +1,4 @@
-import { addLawyer } from '@/api-client';
+import { addLawyer, updateAdminLawyer } from '@/api-client';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,7 +14,7 @@ import WithShimmer from '@/components/WithShimmer';
 import { useCategories } from '@/hooks/useCategories';
 import { queryClient } from '@/lib/query-client';
 import { validateEmail, validatePhone } from '@/lib/utils';
-import type { FieldErrors, Lawyer, LawyerFormModalProps } from '@/types';
+import type { FieldErrors, LawyerFormModalProps } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -25,6 +25,7 @@ export const LawyerFormModal = ({
   lawyer,
   onSave,
 }: LawyerFormModalProps) => {
+  const isEditMode = !!lawyer;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -41,20 +42,38 @@ export const LawyerFormModal = ({
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync: createLawyer, isPending: isCreating } = useMutation({
     mutationFn: addLawyer,
   });
 
+  const { mutateAsync: editLawyer, isPending: isUpdating } = useMutation({
+    mutationFn: (body: Record<string, unknown>) =>
+      updateAdminLawyer(lawyer!.id, body),
+  });
+
+  const isPending = isCreating || isUpdating;
+
   useEffect(() => {
-    if (lawyer) {
-      setName(lawyer.name);
-      setEmail(lawyer.email);
-      setPhone(lawyer.phone);
-      setBarCouncilId(lawyer.barCouncilId);
-      setDegree(lawyer.degree);
-      setBio(lawyer.bio);
-      setSelectedSpecializations([]);
-    } else {
+    if (open && lawyer) {
+      setName(lawyer.user?.fullName ?? '');
+      setEmail(lawyer.user?.email ?? '');
+      setPhone(lawyer.user?.phone ?? '');
+      setPassword('');
+      setBarCouncilId(lawyer.barCouncilId ?? '');
+      setDegree(lawyer.degree ?? '');
+      setCareerStartDate(
+        lawyer.careerStartDate
+          ? new Date(lawyer.careerStartDate).toISOString().split('T')[0]
+          : ''
+      );
+      setBio(lawyer.bio ?? '');
+      setSelectedSpecializations(
+        (lawyer.lawyerPracticeAreas
+          ?.map((s) => s.practiceArea?.id)
+          .filter(Boolean) as string[]) ?? []
+      );
+      setErrors({});
+    } else if (open) {
       resetForm();
     }
   }, [lawyer, open]);
@@ -93,11 +112,11 @@ export const LawyerFormModal = ({
 
     if (!name.trim()) newErrors.name = 'Full name is required';
 
-    const emailError = validateEmail(email);
-    if (emailError) newErrors.email = emailError;
-
-    if (!lawyer && !password.trim())
-      newErrors.password = 'Password is required';
+    if (!isEditMode) {
+      const emailError = validateEmail(email);
+      if (emailError) newErrors.email = emailError;
+      if (!password.trim()) newErrors.password = 'Password is required';
+    }
 
     if (phone.trim()) {
       const phoneError = validatePhone(phone);
@@ -109,29 +128,50 @@ export const LawyerFormModal = ({
       return;
     }
 
-    const payload = {
-      fullName: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      password: password.trim(),
-      barCouncilId: barCouncilId.trim(),
-      degree: degree.trim(),
-      careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
-      bio: bio.trim(),
-      lawyerPracticeAreas: selectedSpecializations,
-    };
+    let response;
 
-    await mutateAsync(payload);
+    if (isEditMode) {
+      const editPayload = {
+        userProfile: {
+          fullName: name.trim(),
+          phone: phone.trim(),
+        },
+        barCouncilId: barCouncilId.trim(),
+        degree: degree.trim(),
+        careerStartDate: careerStartDate || null,
+        bio: bio.trim(),
+        lawyerPracticeAreas: selectedSpecializations,
+      };
+      response = await editLawyer(editPayload);
+    } else {
+      const createPayload = {
+        fullName: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        password: password.trim(),
+        barCouncilId: barCouncilId.trim(),
+        degree: degree.trim(),
+        careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
+        bio: bio.trim(),
+        lawyerPracticeAreas: selectedSpecializations,
+      };
+      response = await createLawyer(createPayload);
+    }
+
     await queryClient.invalidateQueries({ queryKey: ['admin-lawyers'] });
-    onSave({ name, email, phone, barCouncilId, degree, bio });
+    onSave(
+      { name, email, phone, barCouncilId, degree, bio },
+      response?.data?.message
+    );
     resetForm();
+    onClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{lawyer ? 'Edit Lawyer' : 'Add Lawyer'}</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Lawyer' : 'Add Lawyer'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -163,6 +203,7 @@ export const LawyerFormModal = ({
                   clearError('email');
                 }}
                 placeholder="lawyer@example.com"
+                disabled={isEditMode}
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email}</p>
@@ -170,23 +211,25 @@ export const LawyerFormModal = ({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label>
-              Password {!lawyer && <span className="text-destructive">*</span>}
-            </Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                clearError('password');
-              }}
-              placeholder="Enter password"
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password}</p>
-            )}
-          </div>
+          {!isEditMode && (
+            <div className="space-y-1.5">
+              <Label>
+                Password <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearError('password');
+                }}
+                placeholder="Enter password"
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -216,6 +259,7 @@ export const LawyerFormModal = ({
                 value={barCouncilId}
                 onChange={(e) => setBarCouncilId(e.target.value)}
                 placeholder="BCI/XX/XXXX/XXXX"
+                disabled={isEditMode}
               />
             </div>
           </div>
@@ -227,10 +271,11 @@ export const LawyerFormModal = ({
                 value={degree}
                 onChange={(e) => setDegree(e.target.value)}
                 placeholder="LL.B, LL.M"
+                // disabled={isEditMode}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Experience (years)</Label>
+              <Label>Career Start Date</Label>
               <Input
                 type="date"
                 value={careerStartDate}
@@ -282,7 +327,7 @@ export const LawyerFormModal = ({
           </Button>
           <Button onClick={handleSave} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {lawyer ? 'Save Changes' : 'Add Lawyer'}
+            {isEditMode ? 'Save Changes' : 'Add Lawyer'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,4 @@
-import { createAdminUser } from '@/api-client';
+import { createAdminUser, updateAdminUser } from '@/api-client';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,7 +14,7 @@ import { validateEmail, validatePhone } from '@/lib/utils';
 import type { FieldErrors, User, UserFormModalProps } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const UserFormModal = ({
   open,
@@ -22,20 +22,44 @@ export const UserFormModal = ({
   user,
   onSave,
 }: UserFormModalProps) => {
+  const isEditMode = !!user;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const { mutateAsync, isPending } = useMutation({
+  useEffect(() => {
+    if (open && user) {
+      setName(user.fullName ?? user.name ?? '');
+      setEmail(user.email ?? '');
+      setPhone(user.phone ?? '');
+      setPassword('');
+      setErrors({});
+    } else if (open) {
+      setName('');
+      setEmail('');
+      setPhone('');
+      setPassword('');
+      setErrors({});
+    }
+  }, [open, user]);
+
+  const { mutateAsync: createUser, isPending: isCreating } = useMutation({
     mutationFn: async (body: {
-      name: string;
+      fullName: string;
       email: string;
       phone: string;
-      password: string;
+      password?: string;
     }) => await createAdminUser(body),
   });
+
+  const { mutateAsync: editUser, isPending: isUpdating } = useMutation({
+    mutationFn: async (body: { fullName: string; phone: string }) =>
+      await updateAdminUser(user!.id, body),
+  });
+
+  const isPending = isCreating || isUpdating;
 
   const clearError = (field: keyof FieldErrors) => {
     if (errors[field]) {
@@ -54,21 +78,27 @@ export const UserFormModal = ({
       if (phoneError) newErrors.phone = phoneError;
     }
 
-    if (!password.trim()) newErrors.password = 'Password is required';
+    if (!isEditMode && !password.trim()) newErrors.password = 'Password is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    await mutateAsync({
-      name: name.trim(),
+    const payload = {
+      fullName: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      password: password.trim(),
-    });
+      ...(isEditMode ? {} : { password: password.trim() }),
+    };
+    let response;
+    if (isEditMode) {
+      response = await editUser({ fullName: payload.fullName, phone: payload.phone });
+    } else {
+      response = await createUser(payload);
+    }
     await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-    onSave({ name, email, phone, password });
+    onSave(payload, response?.data?.message);
     setName('');
     setEmail('');
     setPhone('');
@@ -100,25 +130,28 @@ export const UserFormModal = ({
               onChange={(e) => { setEmail(e.target.value); clearError('email'); }}
               placeholder="Enter email"
               required
+              disabled={isEditMode}
             />
             {errors.email && (
               <p className="text-xs text-destructive">{errors.email}</p>
             )}
           </div>
-          <div className="space-y-1.5">
-            <Label>Password</Label>
-            <span className="ml-1 text-xs text-muted-foreground">*</span>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); clearError('password'); }}
-              placeholder="Enter password"
-              required
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password}</p>
-            )}
-          </div>
+          {!isEditMode && (
+            <div className="space-y-1.5">
+              <Label>Password</Label>
+              <span className="ml-1 text-xs text-muted-foreground">*</span>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); clearError('password'); }}
+                placeholder="Enter password"
+                required
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password}</p>
+              )}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="profile-phone">Phone Number</Label>
             <div className="flex">

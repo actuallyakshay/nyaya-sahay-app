@@ -147,6 +147,14 @@ const routes = {
     URL: '/api/admin/lawyers',
     METHOD: 'POST',
   },
+  ADMIN_UPDATE_USER: {
+    URL: '/api/admin/users/:id',
+    METHOD: 'PATCH',
+  },
+  ADMIN_UPDATE_LAWYER: {
+    URL: '/api/admin/lawyers/:id',
+    METHOD: 'PATCH',
+  },
 };
 
 export default routes;

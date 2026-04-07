@@ -289,3 +289,19 @@ export const addLawyer = (data) => {
     data,
   });
 };
+
+export const updateAdminUser = (id, data) => {
+  return apiClient({
+    method: routes.ADMIN_UPDATE_USER.METHOD,
+    url: `${routes.ADMIN_UPDATE_USER.URL.replace(':id', id)}/update`,
+    data,
+  });
+};
+
+export const updateAdminLawyer = (id, data) => {
+  return apiClient({
+    method: routes.ADMIN_UPDATE_LAWYER.METHOD,
+    url: `${routes.ADMIN_UPDATE_LAWYER.URL.replace(':id', id)}/update`,
+    data,
+  });
+};

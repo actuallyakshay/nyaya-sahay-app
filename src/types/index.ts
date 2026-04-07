@@ -307,14 +307,14 @@ export interface UserFormModalProps {
   open: boolean;
   onClose: () => void;
   user?: User | null;
-  onSave: (data: Partial<User>) => void;
+  onSave: (data: Partial<User>, message?: string) => void;
 }
 
 export interface LawyerFormModalProps {
   open: boolean;
   onClose: () => void;
-  lawyer?: Lawyer | null;
-  onSave: (data: Partial<Lawyer>) => void;
+  lawyer?: LawyerListItem | null;
+  onSave: (data: Record<string, unknown>, message?: string) => void;
 }
 
 // Admin auth types
