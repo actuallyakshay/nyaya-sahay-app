@@ -17,6 +17,14 @@ export const login = (body) => {
   });
 };
 
+export const adminLogin = (body) => {
+  return apiClient({
+    method: routes.ADMIN_LOGIN.METHOD,
+    url: routes.ADMIN_LOGIN.URL,
+    data: body,
+  });
+};
+
 export const refreshAuthToken = () => {
   return apiClient({
     method: routes.REFRESH_TOKEN.METHOD,
@@ -270,6 +278,14 @@ export const updateAdminSettings = (data) => {
   return apiClient({
     method: routes.UPDATE_ADMIN_SETTINGS.METHOD,
     url: routes.UPDATE_ADMIN_SETTINGS.URL,
+    data,
+  });
+};
+
+export const addLawyer = (data) => {
+  return apiClient({
+    method: routes.ADD_LAWYER.METHOD,
+    url: routes.ADD_LAWYER.URL,
     data,
   });
 };

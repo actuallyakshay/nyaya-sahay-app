@@ -18,6 +18,8 @@ const APP_SESSION_COOKIES = [
   'access-token',
   'refresh-token',
   'auth-user',
+  'admin-access-token',
+  'admin-refresh-token',
 ] as const;
 
 export const resetCookies = () => {

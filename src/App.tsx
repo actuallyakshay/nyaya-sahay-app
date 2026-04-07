@@ -1,3 +1,4 @@
+import AdminProtectedRoute from '@/components/AdminProtectedRoute';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -46,17 +47,6 @@ import NotFound from './pages/NotFound';
 import AdminCaseRequests from './pages/admin/AdminCaseRequests';
 import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
 import AdminSessionRequests from './pages/admin/AdminSessionRequests';
-
-console.log('[App] Origin:', window.location.origin);
-console.log('[App] Full URL:', window.location.href);
-console.log('[App] Protocol:', window.location.protocol);
-console.log('[App] Hostname:', window.location.hostname);
-console.log('[App] Port:', window.location.port);
-console.log(
-  '[App] VITE_GOOGLE_CLIENT_ID:',
-  import.meta.env.VITE_GOOGLE_CLIENT_ID
-);
-console.log('[App] env.googleClientId:', env.googleClientId);
 
 const App = () => (
   <GoogleOAuthProvider clientId={env.googleClientId}>
@@ -197,126 +187,109 @@ const App = () => (
               <Route
                 path="/admin/dashboard"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminDashboard />
+                  </AdminProtectedRoute>
                 }
               />
 
               <Route
                 path="/admin/case-requests"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminCaseRequests />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminCaseRequests />
+                  </AdminProtectedRoute>
                 }
               />
 
               <Route
                 path="/admin/session-requests"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminSessionRequests />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminSessionRequests />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/users"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminUsers />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminUsers />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/users/:id"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminUserDetail />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminUserDetail />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/lawyers"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminLawyers />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminLawyers />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/lawyers/:id"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminLawyerDetail />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminLawyerDetail />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/cases"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminCases />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminCases />
+                  </AdminProtectedRoute>
                 }
               />
 
               <Route
                 path="/admin/lawyer-verifications"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminLawyerVerifications />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminLawyerVerifications />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/cases/:id"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminCaseDetail />
-                  //  </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminCaseDetail />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/subscriptions"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminSubscriptions />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminSubscriptions />
+                  </AdminProtectedRoute>
                 }
               />
               <Route
                 path="/admin/payments"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminPayments />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminPayments />
+                  </AdminProtectedRoute>
                 }
               />
 
-              <Route
-                path="/admin/users/:id"
-                element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminUserDetail />
-                  // </ProtectedRoute>
-                }
-              />
               <Route
                 path="/admin/settings"
                 element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminSettings />
-                  // </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path="/admin/lawyers/:id"
-                element={
-                  // <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminLawyerDetail />
-                  // </ProtectedRoute>
+                  <AdminProtectedRoute>
+                    <AdminSettings />
+                  </AdminProtectedRoute>
                 }
               />
 

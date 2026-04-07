@@ -7,6 +7,10 @@ const routes = {
     URL: '/api/auth/email',
     METHOD: 'POST',
   },
+  ADMIN_LOGIN: {
+    URL: '/api/auth/admin/login',
+    METHOD: 'POST',
+  },
   REFRESH_TOKEN: {
     URL: '/api/auth/refresh',
     METHOD: 'POST',
@@ -138,6 +142,10 @@ const routes = {
   UPDATE_ADMIN_SETTINGS: {
     URL: '/api/admin/settings',
     METHOD: 'PATCH',
+  },
+  ADD_LAWYER: {
+    URL: '/api/admin/lawyers',
+    METHOD: 'POST',
   },
 };
 
