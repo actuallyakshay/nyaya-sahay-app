@@ -25,7 +25,7 @@ const ProfileCompletionModal = ({ open, onComplete }: ProfileCompletionModalProp
     if (!name.trim()) newErrors.name = 'Full name is required';
     else if (name.trim().length < 2) newErrors.name = 'Name must be at least 2 characters';
     if (!phone.trim()) newErrors.phone = 'Phone number is required';
-    else if (!/^[6-9]\d{9}$/.test(phone.trim())) newErrors.phone = 'Enter a valid 10-digit Indian mobile number';
+    else if (!/^[6-9]\d{9}$/.test(phone.trim())) newErrors.phone = 'Number must be 10 digits and start with 6, 7, 8 or 9';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
