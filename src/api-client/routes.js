@@ -60,7 +60,7 @@ const routes = {
     METHOD: 'GET',
   },
   CASE_DETAILS: {
-    URL: '/api/cases/',
+    URL: '/api/cases/:id',
     METHOD: 'GET',
   },
   LAWYER_ANALYTICS: {
@@ -93,6 +93,10 @@ const routes = {
   },
   ADMIN_CASE_REQUESTS: {
     URL: '/api/admin/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_SESSION_REQUESTS: {
+    URL: '/api/admin/cases/session-requests',
     METHOD: 'GET',
   },
   ADMIN_CASE_STATUS: {
@@ -143,10 +147,26 @@ const routes = {
     URL: '/api/admin/settings',
     METHOD: 'PATCH',
   },
+<<<<<<< HEAD
+=======
+  CASE_DOCUMENTS: {
+    URL: '/api/cases/:caseId/documents',
+    METHOD: 'GET',
+  },
+  UPLOAD_CASE_DOCUMENT: {
+    URL: '/api/cases/:caseId/documents/upload',
+    METHOD: 'POST',
+  },
+  CASE_SESSION_REQUEST: {
+    URL: '/api/cases/:caseId/session-requests',
+    METHOD: 'POST',
+  },
+>>>>>>> stagging
   ADD_LAWYER: {
     URL: '/api/admin/lawyers',
     METHOD: 'POST',
   },
+<<<<<<< HEAD
   ADMIN_UPDATE_USER: {
     URL: '/api/admin/users/:id',
     METHOD: 'PATCH',
@@ -155,6 +175,8 @@ const routes = {
     URL: '/api/admin/lawyers/:id',
     METHOD: 'PATCH',
   },
+=======
+>>>>>>> stagging
 };
 
 export default routes;

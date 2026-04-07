@@ -1,41 +1,30 @@
+import { getCaseDetails, uploadAsset, uploadCaseDocument } from '@/api-client';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { mockCases } from '@/lib/mock-data';
+import { getCookie } from '@/lib/helpers';
+import { queryClient } from '@/lib/query-client';
+import { getApiErrorMessage } from '@/lib/utils';
 import { LEGAL_CATEGORIES } from '@/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  Calendar,
   Clock,
   ExternalLink,
   FileText,
-  Phone,
+  Loader2,
   Scale,
   Send,
   StickyNote,
@@ -44,77 +33,92 @@ import {
   Video,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const CaseDetail = () => {
   const { id } = useParams();
-  const caseData = mockCases.find((c) => c.id === id);
+  const activeRole = getCookie('x-active-role');
+  const isLawyer = activeRole === 'lawyer' ? true : false;
+  // const caseData = mockCases.find((c) => c.id === id);
   const [message, setMessage] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatFileInputRef = useRef<HTMLInputElement>(null);
+  const drawerFileInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [sessionType, setSessionType] = useState('video');
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
-  const [internalNotes, setInternalNotes] = useState<
-    { text: string; by: string; at: string }[]
-  >([
-    {
-      text: 'Ancestral property — multiple legal heirs involved',
-      by: 'Adv. Priya Sharma',
-      at: '2024-09-03T14:00:00',
-    },
-    {
-      text: 'Mutation pending since 2019, recommend civil suit',
-      by: 'Platform Admin',
-      at: '2024-09-04T10:00:00',
-    },
-  ]);
+  const [internalNotes, setInternalNotes] = useState([]);
+  const navigate = useNavigate();
 
-  const [meetingLink] = useState('https://meet.google.com/abc-defg-hij');
-  const hasMeeting = caseData?.status === 'in_consultation';
+  const meetingLink = 'https://meet.google.com/abc-defg-hij';
+  // const hasMeeting = caseData?.status === 'in_consultation';
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
+  const { data: caseData, isFetching } = useQuery({
+    queryKey: ['case-details', id],
+    queryFn: async () => {
+      const response = await getCaseDetails(id);
+      return response.data;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const { mutateAsync: uploadSingleDocument, isPending: isUploadingDocument } =
+    useMutation({
+      mutationFn: async (file: File) => {
+        if (!id) {
+          throw new Error('Case ID is missing.');
+        }
+        const { data } = await uploadAsset(file);
+        await uploadCaseDocument(id, {
+          assetUrl: data.assetUrl,
+          assetType: data.assetType,
+          assetName: data.assetName,
+          author: isLawyer ? 'lawyer' : 'user',
+        });
+      },
+    });
+
+  const uploadFromSource = async (
+    file: File,
+    source: 'Chat' | 'Documents drawer'
+  ) => {
+    try {
+      await uploadSingleDocument(file);
+      await queryClient.invalidateQueries({ queryKey: ['case-documents'] });
       toast({
-        title: 'Documents uploaded',
-        description: `${files.length} file(s) uploaded successfully.`,
+        title: 'Document uploaded',
+        description: `${file.name} uploaded from ${source}.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Upload failed',
+        description: getApiErrorMessage(err),
+        variant: 'destructive',
       });
     }
   };
 
-  const handleBookSession = () => {
-    toast({
-      title: 'Session Booked',
-      description: `Your ${sessionType} consultation request has been sent for admin approval.`,
-    });
-    setBookingOpen(false);
+  const handleChatUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    await uploadFromSource(file, 'Chat');
+  };
+
+  const handleDrawerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    await uploadFromSource(file, 'Documents drawer');
   };
 
   const handleAddNote = (note: { text: string; by: string; at: string }) => {
     setInternalNotes((prev) => [...prev, note]);
   };
 
-  if (!caseData)
-    return (
-      <DashboardLayout>
-        <div className="py-16 text-center">
-          <p className="text-muted-foreground">Case not found.</p>
-        </div>
-      </DashboardLayout>
-    );
-
-  const isLawyer = user?.roles.includes('lawyer');
-  const isUser = user?.roles.includes('user');
-  const isAdmin = user?.roles.includes('admin');
-  const canSeeNotes = isLawyer || isAdmin;
-  const lawyerProfileLink =
-    isUser && caseData.lawyerId
-      ? `/app/lawyers/${caseData.lawyerId}`
-      : undefined;
+  const isLawyerAssigned = caseData?.assignedLawyerId;
 
   return (
     <DashboardLayout>
@@ -123,49 +127,44 @@ const CaseDetail = () => {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-muted-foreground">
-              {caseData.caseNumber}
+              {caseData?.caseCode}
             </span>
-            <StatusBadge status={caseData.status} />
-            {caseData.priority === 'urgent' && (
+            <StatusBadge status={caseData?.status} />
+            {caseData?.isEmergency && (
               <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
                 Urgent
               </span>
             )}
           </div>
           <h1 className="mt-1 text-xl font-bold sm:text-2xl">
-            {caseData.title}
+            {caseData?.title}
           </h1>
           <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-            {caseData.description}
+            {caseData?.description}
           </p>
         </div>
 
         {/* Action bar */}
         <div className="flex flex-wrap items-center gap-2">
-          {caseData.lawyerName &&
-            !isLawyer &&
-            (lawyerProfileLink ? (
-              <Link
-                to={lawyerProfileLink}
-                className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20"
-              >
-                <Scale className="h-3 w-3" />
-                {caseData.lawyerName}
-              </Link>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold">
-                <Scale className="h-3 w-3" />
-                {caseData.lawyerName}
-              </span>
-            ))}
+          {isLawyerAssigned && (
+            <span
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20"
+              onClick={() =>
+                navigate(`/app/lawyers/${caseData?.assignedLawyerId}`)
+              }
+            >
+              <Scale className="h-3 w-3" />
+              Adv. {caseData?.assignedLawyer?.user?.fullName}
+            </span>
+          )}
           {isLawyer && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
               <User className="h-3 w-3" />
-              Client: {caseData.userName}
+              Client: {caseData.user?.fullName}
             </span>
           )}
           <span className="text-xs text-muted-foreground">
-            {LEGAL_CATEGORIES[caseData.category]}
+            {LEGAL_CATEGORIES[caseData?.practiceArea?.name]}
           </span>
           <div className="flex-1" />
 
@@ -182,9 +181,7 @@ const CaseDetail = () => {
                     <FileText className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  Documents ({caseData.documents.length})
-                </TooltipContent>
+                <TooltipContent>Documents</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -201,7 +198,7 @@ const CaseDetail = () => {
                 <TooltipContent>Timeline</TooltipContent>
               </Tooltip>
 
-              {canSeeNotes && (
+              {isLawyer && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -219,7 +216,7 @@ const CaseDetail = () => {
                 </Tooltip>
               )}
 
-              {caseData.lawyerName && (
+              {isLawyerAssigned && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -239,22 +236,22 @@ const CaseDetail = () => {
         </div>
 
         {/* Meeting link banner */}
-        {hasMeeting && (
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-gold/30 bg-gold/5 p-3">
-            <div className="flex items-center gap-2 text-sm">
-              <Video className="h-4 w-4 text-gold" />
-              <span className="font-medium">Active consultation session</span>
-            </div>
-            <a
-              href={meetingLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline"
-            >
-              <ExternalLink className="h-3.5 w-3.5" /> Join Google Meet
-            </a>
+        {/* {hasMeeting && ( */}
+
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-gold/30 bg-gold/5 p-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Video className="h-4 w-4 text-gold" />
+            <span className="font-medium">Active consultation session</span>
           </div>
-        )}
+          <a
+            href={meetingLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline"
+          >
+            <ExternalLink className="h-3.5 w-3.5" /> Join Google Meet
+          </a>
+        </div>
 
         {/* Chat — full width now */}
         <div
@@ -264,16 +261,16 @@ const CaseDetail = () => {
           <div className="flex shrink-0 items-center justify-between border-b p-3">
             <h3 className="text-sm font-semibold">Case Communication</h3>
             <span className="text-xs text-muted-foreground">
-              {caseData.messages.length} messages
+              {caseData?.messages?.length} messages
             </span>
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {caseData.messages.length === 0 ? (
+            {caseData?.messages?.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">
                 No messages yet. Start the conversation.
               </p>
             ) : (
-              caseData.messages.map((m) => (
+              caseData?.messages?.map((m) => (
                 <div
                   key={m.id}
                   className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}
@@ -315,19 +312,30 @@ const CaseDetail = () => {
               className="flex-1"
             />
             <input
-              ref={fileInputRef}
+              ref={chatFileInputRef}
               type="file"
-              multiple
               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
               className="hidden"
-              onChange={handleUpload}
+              onChange={handleChatUpload}
+            />
+            <input
+              ref={drawerFileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              className="hidden"
+              onChange={handleDrawerUpload}
             />
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingDocument}
+              onClick={() => chatFileInputRef.current?.click()}
             >
-              <Upload className="h-4 w-4" />
+              {isUploadingDocument ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
             </Button>
             <Button size="icon">
               <Send className="h-4 w-4" />
@@ -337,74 +345,34 @@ const CaseDetail = () => {
       </div>
 
       {/* Booking dialog */}
-      <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Book Consultation</DialogTitle>
-            <DialogDescription>
-              Schedule a session with {caseData.lawyerName}. The request will be
-              sent to admin for approval.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label>Session Type</Label>
-              <Select value={sessionType} onValueChange={setSessionType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="video">
-                    <div className="flex items-center gap-2">
-                      <Video className="h-3.5 w-3.5" /> Video Call
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="phone">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3.5 w-3.5" /> Phone Call
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="chat">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5" /> Chat Session
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Preferred Date</Label>
-              <Input type="date" />
-            </div>
-            <div className="space-y-2">
-              <Label>Preferred Time</Label>
-              <Input type="time" />
-            </div>
-            <Button className="w-full" onClick={handleBookSession}>
-              Send Booking Request
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SessionBookingModal
+        bookingOpen={bookingOpen}
+        setBookingOpen={setBookingOpen}
+        caseId={id}
+        lawyerName={caseData?.assignedLawyer?.user?.fullName}
+      />
 
       {/* Drawers */}
       <DocumentsDrawer
         open={docsDrawerOpen}
+        caseClientName={caseData?.user?.fullName}
+        caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
         onOpenChange={setDocsDrawerOpen}
-        documents={caseData.documents}
         onUploadClick={() => {
-          setDocsDrawerOpen(false);
-          fileInputRef.current?.click();
+          if (isUploadingDocument) return;
+          drawerFileInputRef.current?.click();
         }}
+        loading={isUploadingDocument}
       />
 
       <TimelineDrawer
         open={timelineDrawerOpen}
         onOpenChange={setTimelineDrawerOpen}
-        events={caseData.timeline}
+        status={caseData?.status}
+        updatedAt={caseData?.updatedAt}
       />
 
-      {canSeeNotes && (
+      {isLawyer && (
         <InternalNotesDrawer
           open={notesDrawerOpen}
           onOpenChange={setNotesDrawerOpen}
