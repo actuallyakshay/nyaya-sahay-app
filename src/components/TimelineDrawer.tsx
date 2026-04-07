@@ -6,18 +6,20 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import type { TimelineEvent } from '@/types';
+import type { CaseStatus } from '@/types';
 
 interface TimelineDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  events: TimelineEvent[];
+  status?: CaseStatus;
+  updatedAt?: string;
 }
 
 export const TimelineDrawer = ({
   open,
   onOpenChange,
-  events,
+  status,
+  updatedAt,
 }: TimelineDrawerProps) => (
   <Sheet open={open} onOpenChange={onOpenChange}>
     <SheetContent className="flex flex-col sm:max-w-md">
@@ -29,13 +31,7 @@ export const TimelineDrawer = ({
       </SheetHeader>
 
       <div className="flex-1 overflow-y-auto py-4">
-        {events.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No activity yet.
-          </p>
-        ) : (
-          <CaseTimeline events={events} />
-        )}
+        <CaseTimeline events={[]} />
       </div>
     </SheetContent>
   </Sheet>

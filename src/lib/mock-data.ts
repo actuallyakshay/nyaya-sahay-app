@@ -120,7 +120,7 @@ export const mockLawyers: Lawyer[] = [
 
 export const mockCases: Case[] = [
   {
-    id: 'c1',
+    id: '266a4489-f131-4ac6-96f1-d73e663b131b',
     caseNumber: 'LSP-2024-001',
     userId: 'u1',
     userName: 'Rajesh Kumar',
