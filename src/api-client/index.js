@@ -17,6 +17,14 @@ export const login = (body) => {
   });
 };
 
+export const adminLogin = (body) => {
+  return apiClient({
+    method: routes.ADMIN_LOGIN.METHOD,
+    url: routes.ADMIN_LOGIN.URL,
+    data: body,
+  });
+};
+
 export const refreshAuthToken = () => {
   return apiClient({
     method: routes.REFRESH_TOKEN.METHOD,
@@ -302,5 +310,13 @@ export const createCaseSessionRequest = (caseId, body) => {
     method: routes.CASE_SESSION_REQUEST.METHOD,
     url: routes.CASE_SESSION_REQUEST.URL.replace(':caseId', caseId),
     data: body,
+  });
+};
+
+export const addLawyer = (data) => {
+  return apiClient({
+    method: routes.ADD_LAWYER.METHOD,
+    url: routes.ADD_LAWYER.URL,
+    data,
   });
 };

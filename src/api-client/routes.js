@@ -7,6 +7,10 @@ const routes = {
     URL: '/api/auth/email',
     METHOD: 'POST',
   },
+  ADMIN_LOGIN: {
+    URL: '/api/auth/admin/login',
+    METHOD: 'POST',
+  },
   REFRESH_TOKEN: {
     URL: '/api/auth/refresh',
     METHOD: 'POST',
@@ -153,6 +157,10 @@ const routes = {
   },
   CASE_SESSION_REQUEST: {
     URL: '/api/cases/:caseId/session-requests',
+    METHOD: 'POST',
+  },
+  ADD_LAWYER: {
+    URL: '/api/admin/lawyers',
     METHOD: 'POST',
   },
 };

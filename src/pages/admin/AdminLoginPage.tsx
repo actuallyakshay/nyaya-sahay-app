@@ -1,28 +1,48 @@
+import { adminLogin } from '@/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { getCookie, setCookie } from '@/lib/helpers';
 import { Eye, EyeOff, Scale } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const { login, isLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const adminToken = getCookie('admin-access-token');
+
+  useEffect(() => {
+    if (adminToken) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [adminToken, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // await login(email, password, 'admin');
+      setLoading(true);
+      const { data } = await adminLogin({ email, password });
+      if (!data.status) throw new Error(data.message);
+
+      setCookie('admin-access-token', data.accessToken);
+      setCookie('admin-refresh-token', data.refreshToken);
       toast({ title: 'Welcome, Admin' });
       navigate('/admin/dashboard');
-    } catch {
-      toast({ title: 'Login failed', variant: 'destructive' });
+    } catch (err) {
+      toast({
+        title: 'Login failed',
+        description:
+          err instanceof Error ? err.message : 'Please check your credentials.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,8 +88,8 @@ const AdminLoginPage = () => {
               </button>
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
       </div>

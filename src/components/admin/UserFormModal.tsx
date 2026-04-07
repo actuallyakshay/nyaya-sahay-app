@@ -11,17 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { queryClient } from '@/lib/query-client';
 import { validateEmail, validatePhone } from '@/lib/utils';
-import type { FieldErrors, User } from '@/types';
+import type { FieldErrors, User, UserFormModalProps } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
-
-interface UserFormModalProps {
-  open: boolean;
-  onClose: () => void;
-  user?: User | null;
-  onSave: (data: Partial<User>) => void;
-}
 
 export const UserFormModal = ({
   open,

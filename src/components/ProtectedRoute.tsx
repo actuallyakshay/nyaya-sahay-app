@@ -27,6 +27,8 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
     setIsLoading(false);
   }, [setUser]);
 
+
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');

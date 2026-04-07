@@ -75,64 +75,95 @@ const AdminLawyerDetail = () => {
 
         <div className="rounded-xl border bg-card p-6">
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
-              {lawyerData?.user?.avatarUrl && (
-                <img
-                  src={lawyerData?.user?.avatarUrl}
-                  alt={lawyerData?.user?.fullName}
-                  className="object-cover"
-                />
-              )}
-              {!lawyerData?.user?.avatarUrl && (
-                <WithShimmer loading={isLoading}>
-                  <div className="flex items-center justify-center rounded-full text-lg font-bold text-gold">
-                    {lawyerData?.user?.fullName.charAt(0).toUpperCase()}
-                  </div>
-                </WithShimmer>
-              )}
-            </div>
+            <WithShimmer loading={isLoading} className="h-14 w-14 rounded-full">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-lg font-bold text-gold">
+                {lawyerData?.user?.avatarUrl ? (
+                  <img
+                    src={lawyerData?.user?.avatarUrl}
+                    alt={lawyerData?.user?.fullName}
+                    className="h-14 w-14 rounded-full object-cover"
+                  />
+                ) : (
+                  <span>
+                    {lawyerData?.user?.fullName?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+            </WithShimmer>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold">
-                  {lawyerData?.user?.fullName}
-                </h1>
+                <WithShimmer loading={isLoading} className="h-7 w-40">
+                  <h1 className="text-xl font-bold">
+                    {lawyerData?.user?.fullName}
+                  </h1>
+                </WithShimmer>
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Mail className="h-3.5 w-3.5" />
-                  {lawyerData?.user?.email}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Phone className="h-3.5 w-3.5" />
-                  +91-{lawyerData?.user?.phone}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Award className="h-3.5 w-3.5" />
-                  {lawyerData?.barCouncilId}
-                </span>
+                <WithShimmer loading={isLoading} className="h-4 w-36">
+                  <span className="flex items-center gap-1">
+                    <Mail className="h-3.5 w-3.5" />
+                    {lawyerData?.user?.email}
+                  </span>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-4 w-28">
+                  <span className="flex items-center gap-1">
+                    <Phone className="h-3.5 w-3.5" />
+                    +91-{lawyerData?.user?.phone}
+                  </span>
+                </WithShimmer>
+                <WithShimmer loading={isLoading} className="h-4 w-32">
+                  <span className="flex items-center gap-1">
+                    <Award className="h-3.5 w-3.5" />
+                    {lawyerData?.barCouncilId}
+                  </span>
+                </WithShimmer>
               </div>
-              <p className="mt-2 text-sm">{lawyerData?.bio || '-'}</p>
+              <WithShimmer loading={isLoading} className="mt-2 h-4 w-full">
+                <p className="mt-2 text-sm">{lawyerData?.bio || '-'}</p>
+              </WithShimmer>
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                  {lawyerData?.degree}
-                </span>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                  10 years exp
-                  {/* {lawyer.experience} years exp */}
-                </span>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                  {totalCasesHandled} cases
-                </span>
+                <WithShimmer
+                  loading={isLoading}
+                  className="h-5 w-16 rounded-full"
+                >
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                    {lawyerData?.degree}
+                  </span>
+                </WithShimmer>
+                <WithShimmer
+                  loading={isLoading}
+                  className="h-5 w-20 rounded-full"
+                >
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                    10 years exp
+                  </span>
+                </WithShimmer>
+                <WithShimmer
+                  loading={isLoading}
+                  className="h-5 w-16 rounded-full"
+                >
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                    {totalCasesHandled} cases
+                  </span>
+                </WithShimmer>
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {lawyerData?.lawyerPracticeAreas?.map((s) => (
-                  <span
-                    key={s.practiceAreaId}
-                    className="rounded-full bg-gold/10 px-2 py-0.5 text-xs font-medium text-gold"
-                  >
-                    {s.practiceArea?.name}
-                  </span>
-                ))}
+                {isLoading
+                  ? Array.from({ length: 3 }).map((_, i) => (
+                      <WithShimmer
+                        key={i}
+                        loading
+                        className="h-5 w-20 rounded-full"
+                      />
+                    ))
+                  : lawyerData?.lawyerPracticeAreas?.map((s) => (
+                      <span
+                        key={s.practiceAreaId}
+                        className="rounded-full bg-gold/10 px-2 py-0.5 text-xs font-medium text-gold"
+                      >
+                        {s.practiceArea?.name}
+                      </span>
+                    ))}
               </div>
             </div>
           </div>

@@ -67,6 +67,12 @@ const AdminLawyers = () => {
     status: string
   ) => {
     const kind = status === 'inactive' ? 'active' : 'rejected';
+    console.log('Updating lawyer role status:', {
+      lawyerId,
+      userId,
+      roleCode,
+      status,
+    });
     setPending({ lawyerId, kind });
     try {
       await updateLawyerRoleStatus(userId, roleCode, status);
@@ -222,11 +228,16 @@ const AdminLawyers = () => {
                           <Switch
                             checked={l.user?.userRole?.status === 'active'}
                             onCheckedChange={() => {
+                              const currentStatus = l.user?.userRole?.status;
+                              const newStatus =
+                                currentStatus === 'active'
+                                  ? 'inactive'
+                                  : 'active';
                               handleUpdateLawyerRoleStatus(
                                 l.id,
                                 l.user?.id,
                                 'lawyer',
-                                activating ? 'rejected' : 'active'
+                                newStatus
                               );
                             }}
                           />
