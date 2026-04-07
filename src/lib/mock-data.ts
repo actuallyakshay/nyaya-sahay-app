@@ -250,10 +250,10 @@ export const mockSubscription: Subscription = {
   userId: 'u1',
   planId: 'professional',
   planName: 'Professional',
-  status: 'active',
+  status: 'expired',
   startDate: '2024-08-15',
   endDate: '2025-08-15',
-  autoRenew: true,
+  autoRenew: false,
 };
 
 export const mockNotifications: Notification[] = [
