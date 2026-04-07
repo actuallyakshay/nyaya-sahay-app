@@ -15,8 +15,10 @@ const UserDashboard = () => {
   const activeCases = mockCases.filter((c) => !['resolved', 'closed'].includes(c.status));
   const hasSubscription = mockSubscription.status === 'active';
   const isProfileComplete = localStorage.getItem('profile_completed') === 'true';
+  const hasCreatedCase = localStorage.getItem('first_case_created') === 'true';
   const [profileModalOpen, setProfileModalOpen] = useState(!isProfileComplete);
   const [paywallOpen, setPaywallOpen] = useState(!hasSubscription && isProfileComplete);
+  const [firstCaseOpen, setFirstCaseOpen] = useState(isProfileComplete && hasSubscription && !hasCreatedCase);
 
   return (
     <DashboardLayout>
