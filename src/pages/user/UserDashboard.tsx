@@ -4,7 +4,7 @@ import { mockCases, mockSubscription } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { Briefcase, CreditCard, ArrowRight, Plus, Clock, Crown, CalendarCheck } from 'lucide-react';
+import { Briefcase, CreditCard, ArrowRight, Plus, Clock, Crown, CalendarCheck, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LEGAL_CATEGORIES } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
