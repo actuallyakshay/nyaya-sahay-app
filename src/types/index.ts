@@ -303,6 +303,7 @@ export interface ConsultationNotification {
 
 // Form validation types
 export interface FieldErrors {
+  name?: string;
   email?: string;
   phone?: string;
   password?: string;
@@ -313,4 +314,24 @@ export interface RegistrationFields {
   email: string;
   phone: string;
   password: string;
+}
+
+// Modal prop types
+export interface UserFormModalProps {
+  open: boolean;
+  onClose: () => void;
+  user?: User | null;
+  onSave: (data: Partial<User>) => void;
+}
+
+export interface LawyerFormModalProps {
+  open: boolean;
+  onClose: () => void;
+  lawyer?: Lawyer | null;
+  onSave: (data: Partial<Lawyer>) => void;
+}
+
+// Admin auth types
+export interface AdminProtectedRouteProps {
+  children: React.ReactNode;
 }
