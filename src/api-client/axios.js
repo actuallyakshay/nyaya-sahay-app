@@ -13,6 +13,7 @@ const skipAccessTokenPaths = new Set([
   routes.REFRESH_TOKEN.URL,
   routes.GOOGLE_AUTH_LOGIN.URL,
   routes.LOGIN.URL,
+  routes.ADMIN_LOGIN.URL,
 ]);
 
 // --- Axios instance ---
@@ -57,10 +58,17 @@ const isRefreshRequest = (config) => {
   return config.url === routes.REFRESH_TOKEN.URL;
 };
 
-const redirectToLogin = () => {
+const redirectToLogin = (requestUrl = '') => {
   queryClient.clear();
-  localStorage.removeItem('auth_user');
-  window.location.href = '/login';
+  const isAdminRequest = requestUrl.startsWith('/api/admin/');
+  if (isAdminRequest) {
+    document.cookie = 'admin-access-token=; Max-Age=0; path=/';
+    document.cookie = 'admin-refresh-token=; Max-Age=0; path=/';
+    window.location.href = '/admin/login';
+  } else {
+    localStorage.removeItem('auth_user');
+    window.location.href = '/login';
+  }
 };
 
 const attemptTokenRefresh = async () => {
@@ -122,10 +130,16 @@ apiClient.interceptors.response.use(
     const isUnauthorized = error.response?.status === 401;
     const isAlreadyRetried = originalRequest._retry;
     const isRefreshCall = isRefreshRequest(originalRequest);
+    const isAuthEndpoint = skipAccessTokenPaths.has(originalRequest.url);
+
+    // Auth endpoints (login/register) — just reject, don't redirect
+    if (isAuthEndpoint) {
+      return Promise.reject(error);
+    }
 
     // If refresh itself failed or already retried, bail out
     if (!isUnauthorized || isAlreadyRetried || isRefreshCall) {
-      if (isUnauthorized) redirectToLogin();
+      if (isUnauthorized) redirectToLogin(originalRequest.url);
       return Promise.reject(error);
     }
 
@@ -144,7 +158,7 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError);
-      redirectToLogin();
+      redirectToLogin(originalRequest.url);
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
