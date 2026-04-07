@@ -14,32 +14,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-
-const mockSessionRequests = [
-  {
-    id: 'sr1',
-    caseNumber: 'LSP-2024-001',
-    userName: 'Rajesh Kumar',
-    lawyerName: 'Adv. Priya Sharma',
-    type: 'video',
-    date: '2024-09-15',
-    time: '10:00 AM',
-    status: 'pending',
-    createdAt: '2024-09-10T09:00:00',
-  },
-  {
-    id: 'sr2',
-    caseNumber: 'LSP-2024-003',
-    userName: 'Meera Patel',
-    lawyerName: 'Adv. Vikram Desai',
-    type: 'phone',
-    date: '2024-09-16',
-    time: '2:00 PM',
-    status: 'pending',
-    createdAt: '2024-09-11T14:00:00',
-  },
-];
-
+import { Link } from 'react-router-dom';
 const typeIcons = { video: Video, phone: Phone, chat: MessageSquare };
 
 export const buildSessionRequestsQueryParams = (page: number) => {
@@ -99,9 +74,14 @@ const AdminSessionRequests = () => {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex-1">
                       <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {req?.case?.caseCode}
-                        </span>
+                        <Link
+                          to={`/admin/cases/${req?.case?.id}`}
+                          className="hover:text-gold hover:underline"
+                        >
+                          <span className="font-mono text-xs text-muted-foreground">
+                            {req?.case?.caseCode}
+                          </span>
+                        </Link>
                         <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
                           <Icon className="h-3 w-3" />
                           {req?.callType}
@@ -132,9 +112,9 @@ const AdminSessionRequests = () => {
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">
-                      <Button variant="link" size="sm">
+                      <Button variant="outline" size="sm">
                         <Eye className="mr-1.5 h-3.5 w-3.5" />
-                        View
+                        View Case
                       </Button>
                       <Button
                         size="sm"
