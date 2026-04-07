@@ -10,7 +10,7 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { PAGE_SIZE } from '@/lib/mock-data';
 import { User, UsersListResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Search, UserPlus } from 'lucide-react';
+import { Edit, Search, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -152,6 +152,16 @@ const AdminUsers = () => {
                       {new Date(u.createdAt).toLocaleDateString('en-IN')}
                     </td>
                     <td className="px-4 py-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingUser(u);
+                          setModalOpen(true);
+                        }}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
                       <Link to={`/admin/users/${u.id}`}>
                         <Button variant="ghost" size="sm">
                           View
@@ -177,10 +187,9 @@ const AdminUsers = () => {
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           user={editingUser as User | undefined}
-          onSave={(data) => {
+          onSave={(data, message) => {
             toast({
-              title: 'User Added',
-              description: `${data.name} has been ${editingUser ? 'updated' : 'added'}.`,
+              title: message || `${data.name} has been ${editingUser ? 'updated' : 'added'}.`,
             });
             setModalOpen(false);
           }}

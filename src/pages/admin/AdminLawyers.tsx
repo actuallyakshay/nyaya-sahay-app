@@ -14,7 +14,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { PAGE_SIZE } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
-import { Lawyer, LawyersListResponse } from '@/types';
+import { LawyerListItem, LawyersListResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { CheckCircle, Edit, Loader2, Search, UserPlus } from 'lucide-react';
 import { useState } from 'react';
@@ -37,7 +37,7 @@ const AdminLawyers = () => {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingLawyer, setEditingLawyer] = useState<Partial<Lawyer> | null>(
+  const [editingLawyer, setEditingLawyer] = useState<LawyerListItem | null>(
     null
   );
   const [page, setPage] = useState(1);
@@ -272,11 +272,11 @@ const AdminLawyers = () => {
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           lawyer={editingLawyer as Lawyer}
-          onSave={(data) => {
+          onSave={(data, message) => {
             toast({
-              title: editingLawyer ? 'Lawyer Updated' : 'Lawyer Added',
-              description: `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.`,
+              title: message || `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.`,
             });
+            setModalOpen(false);
           }}
         />
         <PaginationControls

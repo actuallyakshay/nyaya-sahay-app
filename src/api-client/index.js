@@ -289,6 +289,8 @@ export const updateAdminSettings = (data) => {
   });
 };
 
+<<<<<<< HEAD
+=======
 export const getCaseDocuments = (caseId, params) => {
   return apiClient({
     method: routes.CASE_DOCUMENTS.METHOD,
@@ -313,6 +315,7 @@ export const createCaseSessionRequest = (caseId, body) => {
   });
 };
 
+>>>>>>> stagging
 export const addLawyer = (data) => {
   return apiClient({
     method: routes.ADD_LAWYER.METHOD,
@@ -320,3 +323,22 @@ export const addLawyer = (data) => {
     data,
   });
 };
+<<<<<<< HEAD
+
+export const updateAdminUser = (id, data) => {
+  return apiClient({
+    method: routes.ADMIN_UPDATE_USER.METHOD,
+    url: `${routes.ADMIN_UPDATE_USER.URL.replace(':id', id)}/update`,
+    data,
+  });
+};
+
+export const updateAdminLawyer = (id, data) => {
+  return apiClient({
+    method: routes.ADMIN_UPDATE_LAWYER.METHOD,
+    url: `${routes.ADMIN_UPDATE_LAWYER.URL.replace(':id', id)}/update`,
+    data,
+  });
+};
+=======
+>>>>>>> stagging

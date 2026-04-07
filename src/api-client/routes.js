@@ -147,6 +147,8 @@ const routes = {
     URL: '/api/admin/settings',
     METHOD: 'PATCH',
   },
+<<<<<<< HEAD
+=======
   CASE_DOCUMENTS: {
     URL: '/api/cases/:caseId/documents',
     METHOD: 'GET',
@@ -159,10 +161,22 @@ const routes = {
     URL: '/api/cases/:caseId/session-requests',
     METHOD: 'POST',
   },
+>>>>>>> stagging
   ADD_LAWYER: {
     URL: '/api/admin/lawyers',
     METHOD: 'POST',
   },
+<<<<<<< HEAD
+  ADMIN_UPDATE_USER: {
+    URL: '/api/admin/users/:id',
+    METHOD: 'PATCH',
+  },
+  ADMIN_UPDATE_LAWYER: {
+    URL: '/api/admin/lawyers/:id',
+    METHOD: 'PATCH',
+  },
+=======
+>>>>>>> stagging
 };
 
 export default routes;
