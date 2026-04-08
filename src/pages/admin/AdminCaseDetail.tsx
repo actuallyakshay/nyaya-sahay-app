@@ -2,12 +2,10 @@ import { useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockCases, mockLawyers } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
-import { DocumentList } from '@/components/DocumentList';
 import { SearchableSelect } from '@/components/SearchableSelect';
 import { LEGAL_CATEGORIES } from '@/types';
-import { User, Scale, ChevronLeft, CheckCircle, XCircle, RotateCcw, StickyNote, FileText, Clock } from 'lucide-react';
+import { User, Scale, CheckCircle, XCircle, RotateCcw, StickyNote, FileText, Clock, AlertTriangle, CalendarDays, Hash, Tag, Gavel, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useState } from 'react';
@@ -15,7 +13,9 @@ import { useToast } from '@/hooks/use-toast';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
@@ -36,7 +36,7 @@ const AdminCaseDetail = () => {
       <div className="py-16 text-center">
         <p className="text-muted-foreground">Case not found.</p>
         <Button variant="outline" className="mt-4" asChild>
-          <Link to="/admin/cases"><ChevronLeft className="mr-1 h-4 w-4" />Back to Cases</Link>
+          <Link to="/admin/cases">Back to Cases</Link>
         </Button>
       </div>
     </AdminLayout>
@@ -69,156 +69,243 @@ const AdminCaseDetail = () => {
     setInternalNotes(prev => [...prev, note]);
   };
 
+  const priorityConfig = {
+    urgent: { color: 'bg-destructive/10 text-destructive border-destructive/20', icon: AlertTriangle },
+    high: { color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: AlertTriangle },
+    normal: { color: 'bg-muted text-muted-foreground border-border', icon: null },
+    low: { color: 'bg-muted text-muted-foreground border-border', icon: null },
+  };
+
+  const pConfig = priorityConfig[caseData.priority as keyof typeof priorityConfig] || priorityConfig.normal;
+
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/cases"><ChevronLeft className="mr-1 h-4 w-4" />Back to Cases</Link>
-        </Button>
-
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-sm text-muted-foreground">{caseData.caseNumber}</span>
+      <div className="space-y-5">
+        {/* Top summary bar */}
+        <div className="rounded-xl border bg-card overflow-hidden">
+          <div className="border-b bg-muted/30 px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-lg font-bold tracking-tight">{caseData.title}</h1>
               <StatusBadge status={caseData.status} />
-              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                caseData.priority === 'urgent' ? 'bg-destructive/10 text-destructive' :
-                caseData.priority === 'high' ? 'bg-warning/10 text-warning' :
-                'bg-muted text-muted-foreground'
-              }`}>
-                {caseData.priority}
-              </span>
+              <Badge variant="outline" className={`text-[11px] gap-1 ${pConfig.color}`}>
+                {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
+                {caseData.priority.toUpperCase()}
+              </Badge>
             </div>
-            <h1 className="mt-1.5 text-xl font-bold sm:text-2xl">{caseData.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{LEGAL_CATEGORIES[caseData.category]}</p>
+            <div className="flex items-center gap-1.5">
+              {caseData.status !== 'closed' && caseData.status !== 'resolved' && (
+                <>
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => {
+                    toast({ title: 'Case Finalized', description: `Case ${caseData.caseNumber} marked as resolved.` });
+                  }}>
+                    <CheckCircle className="mr-1 h-3.5 w-3.5 text-green-600" />Finalize
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-8 text-xs" onClick={handleResetCase}>
+                    <RotateCcw className="mr-1 h-3.5 w-3.5" />Reset
+                  </Button>
+                  <Button variant="destructive" size="sm" className="h-8 text-xs" onClick={() => setCloseDialogOpen(true)}>
+                    <XCircle className="mr-1 h-3.5 w-3.5" />Close
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {caseData.status !== 'closed' && caseData.status !== 'resolved' && (
-              <>
-                <Button variant="outline" size="sm" onClick={() => {
-                  toast({ title: 'Case Finalized', description: `Case ${caseData.caseNumber} marked as resolved.` });
-                }}>
-                  <CheckCircle className="mr-1.5 h-3.5 w-3.5" />Finalize
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleResetCase}>
-                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" />Reset
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => setCloseDialogOpen(true)}>
-                  <XCircle className="mr-1.5 h-3.5 w-3.5" />Close
-                </Button>
-              </>
-            )}
-            <div className="h-5 w-px bg-border" />
-            <TooltipProvider delayDuration={300}>
-              <div className="flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDocsDrawerOpen(true)}>
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Documents ({caseData.documents.length})</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setTimelineDrawerOpen(true)}>
-                      <Clock className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Timeline</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setNotesDrawerOpen(true)}>
-                      <StickyNote className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Notes ({internalNotes.length})</TooltipContent>
-                </Tooltip>
-              </div>
-            </TooltipProvider>
+
+          {/* Meta row */}
+          <div className="px-5 py-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Hash className="h-3.5 w-3.5" />
+              <span className="font-mono">{caseData.caseNumber}</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Tag className="h-3.5 w-3.5" />
+              {LEGAL_CATEGORIES[caseData.category]}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Created {new Date(caseData.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              Updated {new Date(caseData.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-5 lg:grid-cols-3">
+          {/* Main content */}
+          <div className="lg:col-span-2 space-y-5">
+            <Tabs defaultValue="communication" className="w-full">
+              <TabsList className="w-full grid grid-cols-4 h-9">
+                <TabsTrigger value="communication" className="text-xs">Messages</TabsTrigger>
+                <TabsTrigger value="documents" className="text-xs">Documents ({caseData.documents.length})</TabsTrigger>
+                <TabsTrigger value="timeline" className="text-xs">Timeline</TabsTrigger>
+                <TabsTrigger value="notes" className="text-xs">Notes ({internalNotes.length})</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="communication" className="mt-3">
+                <div className="rounded-xl border bg-card flex flex-col" style={{ height: '460px' }}>
+                  <div className="flex-1 space-y-3 overflow-y-auto p-4">
+                    {caseData.messages.length === 0 ? (
+                      <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
+                    ) : caseData.messages.map((m) => (
+                      <div key={m.id} className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}>
+                        <div className={`h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}>
+                          {m.senderRole === 'lawyer' ? <Scale className="h-3 w-3" /> : <User className="h-3 w-3" />}
+                        </div>
+                        <div className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}>
+                          <p className="mb-0.5 text-[11px] font-medium opacity-60">{m.senderName}</p>
+                          <p className="text-[13px] leading-relaxed">{m.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="documents" className="mt-3">
+                <div className="rounded-xl border bg-card p-4" style={{ minHeight: '300px' }}>
+                  {caseData.documents.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">No documents uploaded.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {caseData.documents.map((doc) => (
+                        <div key={doc.id} className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <p className="text-sm font-medium">{doc.name}</p>
+                              <p className="text-xs text-muted-foreground">{new Date(doc.uploadedAt).toLocaleDateString('en-IN')}</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-7 text-xs">View</Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="mt-3">
+                <div className="rounded-xl border bg-card p-4" style={{ minHeight: '300px' }}>
+                  {caseData.timeline.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">No timeline events.</p>
+                  ) : (
+                    <div className="relative space-y-0">
+                      {caseData.timeline.map((event, idx) => (
+                        <div key={idx} className="flex gap-3 pb-4 last:pb-0">
+                          <div className="flex flex-col items-center">
+                            <div className="h-2.5 w-2.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                            {idx < caseData.timeline.length - 1 && <div className="w-px flex-1 bg-border mt-1" />}
+                          </div>
+                          <div className="pb-1">
+                            <p className="text-sm font-medium">{event.description}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {new Date(event.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              {' · '}
+                              {new Date(event.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="notes" className="mt-3">
+                <div className="rounded-xl border bg-card p-4 space-y-3" style={{ minHeight: '300px' }}>
+                  {internalNotes.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">No internal notes.</p>
+                  ) : internalNotes.map((note, idx) => (
+                    <div key={idx} className="rounded-lg border border-amber-200/50 bg-amber-50/50 dark:bg-amber-950/10 dark:border-amber-800/30 px-4 py-3">
+                      <p className="text-sm">{note.text}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1.5">
+                        {note.by} · {new Date(note.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                  ))}
+                  <Separator />
+                  <Button variant="outline" size="sm" className="text-xs" onClick={() => setNotesDrawerOpen(true)}>
+                    <StickyNote className="mr-1.5 h-3.5 w-3.5" />Add Note
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+
             {/* Description */}
             <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Description</h3>
-              <p className="text-sm leading-relaxed">{caseData.description}</p>
-            </div>
-
-            {/* Assign Lawyer */}
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Assign Lawyer</h3>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <div className="flex-1">
-                  <SearchableSelect
-                    options={lawyerOptions}
-                    value={selectedLawyer}
-                    onValueChange={setSelectedLawyer}
-                    placeholder="Search and select a lawyer..."
-                  />
-                </div>
-                <Button onClick={handleAssign} disabled={!selectedLawyer}>Assign</Button>
-              </div>
-              {caseData.lawyerName && (
-                <p className="mt-3 text-sm text-muted-foreground">Currently assigned: <span className="font-medium text-foreground">{caseData.lawyerName}</span></p>
-              )}
-            </div>
-
-            {/* Communication History */}
-            <div className="rounded-xl border bg-card flex flex-col" style={{ height: '500px' }}>
-              <div className="border-b p-4 shrink-0">
-                <h3 className="text-sm font-semibold">Communication History</h3>
-              </div>
-              <div className="flex-1 space-y-3 overflow-y-auto p-4">
-                {caseData.messages.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
-                ) : caseData.messages.map((m) => (
-                  <div key={m.id} className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}>
-                    <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}>
-                      {m.senderRole === 'lawyer' ? <Scale className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
-                    </div>
-                    <div className={`max-w-[75%] rounded-xl px-4 py-2.5 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}>
-                      <p className="mb-0.5 text-xs font-medium opacity-70">{m.senderName}</p>
-                      <p>{m.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Case Description</h3>
+              <p className="text-sm leading-relaxed text-foreground/90">{caseData.description}</p>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Client</h3>
-              <p className="font-medium text-sm">{caseData.userName}</p>
-              <Link to={`/admin/users/${caseData.userId}`} className="text-xs text-gold hover:underline">View profile →</Link>
+          <div className="space-y-4">
+            {/* Assign Lawyer */}
+            <div className="rounded-xl border bg-card p-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Gavel className="h-3.5 w-3.5" />Lawyer Assignment
+              </h3>
+              {caseData.lawyerName && (
+                <div className="mb-3 flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5">
+                  <div>
+                    <p className="text-sm font-medium">{caseData.lawyerName}</p>
+                    <p className="text-[11px] text-muted-foreground">Currently assigned</p>
+                  </div>
+                  <Link to={`/admin/lawyers/${caseData.lawyerId}`}>
+                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                  </Link>
+                </div>
+              )}
+              <div className="space-y-2">
+                <SearchableSelect
+                  options={lawyerOptions}
+                  value={selectedLawyer}
+                  onValueChange={setSelectedLawyer}
+                  placeholder="Search lawyer..."
+                />
+                <Button onClick={handleAssign} disabled={!selectedLawyer} size="sm" className="w-full text-xs">
+                  {caseData.lawyerName ? 'Reassign Lawyer' : 'Assign Lawyer'}
+                </Button>
+              </div>
             </div>
 
-            {caseData.lawyerName && (
-              <div className="rounded-xl border bg-card p-5">
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Assigned Lawyer</h3>
-                <p className="font-medium text-sm">{caseData.lawyerName}</p>
-                <Link to={`/admin/lawyers/${caseData.lawyerId}`} className="text-xs text-gold hover:underline">View profile →</Link>
+            {/* Client info */}
+            <div className="rounded-xl border bg-card p-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5" />Client
+              </h3>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">{caseData.userName}</p>
+                <Link to={`/admin/users/${caseData.userId}`} className="text-xs text-gold hover:underline flex items-center gap-1">
+                  View <ExternalLink className="h-3 w-3" />
+                </Link>
               </div>
-            )}
+            </div>
 
-
-
-            <div className="rounded-xl border bg-card p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Dates</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Created</span>
-                  <span>{new Date(caseData.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            {/* Quick stats */}
+            <div className="rounded-xl border bg-card p-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Quick Info</h3>
+              <div className="space-y-2.5 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">Messages</span>
+                  <span className="font-mono text-xs font-medium">{caseData.messages.length}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Updated</span>
-                  <span>{new Date(caseData.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">Documents</span>
+                  <span className="font-mono text-xs font-medium">{caseData.documents.length}</span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">Timeline Events</span>
+                  <span className="font-mono text-xs font-medium">{caseData.timeline.length}</span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-xs">Internal Notes</span>
+                  <span className="font-mono text-xs font-medium">{internalNotes.length}</span>
                 </div>
               </div>
             </div>
@@ -241,18 +328,6 @@ const AdminCaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      <DocumentsDrawer
-        open={docsDrawerOpen}
-        onOpenChange={setDocsDrawerOpen}
-        documents={caseData.documents}
-      />
-
-      <TimelineDrawer
-        open={timelineDrawerOpen}
-        onOpenChange={setTimelineDrawerOpen}
-        events={caseData.timeline}
-      />
 
       <InternalNotesDrawer
         open={notesDrawerOpen}
