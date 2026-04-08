@@ -222,6 +222,7 @@ export interface AuthUser {
   phone?: string;
   avatarUrl?: string;
   roles: UserRole[];
+  isProfileCompleted?: boolean;
 }
 
 // Cases list API response types

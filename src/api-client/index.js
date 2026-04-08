@@ -305,3 +305,11 @@ export const updateAdminLawyer = (id, data) => {
     data,
   });
 };
+
+export const completeUserOnboarding = (data) => {
+  return apiClient({
+    method: routes.USER_PROFILE.METHOD,
+    url: routes.USER_PROFILE.URL,
+    data,
+  });
+};

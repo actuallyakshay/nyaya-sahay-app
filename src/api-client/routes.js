@@ -155,6 +155,10 @@ const routes = {
     URL: '/api/admin/lawyers/:id',
     METHOD: 'PATCH',
   },
+  USER_PROFILE: {
+    URL: '/api/users',
+    METHOD: 'PATCH',
+  },
 };
 
 export default routes;

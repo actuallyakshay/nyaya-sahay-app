@@ -154,13 +154,13 @@ export const UserFormModal = ({
           )}
           <div className="space-y-2">
             <Label htmlFor="profile-phone">Phone Number</Label>
-            <div className="flex">
+            <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
               <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
                 +91
               </span>
               <Input
                 id="profile-phone"
-                className="rounded-l-none"
+                className="rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 placeholder="9876543210"
                 maxLength={10}
                 value={phone}

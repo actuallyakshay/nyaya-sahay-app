@@ -214,7 +214,9 @@ const AdminLawyers = () => {
                           </>
                         ))}
                       </td>
-                      <td className="px-4 py-3">{l.user?.phone || '-'}</td>
+                      <td className="px-4 py-3">
+                        {l.user?.phone ? `+91${l.user.phone}` : '-'}
+                      </td>
                       <td className="hidden px-4 py-3 font-mono text-xs text-muted-foreground md:table-cell">
                         {l.barCouncilId}
                       </td>
@@ -274,7 +276,9 @@ const AdminLawyers = () => {
           lawyer={editingLawyer as Lawyer}
           onSave={(data, message) => {
             toast({
-              title: message || `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.`,
+              title:
+                message ||
+                `${data.name} has been ${editingLawyer ? 'updated' : 'added'}.`,
             });
             setModalOpen(false);
           }}

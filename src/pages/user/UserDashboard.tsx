@@ -14,6 +14,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -37,6 +38,7 @@ const UserDashboard = () => {
 
   return (
     <DashboardLayout>
+      <ProfileCompletionModal open={user?.isProfileCompleted === false} />
       <div className="space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

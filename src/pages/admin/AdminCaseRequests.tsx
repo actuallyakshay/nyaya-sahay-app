@@ -1,7 +1,7 @@
 import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
 import { StatusBadge } from '@/components/StatusBadge';
-import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
+import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
@@ -96,7 +96,7 @@ const AdminCaseRequests = () => {
           </p>
         </div>
 
-        {isFetching && <CasesTableSkeleton />}
+        {isFetching && <CaseCardSkeleton />}
 
         {!isFetching && cases.length === 0 ? (
           <div className="rounded-xl border bg-card p-12 text-center">

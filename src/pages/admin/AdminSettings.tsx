@@ -69,11 +69,20 @@ const AdminSettings = () => {
             </div>
             <div className="space-y-2">
               <Label>Support Phone</Label>
-              <Input
-                value={supportPhone}
-                onChange={(e) => setSupportPhone(e.target.value)}
-                placeholder="+91 1800-XXX-XXXX"
-              />
+              <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
+                  +91
+                </span>
+                <Input
+                  className="rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  placeholder="9876543210"
+                  maxLength={10}
+                  value={supportPhone}
+                  onChange={(e) =>
+                    setSupportPhone(e.target.value.replace(/\D/g, ''))
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>

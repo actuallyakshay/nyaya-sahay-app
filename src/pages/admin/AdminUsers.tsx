@@ -145,28 +145,30 @@ const AdminUsers = () => {
                       {u.email}
                     </td>
                     <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
-                      {u.phone || '-'}
+                      {u.phone ? `+91${u.phone}` : '-'}
                     </td>
 
                     <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">
                       {new Date(u.createdAt).toLocaleDateString('en-IN')}
                     </td>
                     <td className="px-4 py-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingUser(u);
-                          setModalOpen(true);
-                        }}
-                      >
-                        <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                      <Link to={`/admin/users/${u.id}`}>
-                        <Button variant="ghost" size="sm">
-                          View
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingUser(u);
+                            setModalOpen(true);
+                          }}
+                        >
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
-                      </Link>
+                        <Link to={`/admin/users/${u.id}`}>
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -189,7 +191,9 @@ const AdminUsers = () => {
           user={editingUser as User | undefined}
           onSave={(data, message) => {
             toast({
-              title: message || `${data.name} has been ${editingUser ? 'updated' : 'added'}.`,
+              title:
+                message ||
+                `${data.name} has been ${editingUser ? 'updated' : 'added'}.`,
             });
             setModalOpen(false);
           }}
