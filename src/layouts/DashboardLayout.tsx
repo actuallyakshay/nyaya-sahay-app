@@ -5,7 +5,7 @@ import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, LogOut, Menu
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
-
+import Breadcrumbs from '@/components/Breadcrumbs';
 const userNav = [
   { label: 'Dashboard', to: '/app/dashboard', icon: LayoutDashboard },
   { label: 'My Cases', to: '/app/cases', icon: Briefcase },
