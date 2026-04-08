@@ -10,8 +10,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { setCookie } from '@/lib/helpers';
 import { useToast } from '@/hooks/use-toast';
+import { setCookie } from '@/lib/helpers';
 import { Loader2, UserCircle } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,8 +22,8 @@ interface ProfileCompletionModalProps {
 const ProfileCompletionModal = ({ open }: ProfileCompletionModalProps) => {
   const { user, setUser } = useAuth();
   const { toast } = useToast();
-  const [name, setName] = useState(user?.fullName || '');
-  const [phone, setPhone] = useState(user?.phone || '');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
 
@@ -72,7 +72,7 @@ const ProfileCompletionModal = ({ open }: ProfileCompletionModalProps) => {
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-md [&>button[data-radix-collection-item]]:hidden [&>button:last-of-type]:hidden"
+        className="sm:max-w-md [&>button:last-of-type]:hidden [&>button[data-radix-collection-item]]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}

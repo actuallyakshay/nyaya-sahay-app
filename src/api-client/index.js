@@ -88,6 +88,14 @@ export const getCases = (params) => {
   });
 };
 
+export const getAdminSessionRequests = (params) => {
+  return apiClient({
+    method: routes.ADMIN_SESSION_REQUESTS.METHOD,
+    url: routes.ADMIN_SESSION_REQUESTS.URL,
+    params,
+  });
+};
+
 export const getAdminCaseRequests = (params) => {
   return apiClient({
     method: routes.ADMIN_CASE_REQUESTS.METHOD,
@@ -167,11 +175,10 @@ export const getLawyerAnalytics = () => {
   });
 };
 
-export const getCaseDetails = (params) => {
+export const getCaseDetails = (id) => {
   return apiClient({
     method: routes.CASE_DETAILS.METHOD,
-    url: routes.CASE_DETAILS.URL,
-    params: params,
+    url: routes.CASE_DETAILS.URL.replace(':id', id),
   });
 };
 
@@ -279,6 +286,30 @@ export const updateAdminSettings = (data) => {
     method: routes.UPDATE_ADMIN_SETTINGS.METHOD,
     url: routes.UPDATE_ADMIN_SETTINGS.URL,
     data,
+  });
+};
+
+export const getCaseDocuments = (caseId, params) => {
+  return apiClient({
+    method: routes.CASE_DOCUMENTS.METHOD,
+    url: routes.CASE_DOCUMENTS.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
+export const uploadCaseDocument = (caseId, body) => {
+  return apiClient({
+    method: routes.UPLOAD_CASE_DOCUMENT.METHOD,
+    url: routes.UPLOAD_CASE_DOCUMENT.URL.replace(':caseId', caseId),
+    data: body,
+  });
+};
+
+export const createCaseSessionRequest = (caseId, body) => {
+  return apiClient({
+    method: routes.CASE_SESSION_REQUEST.METHOD,
+    url: routes.CASE_SESSION_REQUEST.URL.replace(':caseId', caseId),
+    data: body,
   });
 };
 

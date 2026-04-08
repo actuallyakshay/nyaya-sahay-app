@@ -102,13 +102,12 @@ export interface Case {
 
 export interface CaseDocument {
   id: string;
-  name: string;
-  type: string;
-  size: number;
-  uploadedAt: string;
-  uploadedBy: string;
-  uploadedByName: string;
-  uploadedByRole: UserRole;
+  caseId: string;
+  author: UserRole;
+  assetUrl: string;
+  assetType: string;
+  assetName?: string;
+  createdAt: string;
 }
 
 export interface TimelineEvent {
@@ -255,6 +254,21 @@ export interface CasesResponse {
 export interface UploadedDoc {
   assetUrl: string;
   assetType: string;
+  assetName?: string;
+}
+
+/** Align with backend CallType enum (adjust if your API uses different strings). */
+export type CaseSessionCallType = 'video' | 'audio';
+
+/** Align with backend CaseSessionRequestRaisedBy enum. */
+export type CaseSessionRequestRaisedBy = 'user' | 'lawyer';
+
+export interface CreateCaseSessionRequestBody {
+  caseId: string;
+  requestedDate: string;
+  requestedTime: string;
+  callType?: CaseSessionCallType;
+  raisedBy?: CaseSessionRequestRaisedBy;
 }
 
 // Notification types

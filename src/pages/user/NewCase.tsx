@@ -28,6 +28,7 @@ const uploadFiles = async (files: File[]): Promise<UploadedDoc[]> => {
       return {
         assetUrl: data.assetUrl,
         assetType: data.assetType,
+        assetName: data.assetName,
       } as UploadedDoc;
     })
   );

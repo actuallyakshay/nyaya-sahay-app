@@ -110,10 +110,17 @@ export const UserCasesTable = ({
                   key={c.id}
                   className="border-b last:border-0 hover:bg-muted/30"
                 >
-                  <td className="px-4 py-3 font-mono text-xs">{c.caseCode}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    <Link
+                      to={`/cases/${c.id}`}
+                      className="hover:text-gold hover:underline"
+                    >
+                      {c.caseCode}
+                    </Link>
+                  </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={`/app/cases/${c.id}`}
+                      to={`/cases/${c.id}`}
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}

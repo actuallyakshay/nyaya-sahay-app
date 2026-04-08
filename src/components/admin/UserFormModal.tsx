@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { queryClient } from '@/lib/query-client';
 import { validateEmail, validatePhone } from '@/lib/utils';
-import type { FieldErrors, User, UserFormModalProps } from '@/types';
+import type { FieldErrors, UserFormModalProps } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -63,7 +63,11 @@ export const UserFormModal = ({
 
   const clearError = (field: keyof FieldErrors) => {
     if (errors[field]) {
-      setErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
     }
   };
 
@@ -78,7 +82,8 @@ export const UserFormModal = ({
       if (phoneError) newErrors.phone = phoneError;
     }
 
-    if (!isEditMode && !password.trim()) newErrors.password = 'Password is required';
+    if (!isEditMode && !password.trim())
+      newErrors.password = 'Password is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -93,7 +98,10 @@ export const UserFormModal = ({
     };
     let response;
     if (isEditMode) {
-      response = await editUser({ fullName: payload.fullName, phone: payload.phone });
+      response = await editUser({
+        fullName: payload.fullName,
+        phone: payload.phone,
+      });
     } else {
       response = await createUser(payload);
     }
@@ -127,7 +135,10 @@ export const UserFormModal = ({
             <Input
               type="email"
               value={email}
-              onChange={(e) => { setEmail(e.target.value); clearError('email'); }}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearError('email');
+              }}
               placeholder="Enter email"
               required
               disabled={isEditMode}
@@ -143,7 +154,10 @@ export const UserFormModal = ({
               <Input
                 type="password"
                 value={password}
-                onChange={(e) => { setPassword(e.target.value); clearError('password'); }}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearError('password');
+                }}
                 placeholder="Enter password"
                 required
               />
@@ -179,10 +193,7 @@ export const UserFormModal = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isPending}
-          >
+          <Button onClick={handleSave} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4" />}
             {user ? 'Save Changes' : 'Add User'}
           </Button>
