@@ -123,6 +123,38 @@ const UserProfile = () => {
                   <Label>Bio</Label>
                   <Input defaultValue={lawyerData.bio} />
                 </div>
+                <div className="space-y-2">
+                  <Label>Gender</Label>
+                  <Input defaultValue="Male" placeholder="e.g. Male, Female, Other" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Date of Birth</Label>
+                  <Input type="date" defaultValue="1990-01-15" />
+                </div>
+              </div>
+
+              <h3 className="font-semibold mt-6 mb-4">Address Details</h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Address Line 1</Label>
+                  <Input defaultValue="123, MG Road" placeholder="House/Building No., Street" />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Address Line 2</Label>
+                  <Input defaultValue="Near District Court" placeholder="Landmark, Area (optional)" />
+                </div>
+                <div className="space-y-2">
+                  <Label>City</Label>
+                  <Input defaultValue="Mumbai" placeholder="City" />
+                </div>
+                <div className="space-y-2">
+                  <Label>State</Label>
+                  <Input defaultValue="Maharashtra" placeholder="State" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Pincode</Label>
+                  <Input defaultValue="400001" placeholder="6-digit pincode" maxLength={6} />
+                </div>
               </div>
             </div>
           )}
