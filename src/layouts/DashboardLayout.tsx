@@ -5,7 +5,7 @@ import { Scale, LayoutDashboard, Briefcase, Plus, CreditCard, User, LogOut, Menu
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
-
+import Breadcrumbs from '@/components/Breadcrumbs';
 const userNav = [
   { label: 'Dashboard', to: '/app/dashboard', icon: LayoutDashboard },
   { label: 'My Cases', to: '/app/cases', icon: Briefcase },
@@ -195,6 +195,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
       {/* Main content */}
       <main className="flex-1 min-h-screen">
         <div className="p-4 md:p-6 lg:p-8">
+          <Breadcrumbs />
           {children}
         </div>
       </main>
