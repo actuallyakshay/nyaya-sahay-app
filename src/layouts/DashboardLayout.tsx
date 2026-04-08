@@ -195,6 +195,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
       {/* Main content */}
       <main className="flex-1 min-h-screen">
         <div className="p-4 md:p-6 lg:p-8">
+          <Breadcrumbs />
           {children}
         </div>
       </main>
