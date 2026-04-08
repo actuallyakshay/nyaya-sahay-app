@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { getCookie, setCookie } from '@/lib/helpers';
+import { getApiErrorMessage } from '@/lib/utils';
 import { Eye, EyeOff, Scale } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,18 +31,16 @@ const AdminLoginPage = () => {
       const { data } = await adminLogin({ email, password });
       if (!data.status) throw new Error(data.message);
 
-      setCookie('admin-access-token', data.accessToken);
-      setCookie('admin-refresh-token', data.refreshToken);
+      setCookie('access-token', data.accessToken);
+      setCookie('refresh-token', data.refreshToken);
       toast({ title: 'Welcome, Admin' });
       navigate('/admin/dashboard');
     } catch (err) {
       toast({
-        title: 'Login failed',
-        description:
-          err instanceof Error ? err.message : 'Please check your credentials.',
+        title: 'Login Failed',
+        description: getApiErrorMessage(err),
         variant: 'destructive',
       });
-      
     } finally {
       setLoading(false);
     }

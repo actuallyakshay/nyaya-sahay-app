@@ -1,4 +1,5 @@
 import { getCaseDetails, uploadAsset, uploadCaseDocument } from '@/api-client';
+import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -12,7 +13,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { SessionBookingModal } from '@/components/user/SessionBookingModal';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getCookie } from '@/lib/helpers';
@@ -22,7 +22,6 @@ import { LEGAL_CATEGORIES } from '@/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   Clock,
-  ExternalLink,
   FileText,
   Loader2,
   Scale,
@@ -39,9 +38,7 @@ const CaseDetail = () => {
   const { id } = useParams();
   const activeRole = getCookie('x-active-role');
   const isLawyer = activeRole === 'lawyer' ? true : false;
-  // const caseData = mockCases.find((c) => c.id === id);
   const [message, setMessage] = useState('');
-  const { user } = useAuth();
   const { toast } = useToast();
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const drawerFileInputRef = useRef<HTMLInputElement>(null);
@@ -49,10 +46,8 @@ const CaseDetail = () => {
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
-  const [internalNotes, setInternalNotes] = useState([]);
   const navigate = useNavigate();
 
-  const meetingLink = 'https://meet.google.com/abc-defg-hij';
   // const hasMeeting = caseData?.status === 'in_consultation';
 
   const { data: caseData, isFetching } = useQuery({
@@ -114,10 +109,6 @@ const CaseDetail = () => {
     await uploadFromSource(file, 'Documents drawer');
   };
 
-  const handleAddNote = (note: { text: string; by: string; at: string }) => {
-    setInternalNotes((prev) => [...prev, note]);
-  };
-
   const isLawyerAssigned = caseData?.assignedLawyerId;
 
   return (
@@ -147,12 +138,7 @@ const CaseDetail = () => {
         {/* Action bar */}
         <div className="flex flex-wrap items-center gap-2">
           {isLawyerAssigned && (
-            <span
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20"
-              onClick={() =>
-                navigate(`/app/lawyers/${caseData?.assignedLawyerId}`)
-              }
-            >
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20">
               <Scale className="h-3 w-3" />
               Adv. {caseData?.assignedLawyer?.user?.fullName}
             </span>
@@ -160,7 +146,7 @@ const CaseDetail = () => {
           {isLawyer && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
               <User className="h-3 w-3" />
-              Client: {caseData.user?.fullName}
+              Client: {caseData?.user?.fullName}
             </span>
           )}
           <span className="text-xs text-muted-foreground">
@@ -210,9 +196,7 @@ const CaseDetail = () => {
                       <StickyNote className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    Internal Notes ({internalNotes.length})
-                  </TooltipContent>
+                  <TooltipContent>Internal Notes</TooltipContent>
                 </Tooltip>
               )}
 
@@ -235,23 +219,7 @@ const CaseDetail = () => {
           </TooltipProvider>
         </div>
 
-        {/* Meeting link banner */}
-        {/* {hasMeeting && ( */}
-
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-gold/30 bg-gold/5 p-3">
-          <div className="flex items-center gap-2 text-sm">
-            <Video className="h-4 w-4 text-gold" />
-            <span className="font-medium">Active consultation session</span>
-          </div>
-          <a
-            href={meetingLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline"
-          >
-            <ExternalLink className="h-3.5 w-3.5" /> Join Google Meet
-          </a>
-        </div>
+        <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
 
         {/* Chat — full width now */}
         <div
@@ -376,9 +344,6 @@ const CaseDetail = () => {
         <InternalNotesDrawer
           open={notesDrawerOpen}
           onOpenChange={setNotesDrawerOpen}
-          notes={internalNotes}
-          onAddNote={handleAddNote}
-          currentUserName={user?.fullName || 'Unknown'}
         />
       )}
     </DashboardLayout>

@@ -1,12 +1,13 @@
+import Breadcrumbs from '@/components/Breakcrumbs';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCookie, setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
   ArrowRightLeft,
-  Bell,
   Briefcase,
   CreditCard,
   LayoutDashboard,
+  Loader2,
   LogOut,
   Menu,
   PanelLeft,
@@ -26,14 +27,14 @@ const userNav = [
   { label: 'New Case', to: '/app/new-case', icon: Plus },
   { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
   { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
-  { label: 'Notifications', to: '/app/notifications', icon: Bell },
+  // { label: 'Notifications', to: '/app/notifications', icon: Bell },
   { label: 'Profile', to: '/app/profile', icon: User },
 ];
 
 const lawyerNav = [
   { label: 'Dashboard', to: '/lawyer/dashboard', icon: LayoutDashboard },
   { label: 'Cases', to: '/lawyer/cases', icon: Briefcase },
-  { label: 'Notifications', to: '/lawyer/notifications', icon: Bell },
+  // { label: 'Notifications', to: '/lawyer/notifications', icon: Bell },
   { label: 'Profile', to: '/lawyer/profile', icon: User },
 ];
 
@@ -42,7 +43,8 @@ export const DashboardLayout = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -141,11 +143,17 @@ export const DashboardLayout = ({
           {/* Profile section in sidebar */}
           {!collapsed && (
             <div className="mx-4 mb-4 flex items-center gap-3 rounded-lg bg-sidebar-accent px-3 py-2.5">
-              <img
-                src={user?.avatarUrl}
-                alt={user?.fullName}
-                className="h-9 w-9 rounded-full object-cover"
-              />
+              {user?.avatarUrl ? (
+                <img
+                  src={user?.avatarUrl}
+                  alt={user?.fullName}
+                  className="h-9 w-9 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
+                  {user?.fullName?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0">
                 <p className="text-xs font-medium text-gold">
                   {roleName} Panel
@@ -246,7 +254,11 @@ export const DashboardLayout = ({
                 collapsed && 'lg:justify-center lg:px-0'
               )}
             >
-              <LogOut className="h-4 w-4 shrink-0" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : (
+                <LogOut className="h-4 w-4 shrink-0" />
+              )}
               <span className={cn(collapsed && 'lg:hidden')}>Sign Out</span>
             </button>
           </div>
@@ -255,7 +267,10 @@ export const DashboardLayout = ({
 
       {/* Main content */}
       <main className="min-h-screen flex-1">
-        <div className="p-4 md:p-6 lg:p-8">{children}</div>
+        <div className="p-4 md:p-6 lg:p-8">
+          <Breadcrumbs />
+          {children}
+        </div>
       </main>
     </div>
   );

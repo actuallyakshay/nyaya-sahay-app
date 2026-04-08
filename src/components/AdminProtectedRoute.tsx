@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
   const [isChecking, setIsChecking] = useState(true);
-  const adminToken = getCookie('admin-access-token');
+  const adminToken = getCookie('access-token');
   const navigate = useNavigate();
 
   useEffect(() => {

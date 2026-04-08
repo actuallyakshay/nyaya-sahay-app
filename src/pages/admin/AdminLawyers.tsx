@@ -215,7 +215,7 @@ const AdminLawyers = () => {
                         ))}
                       </td>
                       <td className="px-4 py-3">
-                        {l.user?.phone ? `+91${l.user.phone}` : '-'}
+                        {l.user?.phone ? `+91-${l.user.phone}` : '-'}
                       </td>
                       <td className="hidden px-4 py-3 font-mono text-xs text-muted-foreground md:table-cell">
                         {l.barCouncilId}
@@ -273,7 +273,7 @@ const AdminLawyers = () => {
         <LawyerFormModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          lawyer={editingLawyer as Lawyer}
+          lawyer={editingLawyer as LawyerListItem}
           onSave={(data, message) => {
             toast({
               title:

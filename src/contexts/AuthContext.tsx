@@ -38,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<AuthUser | null>(getStoredUser);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const googleLogin = useCallback(async (idToken: string, role: UserRole) => {
@@ -57,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const logout = useCallback(async () => {
+    setIsLoading(true);
     try {
       await logoutApi();
       resetCookies();
@@ -65,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     setUser(null);
     clearStoredUser();
+    setIsLoading(false);
   }, []);
 
   return (

@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { PAGE_SIZE } from '@/lib/mock-data';
+import { buildGenericQueryParams } from '@/lib/helpers';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -24,16 +24,6 @@ interface DocumentsDrawerProps {
   loading?: boolean;
 }
 
-export const buildDocumentsQueryParams = (page: number) => {
-  const params: Record<string, string | number> = {
-    page,
-    limit: PAGE_SIZE,
-    orderBy: 'createdAt',
-    order: 'DESC',
-  };
-  return params;
-};
-
 export const DocumentsDrawer = ({
   open,
   onOpenChange,
@@ -45,10 +35,10 @@ export const DocumentsDrawer = ({
   const { id } = useParams();
   const [page, setPage] = useState(1);
 
-  const { data, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ['case-documents', page],
     queryFn: async () => {
-      const params = buildDocumentsQueryParams(page);
+      const params = buildGenericQueryParams(page);
       const response = await getCaseDocuments(id, params);
       return response.data;
     },

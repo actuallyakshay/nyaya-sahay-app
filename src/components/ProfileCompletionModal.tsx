@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
+import { getApiErrorMessage } from '@/lib/utils';
 import { Loader2, UserCircle } from 'lucide-react';
 import { useState } from 'react';
 
@@ -60,8 +61,8 @@ const ProfileCompletionModal = ({ open }: ProfileCompletionModalProps) => {
       });
     } catch (error) {
       toast({
-        title: 'Failed to save profile',
-        description: error?.message || 'Please try again.',
+        title: getApiErrorMessage(error),
+        description: '',
         variant: 'destructive',
       });
     } finally {

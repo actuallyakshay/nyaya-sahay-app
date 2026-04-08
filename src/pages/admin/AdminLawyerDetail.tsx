@@ -4,6 +4,7 @@ import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import { calculateYearsOfExperience } from '@/lib/helpers';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Award, ChevronLeft, Mail, Phone } from 'lucide-react';
@@ -135,7 +136,7 @@ const AdminLawyerDetail = () => {
                   className="h-5 w-20 rounded-full"
                 >
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                    10 years exp
+                    {calculateYearsOfExperience(lawyerData?.careerStartDate)}
                   </span>
                 </WithShimmer>
                 <WithShimmer

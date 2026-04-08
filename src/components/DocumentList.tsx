@@ -4,7 +4,7 @@ import { Eye } from 'lucide-react';
 import { useState } from 'react';
 import { FileViewer } from './FileViewer';
 
-const roleColorMap: Record<string, { bg: string; label: string }> = {
+export const roleColorMap: Record<string, { bg: string; label: string }> = {
   user: { bg: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Client' },
   lawyer: {
     bg: 'bg-amber-50 text-amber-700 border-amber-200',

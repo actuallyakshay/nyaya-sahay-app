@@ -6,6 +6,7 @@ import {
   FileText,
   Presentation,
 } from 'lucide-react';
+import { PAGE_SIZE } from './mock-data';
 
 export const setCookie = (name: string, value: string) => {
   Cookies.set(name, value);
@@ -69,4 +70,34 @@ export const getFileIcon = (fileName: string) => {
     return <Presentation className="h-4 w-4 shrink-0 text-orange-500" />;
 
   return <File className="h-4 w-4 shrink-0 text-muted-foreground" />;
+};
+
+export const calculateYearsOfExperience = (lawyerExp: string) => {
+  const startDate = new Date(lawyerExp);
+  const currentDate = new Date();
+  const diffTime = Math.abs(currentDate.getTime() - startDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 30) {
+    return `${diffDays} days`;
+  }
+
+  if (Math.floor(diffDays / 365) == 0) {
+    return `${Math.floor((diffDays % 365) / 30)} mo`;
+  }
+  return `${Math.floor(diffDays / 365)} yrs ${Math.floor((diffDays % 365) / 30)} mo`;
+};
+
+export const getFirstLetterCapitalized = (word: string) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
+
+export const buildGenericQueryParams = (page: number) => {
+  const params: Record<string, string | number> = {
+    page,
+    limit: PAGE_SIZE,
+    orderBy: 'createdAt',
+    order: 'DESC',
+  };
+  return params;
 };

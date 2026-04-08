@@ -136,6 +136,17 @@ export const updateAdminCaseStatus = (caseId, status) => {
   });
 };
 
+export const updateCaseSessionRequestStatus = (sessionRequestId, status) => {
+  return apiClient({
+    method: routes.ADMIN_SESSION_REQUEST_STATUS.METHOD,
+    url: routes.ADMIN_SESSION_REQUEST_STATUS.URL.replace(
+      ':sessionRequestId',
+      sessionRequestId
+    ),
+    data: { status },
+  });
+};
+
 export const updateLawyerRoleStatus = (userId, roleCode, status) => {
   return apiClient({
     method: routes.UPDATE_LAWYER_ROLE_STATUS.METHOD,
@@ -293,6 +304,22 @@ export const getCaseDocuments = (caseId, params) => {
   return apiClient({
     method: routes.CASE_DOCUMENTS.METHOD,
     url: routes.CASE_DOCUMENTS.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
+export const createCaseNote = (caseId, body) => {
+  return apiClient({
+    method: routes.CREATE_CASE_NOTE.METHOD,
+    url: routes.CREATE_CASE_NOTE.URL.replace(':caseId', caseId),
+    data: body,
+  });
+};
+
+export const getCaseInternalNotes = (caseId, params) => {
+  return apiClient({
+    method: routes.CASE_INTERNAL_NOTES.METHOD,
+    url: routes.CASE_INTERNAL_NOTES.URL.replace(':caseId', caseId),
     params,
   });
 };

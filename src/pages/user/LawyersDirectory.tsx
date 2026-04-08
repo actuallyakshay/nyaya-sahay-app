@@ -2,6 +2,7 @@ import { getLawyersList } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
 import WithShimmer from '@/components/WithShimmer';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { calculateYearsOfExperience } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import { Award, Briefcase, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -11,18 +12,6 @@ const LawyersDirectory = () => {
   const [limit] = useState(10);
   const [orderBy] = useState('createdAt');
   const [order] = useState('ASC');
-
-  const calculateExperience = (careerStartDate) => {
-    if (!careerStartDate) {
-      return 'Experience not specified';
-    }
-
-    const startYear = new Date(careerStartDate).getFullYear();
-    const currentYear = new Date().getFullYear();
-    const experience = Math.max(0, currentYear - startYear);
-
-    return `${experience} yrs exp`;
-  };
 
   const {
     data: lawyersData,
@@ -111,7 +100,17 @@ const LawyersDirectory = () => {
               <div key={l.id} className="rounded-xl border bg-card p-5">
                 <div className="flex items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/20 font-bold text-gold">
-                    {l.user?.fullName?.charAt(0) || 'L'}
+                    {l.user?.avatarUrl ? (
+                      <img
+                        src={l.user?.avatarUrl}
+                        alt={l.user?.fullName}
+                        className="h-12 w-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/20 font-bold text-gold">
+                        {l.user?.fullName?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
@@ -141,7 +140,7 @@ const LawyersDirectory = () => {
                 <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Briefcase className="h-3 w-3" />
-                    {calculateExperience(l.careerStartDate)}
+                    {calculateYearsOfExperience(l.careerStartDate)}
                   </span>
                   {l.gender && (
                     <span className="flex items-center gap-1">

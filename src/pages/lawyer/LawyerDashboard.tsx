@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { calculateYearsOfExperience } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Briefcase, CheckCircle, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -56,7 +57,7 @@ const LawyerDashboard = () => {
             },
             {
               label: 'Experience',
-              value: `${experience} yrs`,
+              value: calculateYearsOfExperience(experience),
               icon: Clock,
               color: 'text-muted-foreground',
             },

@@ -113,7 +113,7 @@ export const LawyerCasesTable = ({
                   <td className="px-4 py-3 font-mono text-xs">{c.caseCode}</td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={`/lawyer/cases/${c.id}`}
+                      to={`/cases/${c.id}`}
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}
