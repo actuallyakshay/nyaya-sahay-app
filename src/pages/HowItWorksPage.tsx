@@ -36,7 +36,7 @@ const HowItWorksPage = () => (
     <section className="py-16 md:py-24">
       <div className="container max-w-3xl">
         <h1 className="text-center text-3xl font-bold sm:text-4xl">
-          How NyayaSetu Works
+          How Samvidhan Legal Advisory Works
         </h1>
         <p className="mt-4 text-center text-muted-foreground">
           Five simple steps to get legal support from verified advocates.

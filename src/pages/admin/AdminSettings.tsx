@@ -64,7 +64,7 @@ const AdminSettings = () => {
               <Input
                 value={supportEmail}
                 onChange={(e) => setSupportEmail(e.target.value)}
-                placeholder="support@nyayasetu.in"
+                placeholder="support@samvidhanlegaladvisory.in"
               />
             </div>
             <div className="space-y-2">

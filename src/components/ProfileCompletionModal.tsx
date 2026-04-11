@@ -84,7 +84,8 @@ const ProfileCompletionModal = ({ open }: ProfileCompletionModalProps) => {
           </div>
           <DialogTitle className="text-xl">Complete Your Profile</DialogTitle>
           <DialogDescription className="text-base">
-            We need a few details to get you started on NyayaSetu.
+            We need a few details to get you started on Samvidhan Legal
+            Advisory.
           </DialogDescription>
         </DialogHeader>
 

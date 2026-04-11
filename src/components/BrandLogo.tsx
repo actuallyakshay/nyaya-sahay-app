@@ -11,12 +11,42 @@ const sizePx = {
   xl: 48,
 } as const;
 
+/** Serif wordmark — marketing / public chrome (`header`, `footer` only). */
 const textStyles = {
   header: 'font-serif text-xl font-bold text-navy',
-  headerCompact: 'font-serif text-lg font-bold text-navy',
-  sidebar: 'font-serif text-lg font-bold text-primary-foreground',
   footer: 'font-serif text-lg font-bold text-primary-foreground',
 } as const;
+
+/**
+ * Sans stacked wordmark for narrow dashboard chrome — Inter renders more
+ * clearly than small optical-size serif next to the nav.
+ */
+const stackedWordmarkStyles = {
+  sidebar: {
+    wrap: 'min-w-0 flex-1 subpixel-antialiased',
+    line1:
+      'block font-sans text-sm font-semibold leading-tight tracking-tight text-primary-foreground',
+    line2:
+      'mt-0.5 block font-sans text-xs font-medium leading-tight text-primary-foreground/90',
+  },
+  headerCompact: {
+    wrap: 'min-w-0 flex-1',
+    line1:
+      'block font-sans text-sm font-semibold leading-tight tracking-tight text-navy',
+    line2:
+      'mt-0.5 block font-sans text-xs font-medium leading-tight text-navy/80',
+  },
+} as const;
+
+type StackedVariant = keyof typeof stackedWordmarkStyles;
+
+export type BrandLogoTextVariant =
+  | keyof typeof textStyles
+  | keyof typeof stackedWordmarkStyles;
+
+function isStackedVariant(v: BrandLogoTextVariant): v is StackedVariant {
+  return v === 'sidebar' || v === 'headerCompact';
+}
 
 export type BrandLogoProps = {
   to?: string;
@@ -24,7 +54,7 @@ export type BrandLogoProps = {
   as?: 'link' | 'div';
   size?: keyof typeof sizePx | number;
   showText?: boolean;
-  textVariant?: keyof typeof textStyles;
+  textVariant?: BrandLogoTextVariant;
   className?: string;
   imgClassName?: string;
 };
@@ -40,6 +70,28 @@ export function BrandLogo({
 }: BrandLogoProps) {
   const dim = typeof size === 'number' ? size : sizePx[size];
 
+  const wordmark =
+    showText &&
+    (isStackedVariant(textVariant) ? (
+      <span className={stackedWordmarkStyles[textVariant].wrap}>
+        <span className={stackedWordmarkStyles[textVariant].line1}>
+          Samvidhan
+        </span>
+        <span className={stackedWordmarkStyles[textVariant].line2}>
+          Legal Advisory
+        </span>
+      </span>
+    ) : (
+      <span
+        className={cn(
+          textStyles[textVariant],
+          'min-w-0 flex-1 text-left leading-snug'
+        )}
+      >
+        Samvidhan Legal Advisory
+      </span>
+    ));
+
   const inner = (
     <>
       <img
@@ -50,21 +102,21 @@ export function BrandLogo({
         className={cn('shrink-0 rounded-full object-cover', imgClassName)}
         decoding="async"
       />
-      {showText && <span className={textStyles[textVariant]}>NyayaSetu</span>}
+      {wordmark}
     </>
   );
 
+  const rowClass = 'flex min-w-0 items-center gap-2.5';
+
   if (as === 'div') {
-    return (
-      <div className={cn('flex items-center gap-2.5', className)}>{inner}</div>
-    );
+    return <div className={cn(rowClass, className)}>{inner}</div>;
   }
 
   return (
     <Link
       to={to}
-      className={cn('flex items-center gap-2.5', className)}
-      aria-label="NyayaSetu home"
+      className={cn(rowClass, className)}
+      aria-label="Samvidhan Legal Advisory home"
     >
       {inner}
     </Link>

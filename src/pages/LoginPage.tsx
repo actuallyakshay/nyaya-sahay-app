@@ -87,7 +87,7 @@ const LoginPage = () => {
           </p>
         </div>
         <p className="text-xs text-primary-foreground/40">
-          © {new Date().getFullYear()} NyayaSetu
+          © {new Date().getFullYear()} Samvidhan Legal Advisory
         </p>
       </div>
 

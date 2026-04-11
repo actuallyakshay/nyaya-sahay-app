@@ -6,7 +6,9 @@ const AboutPage = () => (
   <PublicLayout>
     <section className="py-16 md:py-24">
       <div className="container max-w-3xl">
-        <h1 className="text-3xl font-bold sm:text-4xl text-center">About NyayaSetu</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl text-center">
+          About Samvidhan Legal Advisory
+        </h1>
         <p className="mt-4 text-center text-muted-foreground">Bridging the gap between Indian citizens and accessible, affordable legal aid.</p>
 
         <div className="mt-12 space-y-8 text-sm leading-relaxed">
@@ -16,7 +18,12 @@ const AboutPage = () => (
             </div>
             <div>
               <h3 className="font-semibold text-base">Our Mission</h3>
-              <p className="mt-1 text-muted-foreground">NyayaSetu was founded to make quality legal services accessible to every Indian — regardless of geography, language, or financial background. We connect citizens with verified advocates through a simple subscription model.</p>
+              <p className="mt-1 text-muted-foreground">
+                Samvidhan Legal Advisory was founded to make quality legal
+                services accessible to every Indian — regardless of geography,
+                language, or financial background. We connect citizens with
+                verified advocates through a simple subscription model.
+              </p>
             </div>
           </div>
           <div className="flex gap-4">

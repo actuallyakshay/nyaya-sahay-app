@@ -27,7 +27,6 @@ export const DashboardLayout = ({
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  /** Google CDN avatars often 403 with a cross-origin Referer; `no-referrer` fixes load. */
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   useEffect(() => {
@@ -59,31 +58,31 @@ export const DashboardLayout = ({
     );
   };
 
-  console.log('nav[0].to', nav[0].to);
-
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Mobile header */}
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 lg:hidden">
-        <button onClick={() => setSidebarOpen(true)} className="p-1">
+        <button onClick={() => setSidebarOpen(true)} className="shrink-0 p-1">
           <Menu className="h-5 w-5" />
         </button>
-        <BrandLogo
-          as="link"
-          to={nav[0].to}
-          size="md"
-          textVariant="headerCompact"
-        />
+        <div className="flex min-w-0 flex-1 justify-center px-1">
+          <BrandLogo
+            as="link"
+            to={nav[0].to}
+            size="md"
+            textVariant="headerCompact"
+          />
+        </div>
         {showAvatar ? (
           <img
             src={user!.avatarUrl}
             alt=""
             referrerPolicy="no-referrer"
-            className="h-8 w-8 rounded-full object-cover"
+            className="h-8 w-8 shrink-0 rounded-full object-cover"
             onError={() => setAvatarLoadFailed(true)}
           />
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
             {user?.fullName?.charAt(0)?.toUpperCase()}
           </div>
         )}
@@ -113,7 +112,7 @@ export const DashboardLayout = ({
               collapsed ? 'lg:justify-center lg:px-0' : 'justify-between'
             )}
           >
-            <div className={cn(collapsed && 'lg:hidden')}>
+            <div className={cn('min-w-0 flex-1 pr-2', collapsed && 'lg:hidden')}>
               <BrandLogo
                 as="link"
                 to={nav[0].to}

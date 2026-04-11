@@ -137,14 +137,15 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h4 className="mb-3 text-sm font-semibold text-gold">Contact</h4>
               <ul className="space-y-2 text-sm text-primary-foreground/70">
-                <li>support@nyayasetu.in</li>
+                <li>support@samvidhanlegaladvisory.in</li>
                 <li>+91 11 4000 XXXX</li>
                 <li>New Delhi, India</li>
               </ul>
             </div>
           </div>
           <div className="mt-8 border-t border-primary-foreground/10 pt-6 text-center text-xs text-primary-foreground/50">
-            © {new Date().getFullYear()} NyayaSetu. All rights reserved. An
+            © {new Date().getFullYear()} Samvidhan Legal Advisory. All rights
+            reserved. An
             initiative towards accessible legal aid in India.
           </div>
         </div>

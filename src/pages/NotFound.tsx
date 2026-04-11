@@ -40,8 +40,9 @@ const NotFound = () => {
             We couldn’t open that page
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            The address may be mistyped, or the page may have moved. NyayaSetu
-            is here to help you reach verified advocates and manage your legal
+            The address may be mistyped, or the page may have moved. Samvidhan
+            Legal Advisory is here to help you reach verified advocates and
+            manage your legal
             matters—let’s get you back on track.
           </p>
 

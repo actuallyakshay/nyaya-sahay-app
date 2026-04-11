@@ -103,7 +103,7 @@ const testimonials = [
   {
     name: 'Ananya M.',
     location: 'Mumbai',
-    text: 'NyayaSetu helped me resolve a property dispute that had been going on for 2 years. The lawyer was incredibly knowledgeable and responsive.',
+    text: 'Samvidhan Legal Advisory helped me resolve a property dispute that had been going on for 2 years. The lawyer was incredibly knowledgeable and responsive.',
     rating: 5,
   },
   {
@@ -237,7 +237,7 @@ const Homepage = () => {
         <div className="container">
           <div className="mx-auto mb-12 max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              Why Families Trust NyayaSetu
+              Why Families Trust Samvidhan Legal Advisory
             </h2>
             <p className="mt-3 text-base text-muted-foreground sm:text-lg">
               Modern legal assistance that's accessible, affordable, and
@@ -319,7 +319,7 @@ const Homepage = () => {
             </h2>
             <p className="mt-3 text-muted-foreground">
               Real stories from real people who found legal support through
-              NyayaSetu.
+              Samvidhan Legal Advisory.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -455,7 +455,8 @@ const Homepage = () => {
               custom={1}
               className="mx-auto mt-4 max-w-lg text-base text-primary-foreground/70 sm:text-lg"
             >
-              Join thousands of Indians who trust NyayaSetu for reliable,
+              Join thousands of Indians who trust Samvidhan Legal Advisory for
+              reliable,
               affordable legal assistance.
             </motion.p>
             <motion.div
