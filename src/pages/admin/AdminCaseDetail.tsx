@@ -1,4 +1,3 @@
-import { path } from '@/constants';
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { AdminInternalNotesDrawer } from '@/components/admin/AdminInternalNotesDrawer';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
@@ -21,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { path } from '@/constants';
 import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
@@ -446,9 +446,12 @@ const AdminCaseDetail = () => {
 
       <AdminInternalNotesDrawer
         open={notesDrawerOpen}
+        caseStatus={caseData?.status}
         onOpenChange={setNotesDrawerOpen}
       />
       <DocumentsDrawer
+        isAdmin={true}
+        caseStatus={caseData?.status}
         open={docsDrawerOpen}
         onOpenChange={setDocsDrawerOpen}
         caseClientName={caseData?.user?.fullName}

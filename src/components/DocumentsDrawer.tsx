@@ -1,4 +1,4 @@
-import { getCaseDocuments } from '@/api-client';
+import { getAdminCaseDocuments, getCaseDocuments } from '@/api-client';
 import { DocumentList } from '@/components/DocumentList';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { buildGenericQueryParams } from '@/lib/helpers';
+import { CaseStatus } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -22,6 +23,8 @@ interface DocumentsDrawerProps {
   caseClientName?: string;
   caseLawyerName?: string;
   loading?: boolean;
+  isAdmin?: boolean;
+  caseStatus: CaseStatus;
 }
 
 export const DocumentsDrawer = ({
@@ -31,15 +34,23 @@ export const DocumentsDrawer = ({
   caseClientName,
   caseLawyerName,
   loading,
+  isAdmin,
+  caseStatus,
 }: DocumentsDrawerProps) => {
   const { id } = useParams();
   const [page, setPage] = useState(1);
 
+  const queryKey = isAdmin
+    ? ['admin-case-documents', page]
+    : ['case-documents', page];
+
+  const queryFn = isAdmin ? getAdminCaseDocuments : getCaseDocuments;
+
   const { data } = useQuery({
-    queryKey: ['case-documents', page],
+    queryKey,
     queryFn: async () => {
       const params = buildGenericQueryParams(page);
-      const response = await getCaseDocuments(id, params);
+      const response = await queryFn(id, params);
       return response.data;
     },
     placeholderData: keepPreviousData,
@@ -50,6 +61,8 @@ export const DocumentsDrawer = ({
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
+
+  const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -87,7 +100,7 @@ export const DocumentsDrawer = ({
             variant="outline"
             className="w-full"
             onClick={onUploadClick}
-            disabled={loading}
+            disabled={loading || isCaseClosed}
           >
             {loading ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />

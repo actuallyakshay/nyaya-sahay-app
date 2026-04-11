@@ -1,8 +1,8 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
-import { ROUTES } from '@/constants';
 import WithShimmer from '@/components/WithShimmer';
 import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
@@ -63,9 +63,12 @@ const AdminLawyerDetail = () => {
   };
 
   const lawyerData = data?.lawyerData;
-  const totalCasesHandled = data?.totalCasesHandled;
-
-  console.log('cases', cases);
+  const totalCasesHandled = data?.totalCasesHandled ?? 0;
+  const user = lawyerData?.user;
+  const practiceAreas = lawyerData?.lawyerPracticeAreas ?? [];
+  const experienceLabel = lawyerData?.careerStartDate
+    ? calculateYearsOfExperience(lawyerData.careerStartDate)
+    : null;
 
   return (
     <AdminLayout>
@@ -88,79 +91,90 @@ const AdminLawyerDetail = () => {
                     className="h-14 w-14 rounded-full object-cover"
                   />
                 ) : (
-                  <span>
-                    {lawyerData?.user?.fullName?.charAt(0).toUpperCase()}
-                  </span>
+                  <span>{user?.fullName?.charAt(0)?.toUpperCase() ?? '?'}</span>
                 )}
               </div>
             </WithShimmer>
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <WithShimmer loading={isLoading} className="h-7 w-40">
-                  <h1 className="text-xl font-bold">
-                    {lawyerData?.user?.fullName}
-                  </h1>
+                  <h1 className="text-xl font-bold">Adv. {user?.fullName}</h1>
                 </WithShimmer>
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <WithShimmer loading={isLoading} className="h-4 w-36">
-                  <span className="flex items-center gap-1">
-                    <Mail className="h-3.5 w-3.5" />
-                    {lawyerData?.user?.email}
-                  </span>
-                </WithShimmer>
-                <WithShimmer loading={isLoading} className="h-4 w-28">
-                  <span className="flex items-center gap-1">
-                    <Phone className="h-3.5 w-3.5" />
-                    +91-{lawyerData?.user?.phone}
-                  </span>
-                </WithShimmer>
-                <WithShimmer loading={isLoading} className="h-4 w-32">
-                  <span className="flex items-center gap-1">
-                    <Award className="h-3.5 w-3.5" />
-                    {lawyerData?.barCouncilId}
-                  </span>
-                </WithShimmer>
+                {isLoading ? (
+                  <>
+                    <WithShimmer loading className="h-4 w-36" />
+                    <WithShimmer loading className="h-4 w-28" />
+                    <WithShimmer loading className="h-4 w-32" />
+                  </>
+                ) : (
+                  <>
+                    {user?.email && (
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        {user.email}
+                      </span>
+                    )}
+                    {user?.phone && (
+                      <span className="flex items-center gap-1">
+                        <Phone className="h-3.5 w-3.5 shrink-0" />
+                        +91-{user.phone}
+                      </span>
+                    )}
+                    {lawyerData?.barCouncilId && (
+                      <span className="flex items-center gap-1">
+                        <Award className="h-3.5 w-3.5 shrink-0" />
+                        {lawyerData.barCouncilId}
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
-              <WithShimmer loading={isLoading} className="mt-2 h-4 w-full">
-                <p className="mt-2 text-sm">{lawyerData?.bio || '-'}</p>
-              </WithShimmer>
+              {isLoading && <WithShimmer loading className="mt-2 h-4 w-full" />}
+              {!isLoading && lawyerData?.bio?.trim() && (
+                <p className="mt-2 text-sm text-foreground">{lawyerData.bio}</p>
+              )}
               <div className="mt-3 flex flex-wrap gap-2">
-                <WithShimmer
-                  loading={isLoading}
-                  className="h-5 w-16 rounded-full"
-                >
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                    {lawyerData?.degree}
-                  </span>
-                </WithShimmer>
-                <WithShimmer
-                  loading={isLoading}
-                  className="h-5 w-20 rounded-full"
-                >
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                    {calculateYearsOfExperience(lawyerData?.careerStartDate)}
-                  </span>
-                </WithShimmer>
-                <WithShimmer
-                  loading={isLoading}
-                  className="h-5 w-16 rounded-full"
-                >
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
-                    {totalCasesHandled} cases
-                  </span>
-                </WithShimmer>
+                {isLoading ? (
+                  <>
+                    <WithShimmer loading className="h-5 w-16 rounded-full" />
+                    <WithShimmer loading className="h-5 w-20 rounded-full" />
+                    <WithShimmer loading className="h-5 w-16 rounded-full" />
+                  </>
+                ) : (
+                  <>
+                    {lawyerData?.degree?.trim() && (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                        {lawyerData.degree}
+                      </span>
+                    )}
+                    {experienceLabel && (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                        {experienceLabel}
+                      </span>
+                    )}
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                      {totalCasesHandled}{' '}
+                      {totalCasesHandled === 1 ? 'case' : 'cases'}
+                    </span>
+                  </>
+                )}
               </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {isLoading
-                  ? Array.from({ length: 3 }).map((_, i) => (
+              <div className="mt-2">
+                {isLoading ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {Array.from({ length: 3 }).map((_, i) => (
                       <WithShimmer
                         key={i}
                         loading
                         className="h-5 w-20 rounded-full"
                       />
-                    ))
-                  : lawyerData?.lawyerPracticeAreas?.map((s) => (
+                    ))}
+                  </div>
+                ) : practiceAreas.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {practiceAreas.map((s) => (
                       <span
                         key={s.practiceAreaId}
                         className="rounded-full bg-gold/10 px-2 py-0.5 text-xs font-medium text-gold"
@@ -168,6 +182,12 @@ const AdminLawyerDetail = () => {
                         {s.practiceArea?.name}
                       </span>
                     ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No practice areas on file.
+                  </p>
+                )}
               </div>
             </div>
           </div>

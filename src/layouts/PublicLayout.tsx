@@ -1,6 +1,7 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import { Button } from '@/components/ui/button';
 import { PUBLIC_NAV_LINKS, ROUTES } from '@/constants';
-import { Menu, Scale, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -12,14 +13,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between">
-          <Link to={ROUTES.home} className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy">
-              <Scale className="h-5 w-5 text-gold" />
-            </div>
-            <span className="font-serif text-xl font-bold text-navy">
-              NyayaSetu
-            </span>
-          </Link>
+          <BrandLogo size="md" textVariant="header" />
 
           <nav className="hidden items-center gap-1 md:flex">
             {PUBLIC_NAV_LINKS.map((l) => (
@@ -86,11 +80,8 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="container py-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <div className="mb-4 flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/20">
-                  <Scale className="h-4 w-4 text-gold" />
-                </div>
-                <span className="font-serif text-lg font-bold">NyayaSetu</span>
+              <div className="mb-4">
+                <BrandLogo size="sm" textVariant="footer" />
               </div>
               <p className="text-sm text-primary-foreground/70">
                 Bridging the gap between citizens and legal support across

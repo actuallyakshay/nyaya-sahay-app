@@ -1,5 +1,6 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import { PublicLayout } from '@/layouts/PublicLayout';
-import { Scale, Shield, BookOpen, Users } from 'lucide-react';
+import { Shield, Users } from 'lucide-react';
 
 const AboutPage = () => (
   <PublicLayout>
@@ -10,7 +11,9 @@ const AboutPage = () => (
 
         <div className="mt-12 space-y-8 text-sm leading-relaxed">
           <div className="flex gap-4">
-            <div className="shrink-0 h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center"><Scale className="h-5 w-5 text-gold" /></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10">
+              <BrandLogo as="div" showText={false} size={32} className="gap-0" />
+            </div>
             <div>
               <h3 className="font-semibold text-base">Our Mission</h3>
               <p className="mt-1 text-muted-foreground">NyayaSetu was founded to make quality legal services accessible to every Indian — regardless of geography, language, or financial background. We connect citizens with verified advocates through a simple subscription model.</p>

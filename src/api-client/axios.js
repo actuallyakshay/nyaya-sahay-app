@@ -1,6 +1,6 @@
 import { ROUTES } from '@/constants/routes';
 import { env } from '@/config/env';
-import { getCookie } from '@/lib/helpers';
+import { getCookie, setCookie } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import axios from 'axios';
 import routes from './routes';
@@ -63,8 +63,8 @@ const redirectToLogin = (requestUrl = '') => {
   queryClient.clear();
   const isAdminRequest = requestUrl.startsWith('/api/admin/');
   if (isAdminRequest) {
-    document.cookie = 'admin-access-token=; Max-Age=0; path=/';
-    document.cookie = 'admin-refresh-token=; Max-Age=0; path=/';
+    document.cookie = 'access-token=; Max-Age=0; path=/';
+    document.cookie = 'refresh-token=; Max-Age=0; path=/';
     window.location.href = ROUTES.admin.login;
   } else {
     localStorage.removeItem('auth_user');
@@ -95,10 +95,8 @@ apiClient.interceptors.request.use(
     const url = config.url ?? '';
 
     if (url === routes.REFRESH_TOKEN.URL) {
-      const refreshToken = getCookie(REFRESH_TOKEN_COOKIE);
-      if (refreshToken) {
-        config.headers.set('X-Refresh-Token', refreshToken);
-      }
+      // Token is sent in JSON body only. A custom header would trigger an extra
+      // CORS preflight field (x-refresh-token) that must be allowlisted on the API.
       return config;
     }
 
@@ -113,7 +111,7 @@ apiClient.interceptors.request.use(
 
     const activeRole = getCookie(ACTIVE_ROLE_COOKIE);
     if (activeRole) {
-      config.headers.set('X-Active-Role', activeRole);
+      config.headers.set('x-active-role', activeRole);
     }
 
     return config;

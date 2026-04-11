@@ -9,6 +9,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useInternalCaseNotes } from '@/hooks/useInternalCaseNotes';
 import { getFirstLetterCapitalized } from '@/lib/helpers';
+import { CaseStatus } from '@/types';
 import { Loader2, StickyNote } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { PaginationControls } from '../PaginationControls';
@@ -16,11 +17,13 @@ import { PaginationControls } from '../PaginationControls';
 interface AdminInternalNotesDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  caseStatus: CaseStatus;
 }
 
 export const AdminInternalNotesDrawer = ({
   open,
   onOpenChange,
+  caseStatus,
 }: AdminInternalNotesDrawerProps) => {
   const { id } = useParams();
 
@@ -35,6 +38,8 @@ export const AdminInternalNotesDrawer = ({
     totalPages,
     total,
   } = useInternalCaseNotes(id, { variant: 'admin' });
+
+  const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -89,11 +94,12 @@ export const AdminInternalNotesDrawer = ({
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             className="min-h-[80px]"
+            disabled={isCaseClosed}
           />
           <Button
             className="w-full"
             onClick={handleAdd}
-            disabled={!noteText.trim() || isAddingNote}
+            disabled={!noteText.trim() || isAddingNote || isCaseClosed}
           >
             {isAddingNote && <Loader2 className="h-4 w-4 animate-spin" />}
             Add Note

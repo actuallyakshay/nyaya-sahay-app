@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
 import { ADMIN_NAV, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +10,6 @@ import {
   Menu,
   PanelLeft,
   PanelLeftClose,
-  Scale,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -34,7 +34,10 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <button onClick={() => setSidebarOpen(true)} className="p-1">
           <Menu className="h-5 w-5" />
         </button>
-        <span className="font-serif text-lg font-bold">Admin</span>
+        <div className="flex items-center gap-2">
+          <BrandLogo size="sm" showText={false} />
+          <span className="font-serif text-lg font-bold">Admin</span>
+        </div>
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
           A
         </div>
@@ -68,7 +71,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 collapsed && 'lg:hidden'
               )}
             >
-              <Scale className="h-5 w-5 text-gold" />
+              <BrandLogo size="md" showText={false} />
               <span className="font-serif text-lg font-bold text-primary-foreground">
                 Admin
               </span>
@@ -79,7 +82,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 collapsed && 'items-center justify-center lg:flex'
               )}
             >
-              <Scale className="h-5 w-5 text-gold" />
+              <BrandLogo size="md" showText={false} />
             </div>
             <button
               className="p-1 text-primary-foreground/60 lg:hidden"

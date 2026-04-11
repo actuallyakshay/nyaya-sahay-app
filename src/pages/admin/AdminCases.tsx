@@ -1,5 +1,4 @@
 import { getAdminCases } from '@/api-client';
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -11,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { path } from '@/constants';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { CASE_STATUS_FILTERS, PAGE_SIZE } from '@/lib/mock-data';
@@ -161,7 +161,12 @@ const AdminCases = () => {
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
                     <td className="px-4 py-3 font-mono text-xs">
-                      {c.caseCode}
+                      <Link
+                        to={path.adminCase(c.id)}
+                        className="hover:text-gold hover:underline"
+                      >
+                        {c.caseCode}
+                      </Link>
                     </td>
                     <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                       <Link

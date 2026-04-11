@@ -330,6 +330,14 @@ export const getCaseDocuments = (caseId, params) => {
   });
 };
 
+export const getAdminCaseDocuments = (caseId, params) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_DOCUMENTS.METHOD,
+    url: routes.ADMIN_CASE_DOCUMENTS.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
 export const createCaseNote = (caseId, body) => {
   return apiClient({
     method: routes.CREATE_CASE_NOTE.METHOD,

@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
@@ -133,9 +134,17 @@ const Homepage = () => {
               animate="visible"
               className="space-y-6"
             >
+              <motion.div variants={fadeUp} custom={0}>
+                <BrandLogo
+                  as="div"
+                  showText={false}
+                  size={64}
+                  className="gap-0"
+                />
+              </motion.div>
               <motion.div
                 variants={fadeUp}
-                custom={0}
+                custom={1}
                 className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm font-medium text-gold"
               >
                 <Star className="h-3.5 w-3.5 fill-current" /> Trusted by 1,200+
@@ -143,7 +152,7 @@ const Homepage = () => {
               </motion.div>
               <motion.h1
                 variants={fadeUp}
-                custom={1}
+                custom={2}
                 className="text-3xl font-bold leading-[1.1] text-primary-foreground sm:text-4xl md:text-5xl lg:text-[3.5rem]"
               >
                 Affordable Legal Help,{' '}
@@ -152,7 +161,7 @@ const Homepage = () => {
               </motion.h1>
               <motion.p
                 variants={fadeUp}
-                custom={2}
+                custom={3}
                 className="max-w-lg text-base text-primary-foreground/70 sm:text-lg"
               >
                 Subscribe to expert legal assistance. Get matched with verified
@@ -161,7 +170,7 @@ const Homepage = () => {
               </motion.p>
               <motion.div
                 variants={fadeUp}
-                custom={3}
+                custom={4}
                 className="flex flex-col gap-3 pt-2 sm:flex-row"
               >
                 <Button
@@ -194,7 +203,7 @@ const Homepage = () => {
                 <motion.div
                   key={s.label}
                   variants={fadeUp}
-                  custom={i + 2}
+                  custom={i + 3}
                   className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur"
                 >
                   <p className="text-3xl font-bold text-gold">{s.value}</p>

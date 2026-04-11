@@ -1,24 +1,95 @@
+import { BrandLogo } from '@/components/BrandLogo';
+import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants';
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { PublicLayout } from '@/layouts/PublicLayout';
+import { ArrowLeft, Home } from 'lucide-react';
+import { useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+const quickLinks = [
+  { label: 'Plans & pricing', to: ROUTES.plans },
+  { label: 'How it works', to: ROUTES.howItWorks },
+  { label: 'FAQ', to: ROUTES.faq },
+  { label: 'About us', to: ROUTES.about },
+  { label: 'Sign in', to: ROUTES.login },
+] as const;
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    console.error(
+      '404 Error: User attempted to access non-existent route:',
+      location.pathname
+    );
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href={ROUTES.home} className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+    <PublicLayout>
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-16 md:py-24">
+        <div className="w-full max-w-lg rounded-2xl border bg-card px-6 py-10 text-center shadow-sm md:px-10 md:py-12">
+          <div className="mb-8 flex justify-center">
+            <BrandLogo size="xl" textVariant="header" />
+          </div>
+
+          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Page not found
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-bold text-navy md:text-4xl">
+            We couldn’t open that page
+          </h1>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            The address may be mistyped, or the page may have moved. NyayaSetu
+            is here to help you reach verified advocates and manage your legal
+            matters—let’s get you back on track.
+          </p>
+
+          {location.pathname !== '/' && (
+            <p className="mt-3 break-all rounded-md bg-muted/80 px-3 py-2 font-mono text-xs text-muted-foreground">
+              Requested:{' '}
+              <span className="text-foreground/80">{location.pathname}</span>
+            </p>
+          )}
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              asChild
+              className="bg-navy text-primary-foreground hover:bg-navy/90"
+            >
+              <Link to={ROUTES.home}>
+                <Home className="mr-2 h-4 w-4" />
+                Back to home
+              </Link>
+            </Button>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Go back
+            </Button>
+          </div>
+
+          <div className="mt-10 border-t pt-8">
+            <p className="text-sm font-medium text-foreground">
+              Popular next steps
+            </p>
+            <nav
+              className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm"
+              aria-label="Helpful links"
+            >
+              {quickLinks.map(({ label, to }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="text-primary underline-offset-4 hover:text-primary/90 hover:underline"
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
       </div>
-    </div>
+    </PublicLayout>
   );
 };
 

@@ -1,9 +1,9 @@
 import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
+import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { PAGE_SIZE } from '@/lib/mock-data';
@@ -179,7 +179,7 @@ const AdminCaseRequests = () => {
                           size="sm"
                           variant="destructive"
                           onClick={() =>
-                            handleUpdateAdminCaseStatus(c.id, 'closed')
+                            handleUpdateAdminCaseStatus(c.id, 'rejected')
                           }
                           disabled={isRowLoading}
                         >

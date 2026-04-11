@@ -1,8 +1,9 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import { ROUTES } from '@/constants';
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { Scale, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,10 +93,9 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <Link to={ROUTES.home} className="mb-8 flex items-center gap-2.5">
-          <Scale className="h-6 w-6 text-gold" />
-          <span className="font-serif text-xl font-bold">NyayaSetu</span>
-        </Link>
+        <div className="mb-8">
+          <BrandLogo size="lg" textVariant="header" />
+        </div>
         <h1 className="text-2xl font-bold">Create your account</h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
           Start your legal support journey today
