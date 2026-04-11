@@ -45,12 +45,6 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             size="sm"
             textVariant="headerCompact"
           />
-          <span
-            className="shrink-0 rounded-md border border-border bg-muted/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
-            title="Administrator area"
-          >
-            Admin
-          </span>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
           {user?.fullName?.charAt(0)?.toUpperCase() ?? 'A'}
