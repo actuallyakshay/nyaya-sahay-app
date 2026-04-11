@@ -83,7 +83,7 @@ const LoginPage = () => {
           </h2>
           <p className="mt-4 max-w-sm text-sm text-primary-foreground/60">
             Access verified legal advocates, track your cases, and resolve
-            disputes — all from one platform.
+            disputes all in one place.
           </p>
         </div>
         <p className="text-xs text-primary-foreground/40">
