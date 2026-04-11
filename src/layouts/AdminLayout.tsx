@@ -31,15 +31,29 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 lg:hidden">
-        <button onClick={() => setSidebarOpen(true)} className="p-1">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="shrink-0 p-1"
+        >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="flex items-center gap-2">
-          <BrandLogo size="sm" showText={false} />
-          <span className="font-serif text-lg font-bold">Admin</span>
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1">
+          <BrandLogo
+            as="link"
+            to={ROUTES.admin.dashboard}
+            size="sm"
+            textVariant="headerCompact"
+          />
+          <span
+            className="shrink-0 rounded-md border border-border bg-muted/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
+            title="Administrator area"
+          >
+            Admin
+          </span>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
-          A
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
+          {user?.fullName?.charAt(0)?.toUpperCase() ?? 'A'}
         </div>
       </header>
 
@@ -66,23 +80,28 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             )}
           >
             <div
-              className={cn(
-                'flex items-center gap-2.5',
-                collapsed && 'lg:hidden'
-              )}
+              className={cn('min-w-0 flex-1 pr-2', collapsed && 'lg:hidden')}
             >
-              <BrandLogo size="md" showText={false} />
-              <span className="font-serif text-lg font-bold text-primary-foreground">
-                Admin
-              </span>
+              <BrandLogo
+                as="link"
+                to={ROUTES.admin.dashboard}
+                size="md"
+                textVariant="sidebar"
+              />
             </div>
             <div
               className={cn(
                 'hidden',
-                collapsed && 'items-center justify-center lg:flex'
+                collapsed && 'flex items-center justify-center lg:flex'
               )}
+              title="Samvidhan Legal Advisory — Admin panel"
             >
-              <BrandLogo size="md" showText={false} />
+              <BrandLogo
+                as="link"
+                to={ROUTES.admin.dashboard}
+                size="md"
+                showText={false}
+              />
             </div>
             <button
               className="p-1 text-primary-foreground/60 lg:hidden"
@@ -92,10 +111,18 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </button>
           </div>
 
+          {!collapsed && (
+            <div className="mx-4 mb-3 px-0.5">
+              <p className="text-xs font-medium uppercase tracking-wide text-gold">
+                Admin panel
+              </p>
+            </div>
+          )}
+
           <nav
             className={cn(
-              'mt-2 flex-1 space-y-0.5',
-              collapsed ? 'px-1.5' : 'px-3'
+              'flex-1 space-y-0.5',
+              collapsed ? 'mt-2 px-1.5' : 'px-3'
             )}
           >
             {ADMIN_NAV.map((item) => {
