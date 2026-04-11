@@ -161,20 +161,18 @@ export function AdminCaseLawyerAssign({
             className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted/70 ${sel ? 'bg-muted' : ''}`}
           >
             <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border/80">
-              {src ? (
-                <AvatarImage src={src} alt="" className="object-cover" />
-              ) : null}
+              {src && <AvatarImage src={src} alt="" className="object-cover" />}
               <AvatarFallback className="bg-muted text-[11px] font-semibold text-foreground">
                 {initials(lawyer.user.fullName)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{lawyer.user.fullName}</p>
-              {sub ? (
+              {sub && (
                 <p className="truncate text-[11px] text-muted-foreground">
                   {sub}
                 </p>
-              ) : null}
+              )}
             </div>
           </button>
         );
@@ -205,13 +203,13 @@ export function AdminCaseLawyerAssign({
               className="h-10 w-full min-w-0 justify-start gap-2.5 px-3 font-normal hover:bg-muted/60 hover:text-foreground data-[state=open]:bg-muted/50 [&_svg[data-chevron]]:ml-auto [&_svg[data-chevron]]:shrink-0"
             >
               <Avatar className="h-8 w-8 shrink-0 ring-1 ring-border/80">
-                {avatarSrc ? (
+                {avatarSrc && (
                   <AvatarImage
                     src={avatarSrc}
                     alt=""
                     className="object-cover"
                   />
-                ) : null}
+                )}
                 <AvatarFallback className="bg-muted text-[11px] font-semibold text-foreground">
                   {label ? initials(label) : '…'}
                 </AvatarFallback>

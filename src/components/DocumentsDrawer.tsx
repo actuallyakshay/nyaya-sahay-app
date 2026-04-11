@@ -9,6 +9,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { buildGenericQueryParams } from '@/lib/helpers';
+import { CaseStatus } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -23,6 +24,7 @@ interface DocumentsDrawerProps {
   caseLawyerName?: string;
   loading?: boolean;
   isAdmin?: boolean;
+  caseStatus: CaseStatus;
 }
 
 export const DocumentsDrawer = ({
@@ -33,6 +35,7 @@ export const DocumentsDrawer = ({
   caseLawyerName,
   loading,
   isAdmin,
+  caseStatus,
 }: DocumentsDrawerProps) => {
   const { id } = useParams();
   const [page, setPage] = useState(1);
@@ -58,6 +61,8 @@ export const DocumentsDrawer = ({
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
+
+  const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -95,7 +100,7 @@ export const DocumentsDrawer = ({
             variant="outline"
             className="w-full"
             onClick={onUploadClick}
-            disabled={loading}
+            disabled={loading || isCaseClosed}
           >
             {loading ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />

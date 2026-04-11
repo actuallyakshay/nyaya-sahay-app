@@ -446,10 +446,12 @@ const AdminCaseDetail = () => {
 
       <AdminInternalNotesDrawer
         open={notesDrawerOpen}
+        caseStatus={caseData?.status}
         onOpenChange={setNotesDrawerOpen}
       />
       <DocumentsDrawer
         isAdmin={true}
+        caseStatus={caseData?.status}
         open={docsDrawerOpen}
         onOpenChange={setDocsDrawerOpen}
         caseClientName={caseData?.user?.fullName}

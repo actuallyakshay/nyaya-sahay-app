@@ -1,8 +1,8 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
-import { ROUTES } from '@/constants';
 import WithShimmer from '@/components/WithShimmer';
 import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
@@ -98,7 +98,7 @@ const AdminLawyerDetail = () => {
               <div className="flex items-center gap-2">
                 <WithShimmer loading={isLoading} className="h-7 w-40">
                   <h1 className="text-xl font-bold">
-                    {lawyerData?.user?.fullName}
+                    Adv. {lawyerData?.user?.fullName}
                   </h1>
                 </WithShimmer>
               </div>
