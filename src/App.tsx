@@ -19,12 +19,10 @@ import PlansPage from './pages/PlansPage';
 import RegisterPage from './pages/RegisterPage';
 
 import CaseDetail from './pages/user/CaseDetail';
-import LawyerProfileView from './pages/user/LawyerProfileView';
 import LawyersDirectory from './pages/user/LawyersDirectory';
 import NewCase from './pages/user/NewCase';
 import UserCases from './pages/user/UserCases';
 import UserDashboard from './pages/user/UserDashboard';
-import UserNotifications from './pages/user/UserNotifications';
 import UserProfile from './pages/user/UserProfile';
 import UserSubscription from './pages/user/UserSubscription';
 
@@ -107,14 +105,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/app/notifications"
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <UserNotifications />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="/app/profile"
                 element={
@@ -128,14 +119,6 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <LawyersDirectory />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/app/lawyers/:id"
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <LawyerProfileView />
                   </ProtectedRoute>
                 }
               />
@@ -157,14 +140,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/lawyer/notifications"
-                element={
-                  <ProtectedRoute allowedRoles={['lawyer']}>
-                    <UserNotifications />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="/lawyer/profile"
                 element={
