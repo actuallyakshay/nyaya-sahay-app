@@ -267,68 +267,71 @@ const AdminCaseDetail = () => {
               </p>
             </div>
           </div>
+          <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3">
+            <div className="w-full min-w-0 flex-1 basis-full sm:basis-0">
+              <AdminCaseLawyerAssign
+                caseId={id}
+                caseStatus={caseData?.status}
+              />
+            </div>
+            <TooltipProvider delayDuration={300}>
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setDocsDrawerOpen(true)}
+                    >
+                      <FileText className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Documents</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setTimelineDrawerOpen(true)}
+                    >
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Timeline</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => setNotesDrawerOpen(true)}
+                    >
+                      <StickyNote className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Internal Notes</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Video className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Book Session</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+          </div>
         </div>
 
         {/* Lawyer assignment + Drawer triggers bar */}
-        <div className="flex w-full flex-wrap items-center gap-3 rounded-xl border bg-card px-4 py-3">
-          <div className="w-full min-w-0 flex-1 basis-full sm:basis-0">
-            <AdminCaseLawyerAssign caseId={id} caseStatus={caseData?.status} />
-          </div>
-          <TooltipProvider delayDuration={300}>
-            <div className="ml-auto flex shrink-0 items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setDocsDrawerOpen(true)}
-                  >
-                    <FileText className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Documents</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setTimelineDrawerOpen(true)}
-                  >
-                    <Clock className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Timeline</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setNotesDrawerOpen(true)}
-                  >
-                    <StickyNote className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Internal Notes</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Video className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Book Session</TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
-        </div>
 
         {/* Full-width message box */}
         <div
