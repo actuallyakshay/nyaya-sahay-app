@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getCookie, setCookie } from '@/lib/helpers';
 import { getApiErrorMessage } from '@/lib/utils';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Scale, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -37,7 +37,11 @@ const LoginPage = () => {
       setLoading(true);
       const { data } = await login({ email, password, role });
       if (!data.status) {
-        toast({ title: 'Login', description: data.message, variant: 'destructive' });
+        toast({
+          title: 'Login',
+          description: data.message,
+          variant: 'destructive',
+        });
         return;
       }
       setCookie('access-token', data.accessToken);
@@ -105,9 +109,18 @@ const LoginPage = () => {
               <button
                 key={r}
                 onClick={() => setRole(r)}
-                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${role === r ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                {r === 'user' ? 'User' : 'Lawyer'}
+                <div className="flex items-center justify-center gap-2">
+                  {r === 'user' ? (
+                    <User className="h-4 w-4" />
+                  ) : (
+                    <Scale className="h-4 w-4" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {r === 'user' ? 'Client' : 'Advocate'}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -171,22 +184,6 @@ const LoginPage = () => {
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link
-              to={ROUTES.register}
-              state={{ role }}
-              className="font-medium text-gold hover:underline"
-            >
-              Create one
-            </Link>
-          </p>
-          {/* <p className="mt-3 text-center text-xs text-muted-foreground">
-            <Link to={ROUTES.admin.login} className="hover:underline">
-              Admin Login →
-            </Link>
-          </p> */}
         </div>
       </div>
     </div>

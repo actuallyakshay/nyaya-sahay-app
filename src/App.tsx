@@ -16,7 +16,6 @@ import HowItWorksPage from './pages/HowItWorksPage';
 import Index from './pages/Index';
 import LoginPage from './pages/LoginPage';
 import PlansPage from './pages/PlansPage';
-import RegisterPage from './pages/RegisterPage';
 
 import CaseDetail from './pages/user/CaseDetail';
 import LawyersDirectory from './pages/user/LawyersDirectory';
@@ -61,7 +60,6 @@ const App = () => (
               <Route path={ROUTES.faq} element={<FAQPage />} />
               {/* <Route path={ROUTES.contact} element={<ContactPage />} /> */}
               <Route path={ROUTES.login} element={<LoginPage />} />
-              <Route path={ROUTES.register} element={<RegisterPage />} />
 
               {/* User */}
               <Route
