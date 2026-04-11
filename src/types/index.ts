@@ -63,21 +63,17 @@ export type CaseStatus =
   | 'new'
   | 'under_review'
   | 'lawyer_assigned'
-  | 'in_consultation'
-  | 'waiting_for_user'
   | 'resolved'
   | 'closed'
-  | 'emergency';
+  | 'rejected';
 
 export const CASE_STATUS_LABELS: Record<CaseStatus, string> = {
   new: 'New',
   under_review: 'Under Review',
   lawyer_assigned: 'Lawyer Assigned',
-  in_consultation: 'In Consultation',
-  waiting_for_user: 'Waiting for User',
   resolved: 'Resolved',
   closed: 'Closed',
-  emergency: 'Emergency',
+  rejected: 'Rejected',
 };
 
 export interface Case {

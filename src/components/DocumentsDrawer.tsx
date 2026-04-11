@@ -1,4 +1,4 @@
-import { getCaseDocuments } from '@/api-client';
+import { getAdminCaseDocuments, getCaseDocuments } from '@/api-client';
 import { DocumentList } from '@/components/DocumentList';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ interface DocumentsDrawerProps {
   caseClientName?: string;
   caseLawyerName?: string;
   loading?: boolean;
+  isAdmin?: boolean;
 }
 
 export const DocumentsDrawer = ({
@@ -31,15 +32,22 @@ export const DocumentsDrawer = ({
   caseClientName,
   caseLawyerName,
   loading,
+  isAdmin,
 }: DocumentsDrawerProps) => {
   const { id } = useParams();
   const [page, setPage] = useState(1);
 
+  const queryKey = isAdmin
+    ? ['admin-case-documents', page]
+    : ['case-documents', page];
+
+  const queryFn = isAdmin ? getAdminCaseDocuments : getCaseDocuments;
+
   const { data } = useQuery({
-    queryKey: ['case-documents', page],
+    queryKey,
     queryFn: async () => {
       const params = buildGenericQueryParams(page);
-      const response = await getCaseDocuments(id, params);
+      const response = await queryFn(id, params);
       return response.data;
     },
     placeholderData: keepPreviousData,

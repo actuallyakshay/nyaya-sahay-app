@@ -167,6 +167,10 @@ const routes = {
     URL: '/api/cases/:caseId/documents',
     METHOD: 'GET',
   },
+  ADMIN_CASE_DOCUMENTS: {
+    URL: '/api/admin/cases/:caseId/documents',
+    METHOD: 'GET',
+  },
   CREATE_CASE_NOTE: {
     URL: '/api/cases/:caseId/notes',
     METHOD: 'POST',
