@@ -273,7 +273,8 @@ export function AdminCaseLawyerAssign({
         type="button"
         disabled={locked || !caseId || !selectedId || assignMutation.isPending}
         size="sm"
-        className="h-10 min-w-0 flex-1 px-4 text-xs font-medium sm:max-w-[11rem] sm:flex-none"
+        // className="h-10 min-w-0 flex-1 px-4 text-xs font-medium sm:max-w-[11rem] sm:flex-none"
+        className="h-10 min-w-0 flex-none w-[20%] px-4 text-xs font-medium sm:max-w-[11rem] sm:flex-none"
         onClick={() => assignMutation.mutate()}
       >
         {assignMutation.isPending ? (

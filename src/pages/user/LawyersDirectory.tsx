@@ -127,7 +127,7 @@ const LawyersDirectory = () => {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {l.lawyerPracticeAreas.length > 0 &&
+                  {l.lawyerPracticeAreas.length > 0 ? (
                     l.lawyerPracticeAreas.map((area) => (
                       <span
                         key={area.id}
@@ -135,7 +135,12 @@ const LawyersDirectory = () => {
                       >
                         {area.practiceArea?.name}
                       </span>
-                    ))}
+                    ))
+                  ) : (
+                    <span className="text-xs italic text-muted-foreground">
+                      No specialization has been added
+                    </span>
+                  )}
                 </div>
                 <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">

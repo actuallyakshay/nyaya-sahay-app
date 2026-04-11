@@ -5,6 +5,7 @@ import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -120,9 +121,9 @@ const CaseDetail = () => {
               Client: {caseData?.user?.fullName}
             </span>
           )}
-          <span className="text-xs text-muted-foreground">
+          <Badge variant="secondary" className="font-normal">
             {caseData?.practiceArea?.name}
-          </span>
+          </Badge>
           <div className="flex-1" />
 
           <TooltipProvider delayDuration={300}>

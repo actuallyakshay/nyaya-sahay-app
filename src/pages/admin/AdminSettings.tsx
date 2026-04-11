@@ -1,4 +1,5 @@
 import { getAdminSettings, updateAdminSettings } from '@/api-client';
+import WithShimmer from '@/components/WithShimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +16,7 @@ const AdminSettings = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const { data: settings } = useQuery({
+  const { isLoading: isSettingsLoading } = useQuery({
     queryKey: ['adminSettings'],
     queryFn: async () => {
       const { data } = await getAdminSettings();
@@ -61,28 +62,38 @@ const AdminSettings = () => {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Support Email</Label>
-              <Input
-                value={supportEmail}
-                onChange={(e) => setSupportEmail(e.target.value)}
-                placeholder="support@samvidhanlegaladvisory.in"
-              />
+              <WithShimmer
+                loading={isSettingsLoading}
+                className="h-10 w-full rounded-md"
+              >
+                <Input
+                  value={supportEmail}
+                  onChange={(e) => setSupportEmail(e.target.value)}
+                  placeholder="support@nyayasetu.in"
+                />
+              </WithShimmer>
             </div>
             <div className="space-y-2">
               <Label>Support Phone</Label>
-              <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
-                <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
-                  +91
-                </span>
-                <Input
-                  className="rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  placeholder="9876543210"
-                  maxLength={10}
-                  value={supportPhone}
-                  onChange={(e) =>
-                    setSupportPhone(e.target.value.replace(/\D/g, ''))
-                  }
-                />
-              </div>
+              <WithShimmer
+                loading={isSettingsLoading}
+                className="h-10 w-full rounded-md"
+              >
+                <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+                  <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
+                    +91
+                  </span>
+                  <Input
+                    className="rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    placeholder="9876543210"
+                    maxLength={10}
+                    value={supportPhone}
+                    onChange={(e) =>
+                      setSupportPhone(e.target.value.replace(/\D/g, ''))
+                    }
+                  />
+                </div>
+              </WithShimmer>
             </div>
           </div>
         </div>
