@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import type { UserRole } from "@/types";
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import type { UserRole } from '@/types';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import { Loader2 } from 'lucide-react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 interface GoogleLoginButtonProps {
   role: UserRole;
@@ -13,45 +15,45 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
   const { googleLogin } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [buttonWidth, setButtonWidth] = useState(400);
 
-  console.log("[GoogleLoginButton] Rendered with role:", role);
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w >= 200) setButtonWidth(Math.floor(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const handleCredentialResponse = async (response: CredentialResponse) => {
-    console.log("[GoogleLoginButton] onSuccess fired, response:", response);
     const idToken = response.credential;
-    console.log(
-      "[GoogleLoginButton] idToken:",
-      idToken ? `${idToken.substring(0, 20)}...` : "MISSING",
-    );
 
     if (!idToken) {
       toast({
-        title: "Google sign-in failed",
-        description: "No credential received.",
-        variant: "destructive",
+        title: 'Google sign-in failed',
+        description: 'No credential received.',
+        variant: 'destructive',
       });
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log(
-        "[GoogleLoginButton] Calling googleLogin API with role:",
-        role,
-      );
       await googleLogin(idToken, role);
-      console.log("[GoogleLoginButton] API call succeeded");
       toast({
-        title: "Welcome!",
+        title: 'Welcome!',
         description: `Signed in with Google as ${role}.`,
       });
       onSuccess();
-    } catch (err) {
-      console.error("[GoogleLoginButton] API call failed:", err);
+    } catch {
       toast({
-        title: "Google sign-in failed",
-        description: "Please try again.",
-        variant: "destructive",
+        title: 'Google sign-in failed',
+        description: 'Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -59,32 +61,44 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
   };
 
   const handleError = () => {
-    console.error(
-      "[GoogleLoginButton] onError fired — Google OAuth popup failed or was cancelled",
-    );
     toast({
-      title: "Google sign-in failed",
-      description: "Google authentication was cancelled or failed.",
-      variant: "destructive",
+      title: 'Google sign-in failed',
+      description: 'Google authentication was cancelled or failed.',
+      variant: 'destructive',
     });
   };
 
   return (
-    <div className="mt-6 flex justify-center [&>div]:w-full">
-      {isLoading ? (
-        <div className="flex w-full items-center justify-center rounded-lg border bg-card px-4 py-2.5 text-sm text-muted-foreground">
-          Signing in with Google...
-        </div>
-      ) : (
-        <GoogleLogin
-          onSuccess={handleCredentialResponse}
-          onError={handleError}
-          width="400"
-          text="continue_with"
-          shape="rectangular"
-          size="large"
-        />
-      )}
+    <div className="mt-6 w-full rounded-lg">
+      <div ref={wrapRef} className="min-h-[42px] w-full">
+        {isLoading ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 w-full rounded-full border-border bg-card font-medium text-muted-foreground shadow-sm"
+            disabled
+          >
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+            Signing in with Google…
+          </Button>
+        ) : (
+          <GoogleLogin
+            onSuccess={handleCredentialResponse}
+            onError={handleError}
+            width={buttonWidth}
+            type="standard"
+            theme="outline"
+            size="large"
+            shape="pill"
+            text="signin_with"
+            logo_alignment="left"
+            containerProps={{
+              className:
+                'flex w-full min-h-10 [&>div]:!w-full [&_iframe]:!w-full',
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

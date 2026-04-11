@@ -17,6 +17,7 @@ interface AuthContextType {
   logout: () => void;
   setUser: (user: AuthUser | null) => void;
   isLoading: boolean;
+  googleLogin: (idToken: string, role: UserRole) => Promise<void>;
 }
 
 const getStoredUser = (): AuthUser | null => {
@@ -76,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAuthenticated: !!user,
         logout,
         isLoading,
+        googleLogin,
       }}
     >
       {children}
