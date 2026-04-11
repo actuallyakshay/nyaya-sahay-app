@@ -1,6 +1,7 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { AdminInternalNotesDrawer } from '@/components/admin/AdminInternalNotesDrawer';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
+import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +75,7 @@ const AdminCaseDetail = () => {
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const drawerFileInputRef = useRef<HTMLInputElement>(null);
-  const { data: caseData } = useAdminCaseDetails(id);
+  const { data: caseData, isLoading } = useAdminCaseDetails(id);
 
   const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
     id,
@@ -127,6 +128,14 @@ const AdminCaseDetail = () => {
   const userId = caseData?.user?.id;
   const messages = caseData?.messages ?? [];
   const timelineUpdatedAt = caseData?.updatedAt ?? caseData?.createdAt;
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <CaseDetailSkeleton />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>

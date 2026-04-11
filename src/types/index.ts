@@ -354,3 +354,44 @@ export interface LawyerFormModalProps {
 export interface AdminProtectedRouteProps {
   children: React.ReactNode;
 }
+
+export interface LawyerProfileApiShape {
+  degree?: string | null;
+  barCouncilId?: string | null;
+  careerStartDate?: string | null;
+  gender?: string | null;
+  dob?: string | null;
+  bio?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  pincode?: string | null;
+  lawyerPracticeAreas?: { practiceAreaId: string }[];
+}
+
+export interface CurrentUserApi {
+  fullName?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  avatarUrl?: string | null;
+  lawyerProfile?: LawyerProfileApiShape | null;
+}
+
+export interface ProfileFormState {
+  fullName: string;
+  phone: string;
+  avatarUrl: string | null;
+  gender: string;
+  dob: string;
+  degree: string;
+  barCouncilId: string;
+  careerStartDate: string;
+  bio: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  selectedSpecializations: string[];
+}
