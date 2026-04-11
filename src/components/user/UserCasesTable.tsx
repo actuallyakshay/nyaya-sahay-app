@@ -25,6 +25,7 @@ export const UserCasesTable = ({
   statusFilter,
   handleSearchChange,
   handleStatusChange,
+  isAdmin = false,
 }) => {
   return (
     <div className="space-y-6">
@@ -112,7 +113,7 @@ export const UserCasesTable = ({
                 >
                   <td className="px-4 py-3 font-mono text-xs">
                     <Link
-                      to={`/cases/${c.id}`}
+                      to={isAdmin ? `/admin/cases/${c.id}` : `/cases/${c.id}`}
                       className="hover:text-gold hover:underline"
                     >
                       {c.caseCode}
@@ -120,7 +121,7 @@ export const UserCasesTable = ({
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={`/cases/${c.id}`}
+                      to={isAdmin ? `/admin/cases/${c.id}` : `/cases/${c.id}`}
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}

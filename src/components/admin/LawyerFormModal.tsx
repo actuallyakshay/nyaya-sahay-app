@@ -13,11 +13,12 @@ import { Textarea } from '@/components/ui/textarea';
 import WithShimmer from '@/components/WithShimmer';
 import { useCategories } from '@/hooks/useCategories';
 import { queryClient } from '@/lib/query-client';
-import { validateEmail, validatePhone } from '@/lib/utils';
+import { getApiErrorMessage, validateEmail, validatePhone } from '@/lib/utils';
 import type { FieldErrors, LawyerFormModalProps } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useToast } from '../ui/use-toast';
 
 export const LawyerFormModal = ({
   open,
@@ -38,6 +39,7 @@ export const LawyerFormModal = ({
     string[]
   >([]);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const { toast } = useToast();
 
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
@@ -108,63 +110,71 @@ export const LawyerFormModal = ({
   };
 
   const handleSave = async () => {
-    const newErrors: FieldErrors = {};
+    try {
+      const newErrors: FieldErrors = {};
 
-    if (!name.trim()) newErrors.name = 'Full name is required';
+      if (!name.trim()) newErrors.name = 'Full name is required';
 
-    if (!isEditMode) {
-      const emailError = validateEmail(email);
-      if (emailError) newErrors.email = emailError;
-      if (!password.trim()) newErrors.password = 'Password is required';
-    }
+      if (!isEditMode) {
+        const emailError = validateEmail(email);
+        if (emailError) newErrors.email = emailError;
+        if (!password.trim()) newErrors.password = 'Password is required';
+      }
 
-    if (phone.trim()) {
-      const phoneError = validatePhone(phone);
-      if (phoneError) newErrors.phone = phoneError;
-    }
+      if (phone.trim()) {
+        const phoneError = validatePhone(phone);
+        if (phoneError) newErrors.phone = phoneError;
+      }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
 
-    let response;
+      let response;
 
-    if (isEditMode) {
-      const editPayload = {
-        userProfile: {
+      if (isEditMode) {
+        const editPayload = {
+          userProfile: {
+            fullName: name.trim(),
+            phone: phone.trim(),
+          },
+          barCouncilId: barCouncilId.trim(),
+          degree: degree.trim(),
+          careerStartDate: careerStartDate || null,
+          bio: bio.trim(),
+          lawyerPracticeAreas: selectedSpecializations,
+        };
+        response = await editLawyer(editPayload);
+      } else {
+        const createPayload = {
           fullName: name.trim(),
+          email: email.trim(),
           phone: phone.trim(),
-        },
-        barCouncilId: barCouncilId.trim(),
-        degree: degree.trim(),
-        careerStartDate: careerStartDate || null,
-        bio: bio.trim(),
-        lawyerPracticeAreas: selectedSpecializations,
-      };
-      response = await editLawyer(editPayload);
-    } else {
-      const createPayload = {
-        fullName: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        password: password.trim(),
-        barCouncilId: barCouncilId.trim(),
-        degree: degree.trim(),
-        careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
-        bio: bio.trim(),
-        lawyerPracticeAreas: selectedSpecializations,
-      };
-      response = await createLawyer(createPayload);
-    }
+          password: password.trim(),
+          barCouncilId: barCouncilId.trim(),
+          degree: degree.trim(),
+          careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
+          bio: bio.trim(),
+          lawyerPracticeAreas: selectedSpecializations,
+        };
+        response = await createLawyer(createPayload);
+      }
 
-    await queryClient.invalidateQueries({ queryKey: ['admin-lawyers'] });
-    onSave(
-      { name, email, phone, barCouncilId, degree, bio },
-      response?.data?.message
-    );
-    resetForm();
-    onClose();
+      await queryClient.invalidateQueries({ queryKey: ['admin-lawyers'] });
+      onSave(
+        { name, email, phone, barCouncilId, degree, bio },
+        response?.data?.message
+      );
+      resetForm();
+      onClose();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

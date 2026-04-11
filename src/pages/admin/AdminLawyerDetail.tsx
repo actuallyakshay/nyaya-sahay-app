@@ -46,8 +46,8 @@ const AdminLawyerDetail = () => {
     refetchOnWindowFocus: false,
   });
 
-  const cases = data?.data ?? [];
-  const pagination = data?.pagination;
+  const cases = casesData?.data ?? [];
+  const pagination = casesData?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
 
@@ -63,6 +63,8 @@ const AdminLawyerDetail = () => {
 
   const lawyerData = data?.lawyerData;
   const totalCasesHandled = data?.totalCasesHandled;
+
+  console.log('cases', cases);
 
   return (
     <AdminLayout>
@@ -179,6 +181,7 @@ const AdminLawyerDetail = () => {
           page={page}
           setPage={setPage}
           search={search}
+          isAdmin={true}
           statusFilter={statusFilter}
           handleSearchChange={handleSearchChange}
           handleStatusChange={handleStatusChange}

@@ -124,6 +124,7 @@ const AdminUserDetail = () => {
             page={page}
             setPage={setPage}
             search={search}
+            isAdmin={true}
             statusFilter={statusFilter}
             handleSearchChange={handleSearchChange}
             handleStatusChange={handleStatusChange}

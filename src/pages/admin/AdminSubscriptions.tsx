@@ -26,6 +26,7 @@ const AdminSubscriptions = () => {
             setEditingPlan(null);
             setModalOpen(true);
           }}
+          disabled
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Plan
