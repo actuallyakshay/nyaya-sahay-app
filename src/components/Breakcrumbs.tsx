@@ -1,6 +1,12 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { PATH_PREFIX, ROUTES } from '@/constants';
+import { getCookie } from '@/lib/helpers';
 import { ChevronRight, Home } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+
+/** First path segment to skip — matches `PATH_PREFIX` (`/lawyer`, `/admin`). User routes have no prefix. */
+const ROLE_PREFIX_SEGMENTS = new Set(
+  Object.values(PATH_PREFIX).map((p) => p.slice(1))
+);
 
 interface BreadcrumbItem {
   label: string;
@@ -8,7 +14,6 @@ interface BreadcrumbItem {
 }
 
 const ROUTE_LABELS: Record<string, string> = {
-  app: 'Dashboard',
   lawyer: 'Dashboard',
   admin: 'Dashboard',
   dashboard: 'Dashboard',
@@ -27,51 +32,80 @@ const ROUTE_LABELS: Record<string, string> = {
   'lawyer-verifications': 'Verifications',
 };
 
-const Breadcrumbs = () => {
-  const location = useLocation();
-  const { user } = useAuth();
-  const params = useParams();
+function dashboardHref(pathname: string, activeRole: string | undefined) {
+  if (pathname.startsWith(PATH_PREFIX.admin)) return ROUTES.admin.dashboard;
+  if (pathname.startsWith(PATH_PREFIX.lawyer)) return ROUTES.lawyer.dashboard;
+  return activeRole === 'lawyer'
+    ? ROUTES.lawyer.dashboard
+    : ROUTES.user.dashboard;
+}
 
-  const segments = location.pathname.split('/').filter(Boolean);
-  if (segments.length <= 1) return null;
+function casesListHref(pathname: string, activeRole: string | undefined) {
+  if (pathname.startsWith(PATH_PREFIX.admin)) return ROUTES.admin.cases;
+  if (pathname.startsWith(PATH_PREFIX.lawyer) || activeRole === 'lawyer')
+    return ROUTES.lawyer.cases;
+  return ROUTES.user.cases;
+}
 
-  const rolePrefix = segments[0]; // 'app', 'lawyer', or 'admin'
+function paramSet(params: Record<string, string | undefined>) {
+  return new Set(Object.values(params).filter((v): v is string => Boolean(v)));
+}
 
-  const dashboardPath =
-    rolePrefix === 'app'
-      ? '/app/dashboard'
-      : rolePrefix === 'lawyer'
-        ? '/lawyer/dashboard'
-        : '/admin/dashboard';
+function segmentLabel(
+  seg: string,
+  i: number,
+  segments: string[],
+  params: Set<string>
+) {
+  if (params.has(seg)) return seg;
+  const next = segments[i + 1];
+  if (seg === 'cases' && next && params.has(next)) return 'Case';
+  return (
+    ROUTE_LABELS[seg] ??
+    seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ')
+  );
+}
 
-  const crumbs: BreadcrumbItem[] = [{ label: 'Home', to: dashboardPath }];
+/** Builds trail after "Home" from the URL. Returns [] if breadcrumbs should be hidden. */
+function pathCrumbs(
+  pathname: string,
+  routeParams: Record<string, string | undefined>,
+  activeRole: string | undefined
+): BreadcrumbItem[] {
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length === 0) return [];
 
-  let pathSoFar = '';
+  const home: BreadcrumbItem = {
+    label: 'Home',
+    to: dashboardHref(pathname, activeRole),
+  };
+  const casesList = casesListHref(pathname, activeRole);
+  const params = paramSet(routeParams);
+  const out: BreadcrumbItem[] = [home];
+  let prefix = '';
+
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
-    pathSoFar += '/' + seg;
+    prefix += `/${seg}`;
 
-    // Skip the role prefix itself (app/lawyer/admin) — already covered by Home
-    if (i === 0) continue;
-    // Skip 'dashboard' since Home already points there
-    if (seg === 'dashboard') continue;
+    if (i === 0 && ROLE_PREFIX_SEGMENTS.has(seg)) continue;
 
-    // Check if this is a dynamic param (like a case ID)
-    const isParam = params.id && seg === params.id;
+    const last = i === segments.length - 1;
+    const label = segmentLabel(seg, i, segments, params);
+    const to = last ? undefined : prefix === '/cases' ? casesList : prefix;
 
-    const label = isParam
-      ? `#${seg.substring(0, 8)}`
-      : ROUTE_LABELS[seg] ||
-        seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ');
-
-    const isLast = i === segments.length - 1;
-
-    crumbs.push({
-      label,
-      to: isLast ? undefined : pathSoFar,
-    });
+    out.push({ label, to });
   }
 
+  return out;
+}
+
+const Breadcrumbs = () => {
+  const { pathname } = useLocation();
+  const params = useParams();
+  const activeRole = getCookie('x-active-role');
+
+  const crumbs = pathCrumbs(pathname, params, activeRole);
   if (crumbs.length <= 1) return null;
 
   return (
@@ -80,7 +114,7 @@ const Breadcrumbs = () => {
       className="mb-4 flex items-center gap-1.5 text-sm"
     >
       {crumbs.map((crumb, i) => (
-        <span key={i} className="flex items-center gap-1.5">
+        <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
           {i > 0 && (
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
           )}
@@ -99,7 +133,10 @@ const Breadcrumbs = () => {
               )}
             </Link>
           ) : (
-            <span className="max-w-[200px] truncate font-medium text-foreground">
+            <span
+              className="max-w-[min(100%,20rem)] truncate font-mono text-xs font-medium text-foreground md:text-sm"
+              title={crumb.label}
+            >
               {crumb.label}
             </span>
           )}

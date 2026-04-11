@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@/api-client';
+import { ROUTES } from '@/constants';
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCookie, setCookie } from '@/lib/helpers';
@@ -29,7 +30,7 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate(ROUTES.login);
     }
 
     if (!user && accessToken && refreshToken && activeRole) {

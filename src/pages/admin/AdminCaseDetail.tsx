@@ -1,3 +1,4 @@
+import { path } from '@/constants';
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { AdminInternalNotesDrawer } from '@/components/admin/AdminInternalNotesDrawer';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
@@ -224,7 +225,7 @@ const AdminCaseDetail = () => {
                 </span>
                 {userId ? (
                   <Link
-                    to={`/admin/users/${userId}`}
+                    to={path.adminUser(userId)}
                     className="text-primary hover:underline"
                   >
                     <ExternalLink className="h-3 w-3" />
@@ -239,7 +240,7 @@ const AdminCaseDetail = () => {
                   </span>
                   {lawyerProfileId ? (
                     <Link
-                      to={`/admin/lawyers/${lawyerProfileId}`}
+                      to={path.adminLawyer(lawyerProfileId)}
                       className="text-primary hover:underline"
                     >
                       <ExternalLink className="h-3 w-3" />

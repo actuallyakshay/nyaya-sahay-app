@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
@@ -6,6 +7,7 @@ import type { UserRole } from '@/types';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Loader2 } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface GoogleLoginButtonProps {
   role: UserRole;
@@ -15,6 +17,7 @@ interface GoogleLoginButtonProps {
 const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
   const { googleLogin } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -34,9 +37,14 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
     try {
       const data = await googleLogin(idToken, role);
       if (!data.status) throw new Error(data.message);
-      setCookie('x-active-role', role as string);
       setCookie('access-token', data.accessToken);
       setCookie('refresh-token', data.refreshToken);
+      if (data?.isAdmin) {
+        setCookie('x-active-role', 'admin');
+        return navigate(ROUTES.admin.dashboard);
+      } else {
+        setCookie('x-active-role', role as string);
+      }
       toast({
         title: 'Welcome!',
         description: `Signed in with Google as ${role}.`,

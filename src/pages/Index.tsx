@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { mockPlans } from '@/lib/mock-data';
 import { motion } from 'framer-motion';
@@ -10,7 +11,6 @@ import {
   FileText,
   Gavel,
   MessageSquare,
-  Phone,
   Scale,
   Shield,
   Star,
@@ -169,7 +169,7 @@ const Homepage = () => {
                   className="bg-gold text-accent-foreground shadow-lg shadow-gold/20 hover:bg-gold/90"
                   asChild
                 >
-                  <Link to="/plans">
+                  <Link to={ROUTES.plans}>
                     View Plans & Pricing <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -179,7 +179,7 @@ const Homepage = () => {
                   className="border-primary-foreground/20 text-black hover:bg-primary-foreground/10"
                   asChild
                 >
-                  <Link to="/how-it-works">See How It Works</Link>
+                  <Link to={ROUTES.howItWorks}>See How It Works</Link>
                 </Button>
               </motion.div>
             </motion.div>
@@ -399,7 +399,7 @@ const Homepage = () => {
                   variant={plan.isPopular ? 'default' : 'outline'}
                   asChild
                 >
-                  <Link to="/register">Subscribe Now</Link>
+                  <Link to={ROUTES.register}>Subscribe Now</Link>
                 </Button>
               </motion.div>
             ))}
@@ -418,12 +418,7 @@ const Homepage = () => {
             </p>
             <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Button variant="outline" asChild>
-                <Link to="/faq">Read FAQ</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/contact">
-                  <Phone className="mr-2 h-4 w-4" /> Contact Support
-                </Link>
+                <Link to={ROUTES.faq}>Read FAQ</Link>
               </Button>
             </div>
           </div>
@@ -464,17 +459,9 @@ const Homepage = () => {
                 className="bg-gold text-accent-foreground shadow-lg shadow-gold/20 hover:bg-gold/90"
                 asChild
               >
-                <Link to="/register">
+                <Link to={ROUTES.register}>
                   Create Free Account <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary-foreground/20 text-black hover:bg-primary-foreground/10"
-                asChild
-              >
-                <Link to="/contact">Talk to Us</Link>
               </Button>
             </motion.div>
           </motion.div>

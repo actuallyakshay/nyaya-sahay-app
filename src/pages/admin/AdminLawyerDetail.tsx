@@ -1,4 +1,5 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
+import { ROUTES } from '@/constants';
 import WithShimmer from '@/components/WithShimmer';
 import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { Button } from '@/components/ui/button';
@@ -70,7 +71,7 @@ const AdminLawyerDetail = () => {
     <AdminLayout>
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/lawyers">
+          <Link to={ROUTES.admin.lawyers}>
             <ChevronLeft className="mr-1 h-4 w-4" />
             Back to Lawyers
           </Link>

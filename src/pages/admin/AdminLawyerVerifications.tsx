@@ -2,6 +2,7 @@ import {
   getAdminLawyerVerifications,
   updateLawyerRoleStatus,
 } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge } from '@/components/StatusBadge';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -210,7 +211,7 @@ const AdminLawyerVerifications = () => {
                                 )}
                                 Reject
                               </Button>
-                              <Link to={`/admin/lawyers/${l.id}`}>
+                              <Link to={path.adminLawyer(l.id)}>
                                 <Button
                                   size="sm"
                                   variant="ghost"

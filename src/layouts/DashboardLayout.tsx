@@ -1,40 +1,20 @@
 import Breadcrumbs from '@/components/Breakcrumbs';
+import { LAWYER_NAV, ROUTES, USER_NAV } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCookie, setCookie } from '@/lib/helpers';
+import { getCookie, resetCookies, setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
   ArrowRightLeft,
-  Briefcase,
-  CreditCard,
-  LayoutDashboard,
   Loader2,
   LogOut,
   Menu,
   PanelLeft,
   PanelLeftClose,
-  Plus,
   Scale,
-  User,
-  Users,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
-const userNav = [
-  { label: 'Dashboard', to: '/app/dashboard', icon: LayoutDashboard },
-  { label: 'My Cases', to: '/app/cases', icon: Briefcase },
-  { label: 'New Case', to: '/app/new-case', icon: Plus },
-  { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
-  { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
-  { label: 'Profile', to: '/app/profile', icon: User },
-];
-
-const lawyerNav = [
-  { label: 'Dashboard', to: '/lawyer/dashboard', icon: LayoutDashboard },
-  { label: 'Cases', to: '/lawyer/cases', icon: Briefcase },
-  { label: 'Profile', to: '/lawyer/profile', icon: User },
-];
 
 export const DashboardLayout = ({
   children,
@@ -58,24 +38,25 @@ export const DashboardLayout = ({
     Boolean(user?.avatarUrl && user.avatarUrl.length > 0) && !avatarLoadFailed;
   const activeRole = getCookie('x-active-role');
 
-  const nav = activeRole === 'lawyer' ? lawyerNav : userNav;
+  const nav = activeRole === 'lawyer' ? LAWYER_NAV : USER_NAV;
   const roleName = activeRole === 'lawyer' ? 'Advocate' : 'User';
 
-  // Check if user has multiple roles (both user and lawyer)
   const hasMultipleRoles = user?.roles?.length > 1;
-  const otherRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
   const switchToText =
     activeRole === 'lawyer' ? 'Switch to User' : 'Switch to Lawyer';
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    resetCookies();
+    navigate(ROUTES.login);
   };
 
   const handleSwitchRole = () => {
     const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
     setCookie('x-active-role', newRole);
-    navigate(newRole === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
+    navigate(
+      newRole === 'lawyer' ? ROUTES.lawyer.dashboard : ROUTES.user.dashboard
+    );
   };
 
   return (
@@ -85,7 +66,7 @@ export const DashboardLayout = ({
         <button onClick={() => setSidebarOpen(true)} className="p-1">
           <Menu className="h-5 w-5" />
         </button>
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={ROUTES.home} className="flex items-center gap-2">
           <Scale className="h-5 w-5 text-gold" />
           <span className="font-serif text-lg font-bold">NyayaSetu</span>
         </Link>
@@ -129,7 +110,7 @@ export const DashboardLayout = ({
             )}
           >
             <Link
-              to="/"
+              to={ROUTES.home}
               className={cn(
                 'flex items-center gap-2.5',
                 collapsed && 'lg:hidden'
@@ -141,7 +122,7 @@ export const DashboardLayout = ({
               </span>
             </Link>
             <Link
-              to="/"
+              to={ROUTES.home}
               className={cn(
                 'hidden',
                 collapsed && 'items-center justify-center lg:flex'

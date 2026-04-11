@@ -1,4 +1,5 @@
 import { getAdminAnalytics } from '@/api-client';
+import { path, ROUTES } from '@/constants';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -86,7 +87,7 @@ const AdminDashboard = () => {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent Cases</h2>
             <Link
-              to="/admin/cases"
+              to={ROUTES.admin.cases}
               className="text-sm text-gold hover:underline"
             >
               View all →
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
                   >
                     <td className="px-4 py-3 font-mono text-xs">
                       <Link
-                        to={`/admin/cases/${c.id}`}
+                        to={path.adminCase(c.id)}
                         className="hover:text-gold hover:underline"
                       >
                         #{c.caseCode}
@@ -150,7 +151,7 @@ const AdminDashboard = () => {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent Payments</h2>
             <Link
-              to="/admin/payments"
+              to={ROUTES.admin.payments}
               className="text-sm text-gold hover:underline"
             >
               View all →

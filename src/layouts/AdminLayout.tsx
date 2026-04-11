@@ -1,58 +1,31 @@
+import Breadcrumbs from '@/components/Breakcrumbs';
+import { ADMIN_NAV, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { resetCookies } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
-  Briefcase,
-  CalendarCheck,
-  CreditCard,
-  FilePlus,
-  FileText,
-  LayoutDashboard,
+  Loader2,
   LogOut,
   Menu,
   PanelLeft,
   PanelLeftClose,
   Scale,
-  Settings,
-  ShieldCheck,
-  UserCheck,
-  Users,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const adminNav = [
-  { label: 'Dashboard', to: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'Users', to: '/admin/users', icon: Users },
-  { label: 'Lawyers', to: '/admin/lawyers', icon: UserCheck },
-  {
-    label: 'Lawyer Verifications',
-    to: '/admin/lawyer-verifications',
-    icon: ShieldCheck,
-  },
-  { label: 'Cases', to: '/admin/cases', icon: Briefcase },
-  { label: 'Case Requests', to: '/admin/case-requests', icon: FilePlus },
-
-  {
-    label: 'Session Requests',
-    to: '/admin/session-requests',
-    icon: CalendarCheck,
-  },
-  { label: 'Subscriptions', to: '/admin/subscriptions', icon: FileText },
-  { label: 'Payments', to: '/admin/payments', icon: CreditCard },
-  { label: 'Settings', to: '/admin/settings', icon: Settings },
-];
-
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    await logout();
+    resetCookies();
+    navigate(ROUTES.login);
   };
 
   return (
@@ -122,7 +95,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               collapsed ? 'px-1.5' : 'px-3'
             )}
           >
-            {adminNav.map((item) => {
+            {ADMIN_NAV.map((item) => {
               const active =
                 location.pathname === item.to ||
                 location.pathname.startsWith(item.to + '/');
@@ -173,14 +146,23 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 collapsed && 'lg:justify-center lg:px-0'
               )}
             >
-              <LogOut className="h-4 w-4 shrink-0" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : (
+                <LogOut className="h-4 w-4 shrink-0" />
+              )}
               <span className={cn(collapsed && 'lg:hidden')}>Sign Out</span>
             </button>
           </div>
         </div>
       </aside>
 
-      <main className="min-h-screen flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+      <main className="min-h-screen flex-1">
+        <div className="p-4 md:p-6 lg:p-8">
+          <Breadcrumbs />
+          {children}
+        </div>
+      </main>
     </div>
   );
 };

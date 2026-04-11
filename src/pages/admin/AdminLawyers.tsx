@@ -2,6 +2,7 @@ import {
   getAdminLawyerVerifications,
   updateLawyerRoleStatus,
 } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge } from '@/components/StatusBadge';
 import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
@@ -192,7 +193,7 @@ const AdminLawyers = () => {
                       <td className="px-4 py-3">
                         <div>
                           <Link
-                            to={`/admin/lawyers/${l.id}`}
+                            to={path.adminLawyer(l.id)}
                             className="font-medium hover:text-gold hover:underline"
                           >
                             {l.user?.fullName}
@@ -257,7 +258,7 @@ const AdminLawyers = () => {
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Link to={`/admin/lawyers/${l.id}`}>
+                        <Link to={path.adminLawyer(l.id)}>
                           <Button variant="ghost" size="sm">
                             View
                           </Button>

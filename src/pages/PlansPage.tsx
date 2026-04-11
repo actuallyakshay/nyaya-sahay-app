@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { mockPlans } from '@/lib/mock-data';
 import { CheckCircle2 } from 'lucide-react';
@@ -27,7 +28,7 @@ const PlansPage = () => (
                 ))}
               </ul>
               <Button className={`mt-8 w-full ${plan.isPopular ? 'bg-gold text-accent-foreground hover:bg-gold/90' : ''}`} variant={plan.isPopular ? 'default' : 'outline'} asChild>
-                <Link to="/register">Subscribe Now</Link>
+                <Link to={ROUTES.register}>Subscribe Now</Link>
               </Button>
             </div>
           ))}

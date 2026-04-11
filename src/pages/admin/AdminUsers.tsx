@@ -1,4 +1,5 @@
 import { getAdminUsers } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { UserFormModal } from '@/components/admin/UserFormModal';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -135,7 +136,7 @@ const AdminUsers = () => {
                     </td>
                     <td className="px-4 py-3 font-medium">
                       <Link
-                        to={`/admin/users/${u.id}`}
+                        to={path.adminUser(u.id)}
                         className="hover:text-gold hover:underline"
                       >
                         {u.fullName}
@@ -163,7 +164,7 @@ const AdminUsers = () => {
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Link to={`/admin/users/${u.id}`}>
+                        <Link to={path.adminUser(u.id)}>
                           <Button variant="ghost" size="sm">
                             View
                           </Button>

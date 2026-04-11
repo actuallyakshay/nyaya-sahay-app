@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { Link } from 'react-router-dom';
 
@@ -60,7 +61,7 @@ const HowItWorksPage = () => (
 
         <div className="mt-12 text-center">
           <Button size="lg" asChild>
-            <Link to="/register">Get Started Now</Link>
+            <Link to={ROUTES.register}>Get Started Now</Link>
           </Button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { env } from '@/config/env';
+import { ROUTE_PATTERNS, ROUTES } from '@/constants';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { queryClient } from '@/lib/query-client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -10,7 +11,6 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import Index from './pages/Index';
@@ -34,7 +34,6 @@ import AdminCases from './pages/admin/AdminCases';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLawyerDetail from './pages/admin/AdminLawyerDetail';
 import AdminLawyers from './pages/admin/AdminLawyers';
-import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
@@ -55,18 +54,18 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               {/* Public */}
-              <Route path="/" element={<Index />} />
-              <Route path="/plans" element={<PlansPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/how-it-works" element={<HowItWorksPage />} />
-              <Route path="/faq" element={<FAQPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path={ROUTES.home} element={<Index />} />
+              <Route path={ROUTES.plans} element={<PlansPage />} />
+              <Route path={ROUTES.about} element={<AboutPage />} />
+              <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
+              <Route path={ROUTES.faq} element={<FAQPage />} />
+              {/* <Route path={ROUTES.contact} element={<ContactPage />} /> */}
+              <Route path={ROUTES.login} element={<LoginPage />} />
+              <Route path={ROUTES.register} element={<RegisterPage />} />
 
               {/* User */}
               <Route
-                path="/app/dashboard"
+                path={ROUTES.user.dashboard}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <UserDashboard />
@@ -74,7 +73,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/app/cases"
+                path={ROUTES.user.cases}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <UserCases />
@@ -82,7 +81,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/cases/:id"
+                path={ROUTE_PATTERNS.caseDetail}
                 element={
                   <ProtectedRoute allowedRoles={['user', 'lawyer']}>
                     <CaseDetail />
@@ -90,7 +89,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/app/new-case"
+                path={ROUTES.user.newCase}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <NewCase />
@@ -98,7 +97,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/app/subscription"
+                path={ROUTES.user.subscription}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <UserSubscription />
@@ -107,7 +106,7 @@ const App = () => (
               />
 
               <Route
-                path="/app/profile"
+                path={ROUTES.user.profile}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <UserProfile />
@@ -115,7 +114,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/app/lawyers"
+                path={ROUTES.user.lawyers}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
                     <LawyersDirectory />
@@ -125,7 +124,7 @@ const App = () => (
 
               {/* Lawyer */}
               <Route
-                path="/lawyer/dashboard"
+                path={ROUTES.lawyer.dashboard}
                 element={
                   <ProtectedRoute allowedRoles={['lawyer']}>
                     <LawyerDashboard />
@@ -133,7 +132,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/lawyer/cases"
+                path={ROUTES.lawyer.cases}
                 element={
                   <ProtectedRoute allowedRoles={['lawyer']}>
                     <LawyerCases />
@@ -142,7 +141,7 @@ const App = () => (
               />
 
               <Route
-                path="/lawyer/profile"
+                path={ROUTES.lawyer.profile}
                 element={
                   <ProtectedRoute allowedRoles={['lawyer']}>
                     <UserProfile />
@@ -151,9 +150,8 @@ const App = () => (
               />
 
               {/* Admin */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route
-                path="/admin/dashboard"
+                path={ROUTES.admin.dashboard}
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboard />
@@ -162,7 +160,7 @@ const App = () => (
               />
 
               <Route
-                path="/admin/case-requests"
+                path={ROUTES.admin.caseRequests}
                 element={
                   <AdminProtectedRoute>
                     <AdminCaseRequests />
@@ -171,7 +169,7 @@ const App = () => (
               />
 
               <Route
-                path="/admin/session-requests"
+                path={ROUTES.admin.sessionRequests}
                 element={
                   <AdminProtectedRoute>
                     <AdminSessionRequests />
@@ -179,7 +177,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/users"
+                path={ROUTES.admin.users}
                 element={
                   <AdminProtectedRoute>
                     <AdminUsers />
@@ -187,7 +185,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/users/:id"
+                path={ROUTE_PATTERNS.adminUserDetail}
                 element={
                   <AdminProtectedRoute>
                     <AdminUserDetail />
@@ -195,7 +193,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/lawyers"
+                path={ROUTES.admin.lawyers}
                 element={
                   <AdminProtectedRoute>
                     <AdminLawyers />
@@ -203,7 +201,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/lawyers/:id"
+                path={ROUTE_PATTERNS.adminLawyerDetail}
                 element={
                   <AdminProtectedRoute>
                     <AdminLawyerDetail />
@@ -211,7 +209,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/cases"
+                path={ROUTES.admin.cases}
                 element={
                   <AdminProtectedRoute>
                     <AdminCases />
@@ -220,7 +218,7 @@ const App = () => (
               />
 
               <Route
-                path="/admin/lawyer-verifications"
+                path={ROUTES.admin.lawyerVerifications}
                 element={
                   <AdminProtectedRoute>
                     <AdminLawyerVerifications />
@@ -228,7 +226,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/cases/:id"
+                path={ROUTE_PATTERNS.adminCaseDetail}
                 element={
                   <AdminProtectedRoute>
                     <AdminCaseDetail />
@@ -236,7 +234,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/subscriptions"
+                path={ROUTES.admin.subscriptions}
                 element={
                   <AdminProtectedRoute>
                     <AdminSubscriptions />
@@ -244,7 +242,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/payments"
+                path={ROUTES.admin.payments}
                 element={
                   <AdminProtectedRoute>
                     <AdminPayments />
@@ -253,7 +251,7 @@ const App = () => (
               />
 
               <Route
-                path="/admin/settings"
+                path={ROUTES.admin.settings}
                 element={
                   <AdminProtectedRoute>
                     <AdminSettings />

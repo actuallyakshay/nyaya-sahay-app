@@ -1,4 +1,5 @@
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
+import { ROUTES } from '@/constants';
 import { getCookie } from '@/lib/helpers';
 import type { AdminProtectedRouteProps } from '@/types';
 import { useEffect, useState } from 'react';
@@ -11,7 +12,7 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
 
   useEffect(() => {
     if (!adminToken) {
-      navigate('/admin/login', { replace: true });
+      navigate(ROUTES.login, { replace: true });
     } else {
       setIsChecking(false);
     }

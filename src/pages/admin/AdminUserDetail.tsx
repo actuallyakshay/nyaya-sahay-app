@@ -1,4 +1,5 @@
 import { getAdminUserCases, getAdminUserDetails } from '@/api-client';
+import { ROUTES } from '@/constants';
 import { Button } from '@/components/ui/button';
 import { UserCasesTable } from '@/components/user/UserCasesTable';
 import WithShimmer from '@/components/WithShimmer';
@@ -66,7 +67,7 @@ const AdminUserDetail = () => {
     <AdminLayout>
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/admin/users">
+          <Link to={ROUTES.admin.users}>
             <ChevronLeft className="mr-1 h-4 w-4" />
             Back to Users
           </Link>

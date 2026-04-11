@@ -2,6 +2,7 @@ import {
   getAdminSessionRequests,
   updateCaseSessionRequestStatus,
 } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
@@ -139,7 +140,7 @@ const AdminSessionRequests = () => {
                       <div className="flex-1">
                         <div className="mb-1 flex flex-wrap items-center gap-2">
                           <Link
-                            to={`/admin/cases/${req?.case?.id}`}
+                            to={path.adminCase(req?.case?.id ?? '')}
                             className="hover:text-gold hover:underline"
                           >
                             <span className="font-mono text-xs text-muted-foreground">
@@ -181,7 +182,7 @@ const AdminSessionRequests = () => {
                       </div>
                       <div className="flex shrink-0 gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link to={`/admin/cases/${req?.case?.id}`}>
+                          <Link to={path.adminCase(req?.case?.id ?? '')}>
                             <Eye className="mr-1.5 h-3.5 w-3.5" />
                             View Case
                           </Link>

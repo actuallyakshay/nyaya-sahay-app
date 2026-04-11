@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants';
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -91,7 +92,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <Link to="/" className="mb-8 flex items-center gap-2.5">
+        <Link to={ROUTES.home} className="mb-8 flex items-center gap-2.5">
           <Scale className="h-6 w-6 text-gold" />
           <span className="font-serif text-xl font-bold">NyayaSetu</span>
         </Link>
@@ -194,7 +195,7 @@ const RegisterPage = () => {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-gold hover:underline">
+          <Link to={ROUTES.login} className="font-medium text-gold hover:underline">
             Sign in
           </Link>
         </p>

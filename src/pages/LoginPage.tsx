@@ -3,9 +3,11 @@ import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { dashboardForRole, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getCookie, setCookie } from '@/lib/helpers';
+import { getApiErrorMessage } from '@/lib/utils';
 import { Eye, EyeOff, Scale } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -24,9 +26,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (authUser) {
-      navigate(
-        activeRole === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard'
-      );
+      navigate(dashboardForRole(activeRole));
     }
   }, [user, navigate, activeRole, authUser]);
 
@@ -36,17 +36,20 @@ const LoginPage = () => {
       setLoading(true);
       const { data } = await login({ email, password, role });
       if (!data.status) throw new Error(data.message);
-
-      setCookie('x-active-role', role as string);
       setCookie('access-token', data.accessToken);
       setCookie('refresh-token', data.refreshToken);
+      if (data?.isAdmin) {
+        setCookie('x-active-role', 'admin');
+        navigate(ROUTES.admin.dashboard);
+      } else {
+        setCookie('x-active-role', role as string);
+      }
       toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
-      navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
+      navigate(dashboardForRole(role));
     } catch (e) {
       toast({
         title: 'Login failed',
-        description:
-          e instanceof Error ? e.message : 'Please check your credentials.',
+        description: getApiErrorMessage(e),
         variant: 'destructive',
       });
     } finally {
@@ -55,14 +58,14 @@ const LoginPage = () => {
   };
 
   const handleGoogleSuccess = () => {
-    navigate(role === 'lawyer' ? '/lawyer/dashboard' : '/app/dashboard');
+    navigate(dashboardForRole(role));
   };
 
   return (
     <div className="flex min-h-screen">
       {/* Left branding panel */}
       <div className="hidden flex-col justify-between bg-navy p-10 lg:flex lg:w-2/5">
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to={ROUTES.home} className="flex items-center gap-2.5">
           <Scale className="h-6 w-6 text-gold" />
           <span className="font-serif text-xl font-bold text-primary-foreground">
             NyayaSetu
@@ -137,7 +140,7 @@ const LoginPage = () => {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  to="/forgot-password"
+                  to={ROUTES.forgotPassword}
                   className="text-xs text-gold hover:underline"
                 >
                   Forgot password?
@@ -173,7 +176,7 @@ const LoginPage = () => {
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link
-              to="/register"
+              to={ROUTES.register}
               state={{ role }}
               className="font-medium text-gold hover:underline"
             >
@@ -181,7 +184,7 @@ const LoginPage = () => {
             </Link>
           </p>
           {/* <p className="mt-3 text-center text-xs text-muted-foreground">
-            <Link to="/admin/login" className="hover:underline">
+            <Link to={ROUTES.admin.login} className="hover:underline">
               Admin Login →
             </Link>
           </p> */}

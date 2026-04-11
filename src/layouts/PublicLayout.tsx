@@ -1,16 +1,8 @@
 import { Button } from '@/components/ui/button';
+import { PUBLIC_NAV_LINKS, ROUTES } from '@/constants';
 import { Menu, Scale, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-const navLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'Plans', to: '/plans' },
-  { label: 'How It Works', to: '/how-it-works' },
-  { label: 'About', to: '/about' },
-  { label: 'FAQ', to: '/faq' },
-  { label: 'Contact', to: '/contact' },
-];
 
 export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -20,7 +12,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to={ROUTES.home} className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy">
               <Scale className="h-5 w-5 text-gold" />
             </div>
@@ -30,7 +22,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {navLinks.map((l) => (
+            {PUBLIC_NAV_LINKS.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -43,10 +35,10 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
 
           <div className="hidden items-center gap-2 md:flex">
             <Button variant="ghost" asChild>
-              <Link to="/login">Log In</Link>
+              <Link to={ROUTES.login}>Log In</Link>
             </Button>
             <Button asChild>
-              <Link to="/register">Get Started</Link>
+              <Link to={ROUTES.register}>Get Started</Link>
             </Button>
           </div>
 
@@ -65,7 +57,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
         {mobileOpen && (
           <div className="border-t bg-card p-4 md:hidden">
             <nav className="flex flex-col gap-1">
-              {navLinks.map((l) => (
+              {PUBLIC_NAV_LINKS.map((l) => (
                 <Link
                   key={l.to}
                   to={l.to}
@@ -77,10 +69,10 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               ))}
               <div className="mt-3 flex flex-col gap-2 border-t pt-3">
                 <Button variant="outline" asChild>
-                  <Link to="/login">Log In</Link>
+                  <Link to={ROUTES.login}>Log In</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/register">Get Started</Link>
+                  <Link to={ROUTES.register}>Get Started</Link>
                 </Button>
               </div>
             </nav>
@@ -109,20 +101,23 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               <h4 className="mb-3 text-sm font-semibold text-gold">Platform</h4>
               <ul className="space-y-2 text-sm text-primary-foreground/70">
                 <li>
-                  <Link to="/plans" className="hover:text-primary-foreground">
+                  <Link
+                    to={ROUTES.plans}
+                    className="hover:text-primary-foreground"
+                  >
                     Subscription Plans
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/how-it-works"
+                    to={ROUTES.howItWorks}
                     className="hover:text-primary-foreground"
                   >
                     How It Works
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="hover:text-primary-foreground">
+                  <Link to={ROUTES.faq} className="hover:text-primary-foreground">
                     FAQ
                   </Link>
                 </li>

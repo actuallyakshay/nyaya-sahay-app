@@ -4,6 +4,7 @@ import {
   updateUserProfile,
   uploadAsset,
 } from '@/api-client';
+import { ROUTES } from '@/constants';
 import PasswordResetModal from '@/components/PasswordResetModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -561,7 +562,7 @@ const UserProfile = () => {
               ))}
             </ul>
             <Button variant="outline" size="sm" asChild>
-              <a href="/app/subscription">Manage Subscription</a>
+              <a href={ROUTES.user.subscription}>Manage Subscription</a>
             </Button>
           </div>
         )}

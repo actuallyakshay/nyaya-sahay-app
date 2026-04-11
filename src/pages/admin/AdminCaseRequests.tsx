@@ -1,4 +1,5 @@
 import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
@@ -155,7 +156,7 @@ const AdminCaseRequests = () => {
                       </div>
                       <div className="flex shrink-0 gap-2">
                         <Button size="sm" variant="outline" asChild>
-                          <Link to={`/admin/cases/${c.id}`}>
+                          <Link to={path.adminCase(c.id)}>
                             <Eye className="mr-1.5 h-3.5 w-3.5" />
                             View
                           </Link>

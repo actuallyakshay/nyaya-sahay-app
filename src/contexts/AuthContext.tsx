@@ -12,6 +12,7 @@ interface GoogleLoginResponse {
   isNewUser: boolean;
   status: boolean;
   message: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {

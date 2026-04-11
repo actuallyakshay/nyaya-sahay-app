@@ -1,4 +1,5 @@
 import { getLawyerAnalytics } from '@/api-client';
+import { path, ROUTES } from '@/constants';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
@@ -88,7 +89,7 @@ const LawyerDashboard = () => {
             <h2 className="mb-4 text-lg font-semibold">Assigned Cases</h2>
             <div className="mb-4 flex items-center justify-end">
               <Link
-                to="/lawyer/cases"
+                to={ROUTES.lawyer.cases}
                 className="text-sm text-gold hover:underline"
               >
                 View all →
@@ -112,7 +113,7 @@ const LawyerDashboard = () => {
               assignedCases.map((c) => (
                 <Link
                   key={c.id}
-                  to={`/lawyer/cases/${c.id}`}
+                  to={path.caseDetail(c.id)}
                   className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

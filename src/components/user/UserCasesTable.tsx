@@ -1,3 +1,4 @@
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
@@ -113,7 +114,7 @@ export const UserCasesTable = ({
                 >
                   <td className="px-4 py-3 font-mono text-xs">
                     <Link
-                      to={isAdmin ? `/admin/cases/${c.id}` : `/cases/${c.id}`}
+                      to={isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)}
                       className="hover:text-gold hover:underline"
                     >
                       {c.caseCode}
@@ -121,7 +122,7 @@ export const UserCasesTable = ({
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={isAdmin ? `/admin/cases/${c.id}` : `/cases/${c.id}`}
+                      to={isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)}
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}

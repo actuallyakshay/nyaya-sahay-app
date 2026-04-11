@@ -1,4 +1,5 @@
 import { createCase, uploadAsset } from '@/api-client';
+import { ROUTES } from '@/constants';
 import { FileUpload } from '@/components/FileUpload';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,7 +85,7 @@ const NewCase = () => {
     e.preventDefault();
     await mutateAsync();
     await queryClient.invalidateQueries({ queryKey: ['user-cases'] });
-    navigate('/app/cases');
+    navigate(ROUTES.user.cases);
   };
 
   const handleFileError = (message: string) => {

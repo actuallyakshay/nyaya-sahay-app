@@ -1,4 +1,5 @@
 import { getAdminCases } from '@/api-client';
+import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -164,7 +165,7 @@ const AdminCases = () => {
                     </td>
                     <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                       <Link
-                        to={`/admin/cases/${c.id}`}
+                        to={path.adminCase(c.id)}
                         className="hover:text-gold hover:underline"
                       >
                         {c.title}

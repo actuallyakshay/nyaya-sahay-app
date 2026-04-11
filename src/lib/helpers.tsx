@@ -20,12 +20,17 @@ export const deleteCookie = (name: string) => {
   Cookies.remove(name);
 };
 
+/** Session cookie: cleared on logout; no max-age so it expires when the browser session ends. */
+export const USER_SESSION_QUERY_PROMPT_COOKIE =
+  'user-session-query-prompt-dismissed';
+
 const APP_SESSION_COOKIES = [
   'user',
   'x-active-role',
   'access-token',
   'refresh-token',
   'auth-user',
+  USER_SESSION_QUERY_PROMPT_COOKIE,
 ] as const;
 
 export const resetCookies = () => {

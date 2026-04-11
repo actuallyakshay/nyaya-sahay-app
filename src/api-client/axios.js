@@ -1,3 +1,4 @@
+import { ROUTES } from '@/constants/routes';
 import { env } from '@/config/env';
 import { getCookie } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
@@ -64,10 +65,10 @@ const redirectToLogin = (requestUrl = '') => {
   if (isAdminRequest) {
     document.cookie = 'admin-access-token=; Max-Age=0; path=/';
     document.cookie = 'admin-refresh-token=; Max-Age=0; path=/';
-    window.location.href = '/admin/login';
+    window.location.href = ROUTES.admin.login;
   } else {
     localStorage.removeItem('auth_user');
-    window.location.href = '/login';
+    window.location.href = ROUTES.login;
   }
 };
 

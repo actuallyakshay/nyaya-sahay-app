@@ -1,11 +1,18 @@
 import { getUserAnalytics } from '@/api-client';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
+import SessionQueryPromptModal from '@/components/SessionQueryPromptModal';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import WithShimmer from '@/components/WithShimmer';
+import { path, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import {
+  getCookie,
+  setCookie,
+  USER_SESSION_QUERY_PROMPT_COOKIE,
+} from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRight,
@@ -14,16 +21,35 @@ import {
   CreditCard,
   FileText,
 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const UserDashboard = () => {
   const { user } = useAuth();
 
-  const {
-    data: analyticsData,
-    isLoading,
-    error,
-  } = useQuery({
+  const profileBlocksOtherModals = user?.isProfileCompleted === false;
+
+  const [queryPromptDismissed, setQueryPromptDismissed] = useState(
+    () => getCookie(USER_SESSION_QUERY_PROMPT_COOKIE) === '1'
+  );
+
+  useEffect(() => {
+    setQueryPromptDismissed(
+      getCookie(USER_SESSION_QUERY_PROMPT_COOKIE) === '1'
+    );
+  }, [user]);
+
+  const markQueryPromptSeen = useCallback(() => {
+    setCookie(USER_SESSION_QUERY_PROMPT_COOKIE, '1');
+    setQueryPromptDismissed(true);
+  }, []);
+
+  const showSessionQueryPrompt = useMemo(
+    () => !!user && !profileBlocksOtherModals && !queryPromptDismissed,
+    [user, profileBlocksOtherModals, queryPromptDismissed]
+  );
+
+  const { data: analyticsData, isLoading } = useQuery({
     queryKey: ['userAnalytics'],
     queryFn: async () => {
       const response = await getUserAnalytics();
@@ -39,6 +65,10 @@ const UserDashboard = () => {
   return (
     <DashboardLayout>
       <ProfileCompletionModal open={user?.isProfileCompleted === false} />
+      <SessionQueryPromptModal
+        open={showSessionQueryPrompt}
+        onDismiss={markQueryPromptSeen}
+      />
       <div className="space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -53,12 +83,12 @@ const UserDashboard = () => {
           {/* Quick actions */}
           <div className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link to="/app/new-case">
+              <Link to={ROUTES.user.newCase}>
                 <FileText className="mr-2 h-4 w-4" /> Raise New Query
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/app/cases">View All Cases</Link>
+              <Link to={ROUTES.user.cases}>View All Cases</Link>
             </Button>
           </div>
         </div>
@@ -118,7 +148,7 @@ const UserDashboard = () => {
             <h2 className="mb-4 text-lg font-semibold">Active Cases</h2>
             <div className="mb-4 flex items-center justify-end">
               <Link
-                to="/app/cases"
+                to={ROUTES.user.cases}
                 className="text-sm text-gold hover:underline"
               >
                 View all →
@@ -142,7 +172,7 @@ const UserDashboard = () => {
               {activeCases.map((c) => (
                 <Link
                   key={c.id}
-                  to={`/cases/${c.id}`}
+                  to={path.caseDetail(c.id)}
                   className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
