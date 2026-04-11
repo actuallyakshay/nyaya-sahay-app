@@ -1,5 +1,6 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { AdminInternalNotesDrawer } from '@/components/admin/AdminInternalNotesDrawer';
+import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -26,6 +27,11 @@ import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import {
+  DESCRIPTION_PREVIEW_MAX_WORDS,
+  splitWords,
+  truncateToWords,
+} from '@/lib/caseDescriptionPreview';
 import { CASE_DOCUMENT_ACCEPT } from '@/lib/helpers';
 import {
   AlertTriangle,
@@ -46,7 +52,7 @@ import {
   Video,
   XCircle,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 const priorityConfig = {
@@ -70,12 +76,26 @@ const AdminCaseDetail = () => {
   const [message, setMessage] = useState('');
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+  const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const drawerFileInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
+
+  const rawDescription = caseData?.description?.trim() ?? '';
+  const descriptionIsLong = useMemo(() => {
+    if (!rawDescription) return false;
+    return splitWords(rawDescription).length > DESCRIPTION_PREVIEW_MAX_WORDS;
+  }, [rawDescription]);
+  const descriptionPreviewText = useMemo(
+    () =>
+      rawDescription
+        ? truncateToWords(rawDescription, DESCRIPTION_PREVIEW_MAX_WORDS)
+        : '',
+    [rawDescription]
+  );
 
   const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
     id,
@@ -262,9 +282,28 @@ const AdminCaseDetail = () => {
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Description
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/90">
-                {caseData?.description?.trim() ? caseData?.description : '—'}
-              </p>
+              {rawDescription ? (
+                descriptionIsLong ? (
+                  <button
+                    type="button"
+                    className="group mt-2 w-full rounded-md text-left text-sm leading-relaxed text-foreground/90 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    onClick={() => setDescriptionModalOpen(true)}
+                  >
+                    <span className="block whitespace-pre-wrap">
+                      {descriptionPreviewText}
+                    </span>
+                    <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold">
+                      Show full description
+                    </span>
+                  </button>
+                ) : (
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                    {rawDescription}
+                  </p>
+                )
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">—</p>
+              )}
             </div>
           </div>
           <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3">
@@ -419,6 +458,13 @@ const AdminCaseDetail = () => {
       </div>
 
       {/* Dialogs & Drawers */}
+      <CaseDescriptionModal
+        open={descriptionModalOpen}
+        onOpenChange={setDescriptionModalOpen}
+        caseTitle={caseData?.title ?? ''}
+        description={rawDescription}
+      />
+
       <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
         <DialogContent>
           <DialogHeader>

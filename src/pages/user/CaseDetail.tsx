@@ -1,4 +1,5 @@
 import { getCaseDetails } from '@/api-client';
+import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
@@ -17,6 +18,11 @@ import {
 import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import {
+  DESCRIPTION_PREVIEW_MAX_WORDS,
+  splitWords,
+  truncateToWords,
+} from '@/lib/caseDescriptionPreview';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -30,7 +36,7 @@ import {
   User,
   Video,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const CaseDetail = () => {
@@ -44,6 +50,7 @@ const CaseDetail = () => {
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
+  const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
 
   const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
     id,
@@ -58,6 +65,19 @@ const CaseDetail = () => {
     },
     refetchOnWindowFocus: false,
   });
+
+  const rawDescription = caseData?.description?.trim() ?? '';
+  const descriptionIsLong = useMemo(() => {
+    if (!rawDescription) return false;
+    return splitWords(rawDescription).length > DESCRIPTION_PREVIEW_MAX_WORDS;
+  }, [rawDescription]);
+  const descriptionPreviewText = useMemo(
+    () =>
+      rawDescription
+        ? truncateToWords(rawDescription, DESCRIPTION_PREVIEW_MAX_WORDS)
+        : '',
+    [rawDescription]
+  );
 
   const handleChatUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,9 +122,28 @@ const CaseDetail = () => {
           <h1 className="mt-1 text-xl font-bold sm:text-2xl">
             {caseData?.title}
           </h1>
-          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-            {caseData?.description}
-          </p>
+          {rawDescription ? (
+            descriptionIsLong ? (
+              <button
+                type="button"
+                className="group mt-0.5 w-full rounded-md text-left text-sm leading-relaxed text-muted-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                onClick={() => setDescriptionModalOpen(true)}
+              >
+                <span className="block whitespace-pre-wrap">
+                  {descriptionPreviewText}
+                </span>
+                <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground group-hover:text-foreground">
+                  Show full description
+                </span>
+              </button>
+            ) : (
+              <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                {rawDescription}
+              </p>
+            )
+          ) : (
+            <p className="mt-0.5 text-sm text-muted-foreground">—</p>
+          )}
         </div>
 
         {/* Action bar */}
@@ -284,6 +323,13 @@ const CaseDetail = () => {
           </div>
         </div>
       </div>
+
+      <CaseDescriptionModal
+        open={descriptionModalOpen}
+        onOpenChange={setDescriptionModalOpen}
+        caseTitle={caseData?.title ?? ''}
+        description={rawDescription}
+      />
 
       {/* Booking dialog */}
       <SessionBookingModal
