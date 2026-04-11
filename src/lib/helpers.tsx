@@ -72,7 +72,8 @@ export const getFileIcon = (fileName: string) => {
   return <File className="h-4 w-4 shrink-0 text-muted-foreground" />;
 };
 
-export const calculateYearsOfExperience = (lawyerExp: string) => {
+export const calculateYearsOfExperience = (lawyerExp: string | null) => {
+  if (!lawyerExp) return '-';
   const startDate = new Date(lawyerExp);
   const currentDate = new Date();
   const diffTime = Math.abs(currentDate.getTime() - startDate.getTime());

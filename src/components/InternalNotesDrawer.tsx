@@ -75,6 +75,9 @@ export const InternalNotesDrawer = ({
               </div>
             ))
           )}
+        </div>
+
+        <div className="shrink-0 space-y-3">
           <PaginationControls
             page={page}
             totalPages={totalPages}
@@ -82,10 +85,8 @@ export const InternalNotesDrawer = ({
             onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
             onPrev={() => setPage((p) => Math.max(p - 1, 1))}
             onPageChange={setPage}
+            className="pt-0"
           />
-        </div>
-
-        <div className="shrink-0 space-y-3 pt-4">
           <Textarea
             placeholder="Write a note..."
             value={noteText}

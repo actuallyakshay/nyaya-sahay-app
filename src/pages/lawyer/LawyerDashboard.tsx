@@ -27,7 +27,7 @@ const LawyerDashboard = () => {
   const activeCases = analyticsData?.totalActiveCases || 0;
   const totalCases = analyticsData?.totalHandledCases || 0;
   const assignedCases = analyticsData?.assignedCases || [];
-  const experience = analyticsData?.lawyerExp || '-';
+  const experience = analyticsData?.lawyerExp || null;
 
   return (
     <DashboardLayout>

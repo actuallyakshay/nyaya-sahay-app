@@ -43,7 +43,6 @@ const UserProfile = () => {
   const [phone, setPhone] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-
   const isLawyer = getCookie('x-active-role') === 'lawyer';
   const [selectedSpecializations, setSelectedSpecializations] = useState<
     string[]
@@ -225,7 +224,13 @@ const UserProfile = () => {
       pincode !== (lp?.pincode || '') ||
       JSON.stringify(selectedSpecializations.slice().sort()) !==
         JSON.stringify(
-          (lp?.lawyerPracticeAreas?.map((a: { practiceAreaId: string }) => a.practiceAreaId) || []).slice().sort()
+          (
+            lp?.lawyerPracticeAreas?.map(
+              (a: { practiceAreaId: string }) => a.practiceAreaId
+            ) || []
+          )
+            .slice()
+            .sort()
         );
 
     return basicChanged || lawyerChanged;
@@ -561,23 +566,25 @@ const UserProfile = () => {
           </div>
         )}
 
-        <div className="space-y-3 rounded-xl border bg-card p-6">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-gold" />
-            <h3 className="font-semibold">Security</h3>
+        {user?.provider === 'email' && (
+          <div className="space-y-3 rounded-xl border bg-card p-6">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-gold" />
+              <h3 className="font-semibold">Security</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Your data is encrypted and stored securely. All communications
+              with your lawyer are confidential.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPasswordModalOpen(true)}
+            >
+              Change Password
+            </Button>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Your data is encrypted and stored securely. All communications with
-            your lawyer are confidential.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPasswordModalOpen(true)}
-          >
-            Change Password
-          </Button>
-        </div>
+        )}
       </div>
 
       <PasswordResetModal

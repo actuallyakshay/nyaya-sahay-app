@@ -9,6 +9,7 @@ interface Props {
   onNext: () => void;
   onPrev: () => void;
   onPageChange?: (page: number) => void;
+  className?: string;
 }
 
 const getPageNumbers = (current: number, total: number): (number | '...')[] => {
@@ -34,6 +35,7 @@ export const PaginationControls = ({
   onNext,
   onPrev,
   onPageChange,
+  className,
 }: Props) => {
   if (totalPages <= 1) return null;
   if (total !== undefined && total <= pageSize) return null;
@@ -46,7 +48,12 @@ export const PaginationControls = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 pt-4 sm:flex-row sm:justify-between">
+    <div
+      className={cn(
+        'flex flex-col items-center gap-3 pt-4 sm:flex-row sm:justify-between',
+        className
+      )}
+    >
       {total !== undefined ? (
         <p className="text-xs text-muted-foreground">
           Showing{' '}

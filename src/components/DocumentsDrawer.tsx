@@ -71,7 +71,9 @@ export const DocumentsDrawer = ({
               caseLawyerName={caseLawyerName}
             />
           )}
+        </div>
 
+        <div className="shrink-0">
           <PaginationControls
             page={page}
             totalPages={totalPages}
@@ -79,11 +81,14 @@ export const DocumentsDrawer = ({
             onNext={() => setPage((p) => Math.min(p + 1, totalPages))}
             onPrev={() => setPage((p) => Math.max(p - 1, 1))}
             onPageChange={setPage}
+            className="pt-0"
           />
-        </div>
-
-        <div className="shrink-0 pt-4">
-          <Button variant="outline" className="w-full" onClick={onUploadClick}>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={onUploadClick}
+            disabled={loading}
+          >
             {loading ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
             ) : (

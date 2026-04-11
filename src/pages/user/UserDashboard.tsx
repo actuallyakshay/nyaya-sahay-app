@@ -1,4 +1,5 @@
 import { getUserAnalytics } from '@/api-client';
+import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,6 @@ import {
   FileText,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 
 const UserDashboard = () => {
   const { user } = useAuth();
@@ -131,12 +131,6 @@ const UserDashboard = () => {
                 <SkeletonCard key={i} />
               ))}
             </div>
-          ) : error ? (
-            <div className="rounded-xl border bg-card p-8 text-center">
-              <p className="text-destructive">
-                Failed to load cases. Please try again.
-              </p>
-            </div>
           ) : activeCases.length === 0 ? (
             <div className="rounded-xl border bg-card p-8 text-center">
               <p className="text-muted-foreground">
@@ -148,7 +142,7 @@ const UserDashboard = () => {
               {activeCases.map((c) => (
                 <Link
                   key={c.id}
-                  to={`/app/cases/${c.id}`}
+                  to={`/cases/${c.id}`}
                   className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

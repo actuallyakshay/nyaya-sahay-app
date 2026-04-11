@@ -16,7 +16,6 @@ import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
-import { LEGAL_CATEGORIES } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import {
   Clock,
@@ -113,7 +112,7 @@ const CaseDetail = () => {
             </span>
           )}
           <span className="text-xs text-muted-foreground">
-            {LEGAL_CATEGORIES[caseData?.practiceArea?.name]}
+            {caseData?.practiceArea?.name}
           </span>
           <div className="flex-1" />
 
