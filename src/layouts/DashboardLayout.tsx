@@ -18,7 +18,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const userNav = [
@@ -27,14 +27,12 @@ const userNav = [
   { label: 'New Case', to: '/app/new-case', icon: Plus },
   { label: 'Our Lawyers', to: '/app/lawyers', icon: Users },
   { label: 'Subscription', to: '/app/subscription', icon: CreditCard },
-  // { label: 'Notifications', to: '/app/notifications', icon: Bell },
   { label: 'Profile', to: '/app/profile', icon: User },
 ];
 
 const lawyerNav = [
   { label: 'Dashboard', to: '/lawyer/dashboard', icon: LayoutDashboard },
   { label: 'Cases', to: '/lawyer/cases', icon: Briefcase },
-  // { label: 'Notifications', to: '/lawyer/notifications', icon: Bell },
   { label: 'Profile', to: '/lawyer/profile', icon: User },
 ];
 
@@ -49,6 +47,15 @@ export const DashboardLayout = ({
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  /** Google CDN avatars often 403 with a cross-origin Referer; `no-referrer` fixes load. */
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [user?.avatarUrl]);
+
+  const showAvatar =
+    Boolean(user?.avatarUrl && user.avatarUrl.length > 0) && !avatarLoadFailed;
   const activeRole = getCookie('x-active-role');
 
   const nav = activeRole === 'lawyer' ? lawyerNav : userNav;
@@ -82,9 +89,19 @@ export const DashboardLayout = ({
           <Scale className="h-5 w-5 text-gold" />
           <span className="font-serif text-lg font-bold">NyayaSetu</span>
         </Link>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
-          {user?.fullName?.charAt(0)}
-        </div>
+        {showAvatar ? (
+          <img
+            src={user!.avatarUrl}
+            alt=""
+            referrerPolicy="no-referrer"
+            className="h-8 w-8 rounded-full object-cover"
+            onError={() => setAvatarLoadFailed(true)}
+          />
+        ) : (
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
+            {user?.fullName?.charAt(0)?.toUpperCase()}
+          </div>
+        )}
       </header>
 
       {/* Sidebar overlay */}
@@ -143,11 +160,13 @@ export const DashboardLayout = ({
           {/* Profile section in sidebar */}
           {!collapsed && (
             <div className="mx-4 mb-4 flex items-center gap-3 rounded-lg bg-sidebar-accent px-3 py-2.5">
-              {user?.avatarUrl ? (
+              {showAvatar ? (
                 <img
-                  src={user?.avatarUrl}
-                  alt={user?.fullName}
+                  src={user!.avatarUrl}
+                  alt={user?.fullName ?? ''}
+                  referrerPolicy="no-referrer"
                   className="h-9 w-9 rounded-full object-cover"
+                  onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
@@ -166,9 +185,19 @@ export const DashboardLayout = ({
           )}
           {collapsed && (
             <div className="mx-auto mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
-                {user?.fullName?.charAt(0)}
-              </div>
+              {showAvatar ? (
+                <img
+                  src={user!.avatarUrl}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="mx-auto h-9 w-9 rounded-full object-cover"
+                  onError={() => setAvatarLoadFailed(true)}
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
+                  {user?.fullName?.charAt(0)?.toUpperCase()}
+                </div>
+              )}
             </div>
           )}
 

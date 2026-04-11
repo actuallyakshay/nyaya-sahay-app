@@ -254,6 +254,7 @@ const UserProfile = () => {
                     <img
                       src={avatar || currentUser?.avatarUrl}
                       alt="Profile"
+                      referrerPolicy="no-referrer"
                       className="h-16 w-16 rounded-full object-cover"
                     />
                   ) : (

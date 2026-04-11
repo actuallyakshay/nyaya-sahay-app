@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/api-client';
+import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCookie, setCookie } from '@/lib/helpers';
-import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,8 +27,6 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
     setIsLoading(false);
   }, [setUser]);
 
-
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -47,15 +45,7 @@ const ProtectedRoute = ({ children, allowedRoles }: Props) => {
     activeRole,
   ]);
 
-  return (
-    <>
-      {isLoading ? (
-        <DashboardSkeleton />
-      ) : (
-        children
-      )}
-    </>
-  );
+  return <>{isLoading ? <DashboardSkeleton /> : children}</>;
 };
 
 export default ProtectedRoute;

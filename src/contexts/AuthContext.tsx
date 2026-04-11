@@ -2,14 +2,17 @@ import {
   googleAuthLogin as googleAuthLoginApi,
   logout as logoutApi,
 } from '@/api-client';
-import {
-  getCookie,
-  removeCookie,
-  resetCookies,
-  setCookie,
-} from '@/lib/helpers';
+import { getCookie, removeCookie, resetCookies } from '@/lib/helpers';
 import type { AuthUser, UserRole } from '@/types';
 import React, { createContext, useCallback, useContext, useState } from 'react';
+
+interface GoogleLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+  status: boolean;
+  message: string;
+}
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -17,16 +20,15 @@ interface AuthContextType {
   logout: () => void;
   setUser: (user: AuthUser | null) => void;
   isLoading: boolean;
-  googleLogin: (idToken: string, role: UserRole) => Promise<void>;
+  googleLogin: (
+    idToken: string,
+    role: UserRole
+  ) => Promise<GoogleLoginResponse>;
 }
 
 const getStoredUser = (): AuthUser | null => {
   const storedUser = getCookie('user');
   return storedUser ? JSON.parse(storedUser) : null;
-};
-
-const persistUser = (user: AuthUser) => {
-  setCookie('user', JSON.stringify(user));
 };
 
 const clearStoredUser = () => {
@@ -49,8 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         role,
         fcmToken: '',
       });
-      setUser(data.user);
-      persistUser(data.user);
+      return data;
     } finally {
       setIsLoading(false);
     }

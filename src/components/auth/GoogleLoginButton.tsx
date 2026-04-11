@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { setCookie } from '@/lib/helpers';
 import type { UserRole } from '@/types';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Loader2 } from 'lucide-react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface GoogleLoginButtonProps {
   role: UserRole;
@@ -16,18 +17,6 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [buttonWidth, setButtonWidth] = useState(400);
-
-  useLayoutEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      const w = entries[0]?.contentRect.width;
-      if (w >= 200) setButtonWidth(Math.floor(w));
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   const handleCredentialResponse = async (response: CredentialResponse) => {
     const idToken = response.credential;
@@ -43,16 +32,21 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
 
     setIsLoading(true);
     try {
-      await googleLogin(idToken, role);
+      const data = await googleLogin(idToken, role);
+      if (!data.status) throw new Error(data.message);
+      setCookie('x-active-role', role as string);
+      setCookie('access-token', data.accessToken);
+      setCookie('refresh-token', data.refreshToken);
       toast({
         title: 'Welcome!',
         description: `Signed in with Google as ${role}.`,
       });
       onSuccess();
-    } catch {
+    } catch (e) {
       toast({
-        title: 'Google sign-in failed',
-        description: 'Please try again.',
+        title: 'Login failed',
+        description:
+          e instanceof Error ? e.message : 'Please check your credentials.',
         variant: 'destructive',
       });
     } finally {
@@ -85,7 +79,7 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
           <GoogleLogin
             onSuccess={handleCredentialResponse}
             onError={handleError}
-            width={buttonWidth}
+            width={'100%'}
             type="standard"
             theme="outline"
             size="large"
