@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import WithShimmer from '@/components/WithShimmer';
 import { useCategories } from '@/hooks/useCategories';
+import { useFormErrors } from '@/hooks/useFormErrors';
 import { queryClient } from '@/lib/query-client';
 import { getApiErrorMessage, validateEmail, validatePhone } from '@/lib/utils';
 import type { FieldErrors, LawyerFormModalProps } from '@/types';
@@ -27,6 +28,12 @@ export const LawyerFormModal = ({
   onSave,
 }: LawyerFormModalProps) => {
   const isEditMode = !!lawyer;
+  const { toast } = useToast();
+  const { errors, setErrors, clearError, hasErrors, resetErrors } =
+    useFormErrors();
+
+  // --- Form state ---
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -38,11 +45,56 @@ export const LawyerFormModal = ({
   const [selectedSpecializations, setSelectedSpecializations] = useState<
     string[]
   >([]);
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const { toast } = useToast();
+
+  // --- Data ---
 
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
+
+  // --- Form reset / populate ---
+
+  const resetForm = () => {
+    setName('');
+    setEmail('');
+    setPhone('');
+    setPassword('');
+    setBarCouncilId('');
+    setDegree('');
+    setCareerStartDate('');
+    setBio('');
+    setSelectedSpecializations([]);
+    resetErrors();
+  };
+
+  const populateFromLawyer = (data: NonNullable<typeof lawyer>) => {
+    setName(data.user?.fullName ?? '');
+    setEmail(data.user?.email ?? '');
+    setPhone(data.user?.phone ?? '');
+    setPassword('');
+
+    setBarCouncilId(data.barCouncilId ?? '');
+    setDegree(data.degree ?? '');
+    setBio(data.bio ?? '');
+    setCareerStartDate(
+      data.careerStartDate
+        ? new Date(data.careerStartDate).toISOString().split('T')[0]
+        : ''
+    );
+
+    const practiceAreaIds = data.lawyerPracticeAreas
+      ?.map((s) => s.practiceArea?.id)
+      .filter(Boolean) as string[];
+    setSelectedSpecializations(practiceAreaIds ?? []);
+
+    resetErrors();
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    lawyer ? populateFromLawyer(lawyer) : resetForm();
+  }, [lawyer, open]);
+
+  // --- Mutations ---
 
   const { mutateAsync: createLawyer, isPending: isCreating } = useMutation({
     mutationFn: addLawyer,
@@ -55,111 +107,64 @@ export const LawyerFormModal = ({
 
   const isPending = isCreating || isUpdating;
 
-  useEffect(() => {
-    if (open && lawyer) {
-      setName(lawyer.user?.fullName ?? '');
-      setEmail(lawyer.user?.email ?? '');
-      setPhone(lawyer.user?.phone ?? '');
-      setPassword('');
-      setBarCouncilId(lawyer.barCouncilId ?? '');
-      setDegree(lawyer.degree ?? '');
-      setCareerStartDate(
-        lawyer.careerStartDate
-          ? new Date(lawyer.careerStartDate).toISOString().split('T')[0]
-          : ''
-      );
-      setBio(lawyer.bio ?? '');
-      setSelectedSpecializations(
-        (lawyer.lawyerPracticeAreas
-          ?.map((s) => s.practiceArea?.id)
-          .filter(Boolean) as string[]) ?? []
-      );
-      setErrors({});
-    } else if (open) {
-      resetForm();
+  // --- Validation ---
+
+  const validate = (): boolean => {
+    const newErrors: FieldErrors = {};
+
+    if (!name.trim()) newErrors.name = 'Full name is required';
+
+    if (!isEditMode) {
+      const emailError = validateEmail(email);
+      if (emailError) newErrors.email = emailError;
+      if (!password.trim()) newErrors.password = 'Password is required';
     }
-  }, [lawyer, open]);
 
-  const resetForm = () => {
-    setName('');
-    setEmail('');
-    setPhone('');
-    setPassword('');
-    setBarCouncilId('');
-    setDegree('');
-    setCareerStartDate('');
-    setBio('');
-    setSelectedSpecializations([]);
-    setErrors({});
-  };
-
-  const clearError = (field: keyof FieldErrors) => {
-    if (errors[field]) {
-      setErrors((prev) => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
+    if (phone.trim()) {
+      const phoneError = validatePhone(phone);
+      if (phoneError) newErrors.phone = phoneError;
     }
+
+    if (hasErrors(newErrors)) {
+      setErrors(newErrors);
+      return false;
+    }
+    return true;
   };
 
-  const toggleSpec = (id: string) => {
-    setSelectedSpecializations((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
-  };
+  // --- Payload builders ---
+
+  const buildSharedFields = () => ({
+    barCouncilId: barCouncilId.trim(),
+    degree: degree.trim(),
+    bio: bio.trim(),
+    lawyerPracticeAreas: selectedSpecializations,
+  });
+
+  const buildEditPayload = () => ({
+    userProfile: { fullName: name.trim(), phone: phone.trim() },
+    ...buildSharedFields(),
+    careerStartDate: careerStartDate || null,
+  });
+
+  const buildCreatePayload = () => ({
+    fullName: name.trim(),
+    email: email.trim(),
+    phone: phone.trim(),
+    password: password.trim(),
+    ...buildSharedFields(),
+    careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
+  });
+
+  // --- Submit ---
 
   const handleSave = async () => {
+    if (!validate()) return;
+
     try {
-      const newErrors: FieldErrors = {};
-
-      if (!name.trim()) newErrors.name = 'Full name is required';
-
-      if (!isEditMode) {
-        const emailError = validateEmail(email);
-        if (emailError) newErrors.email = emailError;
-        if (!password.trim()) newErrors.password = 'Password is required';
-      }
-
-      if (phone.trim()) {
-        const phoneError = validatePhone(phone);
-        if (phoneError) newErrors.phone = phoneError;
-      }
-
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        return;
-      }
-
-      let response;
-
-      if (isEditMode) {
-        const editPayload = {
-          userProfile: {
-            fullName: name.trim(),
-            phone: phone.trim(),
-          },
-          barCouncilId: barCouncilId.trim(),
-          degree: degree.trim(),
-          careerStartDate: careerStartDate || null,
-          bio: bio.trim(),
-          lawyerPracticeAreas: selectedSpecializations,
-        };
-        response = await editLawyer(editPayload);
-      } else {
-        const createPayload = {
-          fullName: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          password: password.trim(),
-          barCouncilId: barCouncilId.trim(),
-          degree: degree.trim(),
-          careerStartDate: careerStartDate ? new Date(careerStartDate) : null,
-          bio: bio.trim(),
-          lawyerPracticeAreas: selectedSpecializations,
-        };
-        response = await createLawyer(createPayload);
-      }
+      const response = isEditMode
+        ? await editLawyer(buildEditPayload())
+        : await createLawyer(buildCreatePayload());
 
       await queryClient.invalidateQueries({ queryKey: ['admin-lawyers'] });
       onSave(
@@ -177,13 +182,25 @@ export const LawyerFormModal = ({
     }
   };
 
+  // --- Helpers ---
+
+  const toggleSpec = (id: string) => {
+    setSelectedSpecializations((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+    );
+  };
+
+  // --- Render ---
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Edit Lawyer' : 'Add Lawyer'}</DialogTitle>
         </DialogHeader>
+
         <div className="space-y-4">
+          {/* Name & Email */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>
@@ -221,6 +238,7 @@ export const LawyerFormModal = ({
             </div>
           </div>
 
+          {/* Password (create mode only) */}
           {!isEditMode && (
             <div className="space-y-1.5">
               <Label>
@@ -241,6 +259,7 @@ export const LawyerFormModal = ({
             </div>
           )}
 
+          {/* Phone & Bar Council ID */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Phone</Label>
@@ -274,6 +293,7 @@ export const LawyerFormModal = ({
             </div>
           </div>
 
+          {/* Degree & Career Start Date */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Degree</Label>
@@ -281,7 +301,6 @@ export const LawyerFormModal = ({
                 value={degree}
                 onChange={(e) => setDegree(e.target.value)}
                 placeholder="LL.B, LL.M"
-                // disabled={isEditMode}
               />
             </div>
             <div className="space-y-1.5">
@@ -294,6 +313,7 @@ export const LawyerFormModal = ({
             </div>
           </div>
 
+          {/* Bio */}
           <div className="space-y-1.5">
             <Label>Bio</Label>
             <Textarea
@@ -303,6 +323,8 @@ export const LawyerFormModal = ({
               rows={3}
             />
           </div>
+
+          {/* Specializations */}
           <div className="space-y-1.5">
             <Label>Specializations</Label>
             <div className="flex flex-wrap gap-1.5">
@@ -331,6 +353,7 @@ export const LawyerFormModal = ({
             </div>
           </div>
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Cancel

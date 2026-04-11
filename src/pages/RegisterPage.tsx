@@ -139,17 +139,23 @@ const RegisterPage = () => {
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+91 98765 43210"
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                clearFieldError("phone");
-              }}
-              required
-            />
+            <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
+                +91
+              </span>
+              <Input
+                id="phone"
+                className="rounded-l-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                placeholder="9876543210"
+                maxLength={10}
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value.replace(/\D/g, ''));
+                  clearFieldError("phone");
+                }}
+                required
+              />
+            </div>
             {errors.phone && (
               <p className="text-xs text-destructive">{errors.phone}</p>
             )}
