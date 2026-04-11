@@ -1,4 +1,5 @@
 import { login } from '@/api-client';
+import { BrandLogo } from '@/components/BrandLogo';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getCookie, setCookie } from '@/lib/helpers';
 import { getApiErrorMessage } from '@/lib/utils';
-import { Eye, EyeOff, Scale } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -65,12 +66,7 @@ const LoginPage = () => {
     <div className="flex min-h-screen">
       {/* Left branding panel */}
       <div className="hidden flex-col justify-between bg-navy p-10 lg:flex lg:w-2/5">
-        <Link to={ROUTES.home} className="flex items-center gap-2.5">
-          <Scale className="h-6 w-6 text-gold" />
-          <span className="font-serif text-xl font-bold text-primary-foreground">
-            NyayaSetu
-          </span>
-        </Link>
+        <BrandLogo size="lg" textVariant="sidebar" />
         <div>
           <h2 className="font-serif text-3xl font-bold leading-snug text-primary-foreground">
             Your legal rights,
@@ -90,9 +86,8 @@ const LoginPage = () => {
       {/* Login form */}
       <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <Scale className="h-6 w-6 text-gold" />
-            <span className="font-serif text-xl font-bold">NyayaSetu</span>
+          <div className="mb-8 lg:hidden">
+            <BrandLogo size="lg" textVariant="header" />
           </div>
 
           <h1 className="text-2xl font-bold">Sign in to your account</h1>

@@ -1,3 +1,4 @@
+import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
 import { LAWYER_NAV, ROUTES, USER_NAV } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +11,6 @@ import {
   Menu,
   PanelLeft,
   PanelLeftClose,
-  Scale,
   X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -59,6 +59,8 @@ export const DashboardLayout = ({
     );
   };
 
+  console.log('nav[0].to', nav[0].to);
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Mobile header */}
@@ -66,10 +68,12 @@ export const DashboardLayout = ({
         <button onClick={() => setSidebarOpen(true)} className="p-1">
           <Menu className="h-5 w-5" />
         </button>
-        <Link to={ROUTES.home} className="flex items-center gap-2">
-          <Scale className="h-5 w-5 text-gold" />
-          <span className="font-serif text-lg font-bold">NyayaSetu</span>
-        </Link>
+        <BrandLogo
+          as="link"
+          to={nav[0].to}
+          size="md"
+          textVariant="headerCompact"
+        />
         {showAvatar ? (
           <img
             src={user!.avatarUrl}
@@ -109,27 +113,22 @@ export const DashboardLayout = ({
               collapsed ? 'lg:justify-center lg:px-0' : 'justify-between'
             )}
           >
-            <Link
-              to={ROUTES.home}
-              className={cn(
-                'flex items-center gap-2.5',
-                collapsed && 'lg:hidden'
-              )}
-            >
-              <Scale className="h-5 w-5 text-gold" />
-              <span className="font-serif text-lg font-bold text-primary-foreground">
-                NyayaSetu
-              </span>
-            </Link>
-            <Link
-              to={ROUTES.home}
+            <div className={cn(collapsed && 'lg:hidden')}>
+              <BrandLogo
+                as="link"
+                to={nav[0].to}
+                size="md"
+                textVariant="sidebar"
+              />
+            </div>
+            <div
               className={cn(
                 'hidden',
-                collapsed && 'items-center justify-center lg:flex'
+                collapsed && 'flex items-center justify-center lg:flex'
               )}
             >
-              <Scale className="h-5 w-5 text-gold" />
-            </Link>
+              <BrandLogo as="link" to={nav[0].to} size="md" showText={false} />
+            </div>
             <button
               className="p-1 text-primary-foreground/60 lg:hidden"
               onClick={() => setSidebarOpen(false)}
