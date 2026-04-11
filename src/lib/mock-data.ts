@@ -118,6 +118,7 @@ export const CASE_STATUS_FILTERS: { value: string; label: string }[] = [
   { value: 'under_review', label: 'Under Review' },
   { value: 'lawyer_assigned', label: 'Lawyer Assigned' },
   { value: 'closed', label: 'Closed' },
+  { value: 'rejected', label: 'Rejected' },
   { value: 'emergency', label: 'Emergency' },
 ];
 
