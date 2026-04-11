@@ -40,7 +40,7 @@ const LoginPage = () => {
       setCookie('refresh-token', data.refreshToken);
       if (data?.isAdmin) {
         setCookie('x-active-role', 'admin');
-        navigate(ROUTES.admin.dashboard);
+        return navigate(ROUTES.admin.dashboard);
       } else {
         setCookie('x-active-role', role as string);
       }

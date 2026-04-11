@@ -4,7 +4,6 @@ import {
   updateUserProfile,
   uploadAsset,
 } from '@/api-client';
-import { ROUTES } from '@/constants';
 import PasswordResetModal from '@/components/PasswordResetModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import WithShimmer from '@/components/WithShimmer';
+import { ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
