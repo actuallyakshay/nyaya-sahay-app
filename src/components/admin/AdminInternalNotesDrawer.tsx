@@ -8,22 +8,20 @@ import {
 } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { useInternalCaseNotes } from '@/hooks/useInternalCaseNotes';
-import { getCookie, getFirstLetterCapitalized } from '@/lib/helpers';
+import { getFirstLetterCapitalized } from '@/lib/helpers';
 import { Loader2, StickyNote } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { PaginationControls } from './PaginationControls';
+import { PaginationControls } from '../PaginationControls';
 
-interface InternalNotesDrawerProps {
+interface AdminInternalNotesDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const InternalNotesDrawer = ({
+export const AdminInternalNotesDrawer = ({
   open,
   onOpenChange,
-}: InternalNotesDrawerProps) => {
-  const isUser = getCookie('x-active-role') === 'user' ? true : false;
-
+}: AdminInternalNotesDrawerProps) => {
   const { id } = useParams();
 
   const {
@@ -36,7 +34,7 @@ export const InternalNotesDrawer = ({
     notes,
     totalPages,
     total,
-  } = useInternalCaseNotes(id, { variant: 'lawyer', skipFetch: isUser });
+  } = useInternalCaseNotes(id, { variant: 'admin' });
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

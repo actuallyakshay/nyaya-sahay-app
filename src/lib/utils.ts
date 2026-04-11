@@ -84,3 +84,62 @@ export const validateLoginForm = (fields: { email: string; password: string }): 
 export const getApiErrorMessage = (err: unknown, fallback = 'Something went wrong. Please try again.'): string => {
   return (err as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback;
 };
+
+/** Case / document APIs only accept these; asset upload may return jpeg, webp, etc. */
+const CASE_DOCUMENT_ASSET_TYPES = new Set([
+  'image',
+  'pdf',
+  'doc',
+  'docx',
+  'other',
+  'png',
+]);
+
+export function normalizeCaseDocumentAssetType(
+  fromUploadApi: string | undefined,
+  file: File
+): string {
+  const raw = (fromUploadApi ?? '').toLowerCase().trim();
+  if (CASE_DOCUMENT_ASSET_TYPES.has(raw)) {
+    return raw;
+  }
+  const ext = file.name.includes('.')
+    ? file.name.slice(file.name.lastIndexOf('.') + 1).toLowerCase()
+    : '';
+  const mime = (file.type ?? '').toLowerCase();
+
+  if (ext === 'png' || mime === 'image/png') {
+    return 'png';
+  }
+  if (
+    mime.startsWith('image/') ||
+    [
+      'jpg',
+      'jpeg',
+      'webp',
+      'gif',
+      'bmp',
+      'tif',
+      'tiff',
+      'svg',
+      'heic',
+      'avif',
+    ].includes(ext)
+  ) {
+    return 'image';
+  }
+  if (ext === 'pdf' || mime === 'application/pdf') {
+    return 'pdf';
+  }
+  if (ext === 'doc' || mime === 'application/msword') {
+    return 'doc';
+  }
+  if (
+    ext === 'docx' ||
+    mime ===
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ) {
+    return 'docx';
+  }
+  return 'other';
+}

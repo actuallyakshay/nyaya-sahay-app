@@ -136,6 +136,21 @@ export const updateAdminCaseStatus = (caseId, status) => {
   });
 };
 
+export const resetAdminCase = (caseId) => {
+  return apiClient({
+    method: routes.ADMIN_RESET_CASE.METHOD,
+    url: routes.ADMIN_RESET_CASE.URL.replace(':caseId', caseId),
+  });
+};
+
+export const assignAdminCaseLawyer = (caseId, lawyerId) => {
+  return apiClient({
+    method: routes.ADMIN_ASSIGN_CASE_LAWYER.METHOD,
+    url: routes.ADMIN_ASSIGN_CASE_LAWYER.URL.replace(':caseId', caseId),
+    data: { lawyerId },
+  });
+};
+
 export const updateCaseSessionRequestStatus = (sessionRequestId, status) => {
   return apiClient({
     method: routes.ADMIN_SESSION_REQUEST_STATUS.METHOD,
@@ -190,6 +205,13 @@ export const getCaseDetails = (id) => {
   return apiClient({
     method: routes.CASE_DETAILS.METHOD,
     url: routes.CASE_DETAILS.URL.replace(':id', id),
+  });
+};
+
+export const getAdminCaseById = (caseId) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_BY_ID.METHOD,
+    url: routes.ADMIN_CASE_BY_ID.URL.replace(':caseId', caseId),
   });
 };
 
@@ -316,10 +338,26 @@ export const createCaseNote = (caseId, body) => {
   });
 };
 
+export const createAdminCaseNote = (caseId, body) => {
+  return apiClient({
+    method: routes.CREATE_ADMIN_CASE_NOTE.METHOD,
+    url: routes.CREATE_ADMIN_CASE_NOTE.URL.replace(':caseId', caseId),
+    data: body,
+  });
+};
+
 export const getCaseInternalNotes = (caseId, params) => {
   return apiClient({
     method: routes.CASE_INTERNAL_NOTES.METHOD,
     url: routes.CASE_INTERNAL_NOTES.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
+export const getAdminCaseInternalNotes = (caseId, params) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_INTERNAL_NOTES.METHOD,
+    url: routes.ADMIN_CASE_INTERNAL_NOTES.URL.replace(':caseId', caseId),
     params,
   });
 };

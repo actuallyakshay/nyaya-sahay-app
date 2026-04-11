@@ -101,3 +101,6 @@ export const buildGenericQueryParams = (page: number) => {
   };
   return params;
 };
+
+/** File input `accept` for case documents: any image type + PDF/Word */
+export const CASE_DOCUMENT_ACCEPT = 'image/*,.pdf,.doc,.docx';

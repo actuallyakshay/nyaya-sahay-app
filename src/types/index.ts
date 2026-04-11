@@ -238,6 +238,29 @@ export interface CaseItem {
   createdAt: string;
 }
 
+export interface CaseMessage {
+  id: string;
+  senderRole: 'user' | 'lawyer';
+  senderName: string;
+  content: string;
+  timestamp: string;
+}
+
+/** Full case payload from GET /api/cases/:id and GET /api/admin/cases/:caseId */
+export interface CaseDetails
+  extends Omit<CaseItem, 'assignedLawyer' | 'user'> {
+  assignedLawyerId?: string | null;
+  assignedLawyer?: {
+    id?: string;
+    user: { fullName: string; avatarUrl?: string | null };
+  } | null;
+  messages?: CaseMessage[];
+  updatedAt?: string;
+  user?: { id?: string; fullName: string };
+  caseSessionRequest?: unknown;
+  priority?: 'urgent' | 'high' | 'normal' | 'low';
+}
+
 export interface Pagination {
   total: number;
   totalPages: number;

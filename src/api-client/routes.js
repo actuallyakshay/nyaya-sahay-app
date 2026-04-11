@@ -103,6 +103,14 @@ const routes = {
     URL: '/api/admin/cases/:caseId/update-status',
     METHOD: 'PATCH',
   },
+  ADMIN_RESET_CASE: {
+    URL: '/api/admin/cases/:caseId/reset-case',
+    METHOD: 'PATCH',
+  },
+  ADMIN_ASSIGN_CASE_LAWYER: {
+    URL: '/api/admin/cases/:caseId/assign-lawyer',
+    METHOD: 'PATCH',
+  },
   ADMIN_SESSION_REQUEST_STATUS: {
     URL: '/api/admin/cases/session-requests/:sessionRequestId/update-status',
     METHOD: 'PATCH',
@@ -117,6 +125,10 @@ const routes = {
   },
   ADMIN_CASES: {
     URL: '/api/admin/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_CASE_BY_ID: {
+    URL: '/api/admin/cases/:caseId',
     METHOD: 'GET',
   },
   ADMIN_USERS: {
@@ -159,8 +171,16 @@ const routes = {
     URL: '/api/cases/:caseId/notes',
     METHOD: 'POST',
   },
+  CREATE_ADMIN_CASE_NOTE: {
+    URL: '/api/admin/cases/:caseId/notes',
+    METHOD: 'POST',
+  },
   CASE_INTERNAL_NOTES: {
     URL: '/api/cases/:caseId/notes',
+    METHOD: 'GET',
+  },
+  ADMIN_CASE_INTERNAL_NOTES: {
+    URL: '/api/admin/cases/:caseId/notes',
     METHOD: 'GET',
   },
   UPLOAD_CASE_DOCUMENT: {

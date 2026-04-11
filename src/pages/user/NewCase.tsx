@@ -14,7 +14,10 @@ import {
   MAX_SIZE_MB,
 } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
-import { getApiErrorMessage } from '@/lib/utils';
+import {
+  getApiErrorMessage,
+  normalizeCaseDocumentAssetType,
+} from '@/lib/utils';
 import type { UploadedDoc } from '@/types';
 import { useMutation } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
@@ -27,7 +30,7 @@ const uploadFiles = async (files: File[]): Promise<UploadedDoc[]> => {
       const { data } = await uploadAsset(file);
       return {
         assetUrl: data.assetUrl,
-        assetType: data.assetType,
+        assetType: normalizeCaseDocumentAssetType(data.assetType, file),
         assetName: data.assetName,
       } as UploadedDoc;
     })

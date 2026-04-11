@@ -1,3 +1,4 @@
+import { CASE_DOCUMENT_ACCEPT } from '@/lib/helpers';
 import { FileText, Image, Paperclip, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
@@ -21,7 +22,7 @@ export const FileUpload = ({
   onError,
   maxFiles = 10,
   maxSizeMB = 10,
-  accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx',
+  accept = CASE_DOCUMENT_ACCEPT,
   label = 'Upload Documents',
 }: FileUploadProps) => {
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -107,7 +108,7 @@ export const FileUpload = ({
           Drag & drop or click to upload
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          PDF, JPEG, PNG, DOC — max {maxSizeMB}MB each · up to {maxFiles} files
+          Images (any), PDF, DOC — max {maxSizeMB}MB each · up to {maxFiles} files
         </p>
       </div>
 

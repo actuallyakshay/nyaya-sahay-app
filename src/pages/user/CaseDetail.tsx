@@ -1,4 +1,4 @@
-import { getCaseDetails, uploadAsset, uploadCaseDocument } from '@/api-client';
+import { getCaseDetails } from '@/api-client';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
@@ -13,13 +13,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { SessionBookingModal } from '@/components/user/SessionBookingModal';
-import { useToast } from '@/hooks/use-toast';
+import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { getCookie } from '@/lib/helpers';
-import { queryClient } from '@/lib/query-client';
-import { getApiErrorMessage } from '@/lib/utils';
+import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { LEGAL_CATEGORIES } from '@/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   Clock,
   FileText,
@@ -32,25 +30,26 @@ import {
   Video,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const CaseDetail = () => {
   const { id } = useParams();
   const activeRole = getCookie('x-active-role');
   const isLawyer = activeRole === 'lawyer' ? true : false;
   const [message, setMessage] = useState('');
-  const { toast } = useToast();
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const drawerFileInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
-  const navigate = useNavigate();
 
-  // const hasMeeting = caseData?.status === 'in_consultation';
+  const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
+    id,
+    isLawyer ? 'lawyer' : 'user'
+  );
 
-  const { data: caseData, isFetching } = useQuery({
+  const { data: caseData } = useQuery({
     queryKey: ['case-details', id],
     queryFn: async () => {
       const response = await getCaseDetails(id);
@@ -58,42 +57,6 @@ const CaseDetail = () => {
     },
     refetchOnWindowFocus: false,
   });
-
-  const { mutateAsync: uploadSingleDocument, isPending: isUploadingDocument } =
-    useMutation({
-      mutationFn: async (file: File) => {
-        if (!id) {
-          throw new Error('Case ID is missing.');
-        }
-        const { data } = await uploadAsset(file);
-        await uploadCaseDocument(id, {
-          assetUrl: data.assetUrl,
-          assetType: data.assetType,
-          assetName: data.assetName,
-          author: isLawyer ? 'lawyer' : 'user',
-        });
-      },
-    });
-
-  const uploadFromSource = async (
-    file: File,
-    source: 'Chat' | 'Documents drawer'
-  ) => {
-    try {
-      await uploadSingleDocument(file);
-      await queryClient.invalidateQueries({ queryKey: ['case-documents'] });
-      toast({
-        title: 'Document uploaded',
-        description: `${file.name} uploaded from ${source}.`,
-      });
-    } catch (err) {
-      toast({
-        title: 'Upload failed',
-        description: getApiErrorMessage(err),
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handleChatUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -282,14 +245,14 @@ const CaseDetail = () => {
             <input
               ref={chatFileInputRef}
               type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              accept={CASE_DOCUMENT_ACCEPT}
               className="hidden"
               onChange={handleChatUpload}
             />
             <input
               ref={drawerFileInputRef}
               type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              accept={CASE_DOCUMENT_ACCEPT}
               className="hidden"
               onChange={handleDrawerUpload}
             />

@@ -82,22 +82,16 @@ export const DocumentsDrawer = ({
           />
         </div>
 
-        {onUploadClick && (
-          <div className="shrink-0 pt-4">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={onUploadClick}
-            >
-              {loading ? (
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Upload className="mr-1.5 h-3.5 w-3.5" />
-              )}
-              Upload Document
-            </Button>
-          </div>
-        )}
+        <div className="shrink-0 pt-4">
+          <Button variant="outline" className="w-full" onClick={onUploadClick}>
+            {loading ? (
+              <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+            )}
+            Upload Document
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
