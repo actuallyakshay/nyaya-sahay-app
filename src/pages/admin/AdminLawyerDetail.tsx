@@ -1,16 +1,14 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
 import WithShimmer from '@/components/WithShimmer';
 import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
-import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/constants';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Award, ChevronLeft, Mail, Phone } from 'lucide-react';
+import { Award, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { buildLawyerCasesQueryParams } from '../lawyer/LawyerCases';
 
 const AdminLawyerDetail = () => {
@@ -73,13 +71,6 @@ const AdminLawyerDetail = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to={ROUTES.admin.lawyers}>
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Lawyers
-          </Link>
-        </Button>
-
         <div className="rounded-xl border bg-card p-6">
           <div className="flex items-start gap-4">
             <WithShimmer loading={isLoading} className="h-14 w-14 rounded-full">

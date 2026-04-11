@@ -1,15 +1,13 @@
 import { getAdminUserCases, getAdminUserDetails } from '@/api-client';
-import { ROUTES } from '@/constants';
-import { Button } from '@/components/ui/button';
 import { UserCasesTable } from '@/components/user/UserCasesTable';
 import WithShimmer from '@/components/WithShimmer';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Calendar, ChevronLeft, Mail, Phone } from 'lucide-react';
+import { Calendar, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { buildUserCasesQueryParams } from '../user/UserCases';
 
 const AdminUserDetail = () => {
@@ -66,13 +64,6 @@ const AdminUserDetail = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <Button variant="ghost" size="sm" asChild>
-          <Link to={ROUTES.admin.users}>
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Users
-          </Link>
-        </Button>
-
         <div className="rounded-xl border bg-card p-6">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-navy text-lg font-bold text-primary-foreground">

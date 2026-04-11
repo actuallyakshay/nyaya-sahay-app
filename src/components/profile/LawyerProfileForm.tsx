@@ -12,6 +12,7 @@ import WithShimmer from '@/components/WithShimmer';
 import { useCategories } from '@/hooks/useCategories';
 import type { ProfilePageController } from '@/hooks/useProfilePage';
 import { Camera, MapPin } from 'lucide-react';
+import { Textarea } from '../ui/textarea';
 
 interface LawyerProfileFormProps {
   profile: ProfilePageController;
@@ -149,9 +150,7 @@ export function LawyerProfileForm({ profile }: LawyerProfileFormProps) {
               <Input
                 type="date"
                 value={form.careerStartDate}
-                onChange={(e) =>
-                  patchForm({ careerStartDate: e.target.value })
-                }
+                onChange={(e) => patchForm({ careerStartDate: e.target.value })}
               />
             </WithShimmer>
           </div>
@@ -287,7 +286,7 @@ export function LawyerProfileForm({ profile }: LawyerProfileFormProps) {
         <div className="space-y-2">
           <Label>Bio</Label>
           <WithShimmer loading={isLoading} className="h-10 w-full">
-            <Input
+            <Textarea
               value={form.bio}
               onChange={(e) => patchForm({ bio: e.target.value })}
               placeholder="Tell us about yourself"
