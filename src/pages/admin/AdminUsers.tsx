@@ -1,10 +1,10 @@
 import { getAdminUsers } from '@/api-client';
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { UserFormModal } from '@/components/admin/UserFormModal';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';

@@ -35,7 +35,10 @@ const LoginPage = () => {
     try {
       setLoading(true);
       const { data } = await login({ email, password, role });
-      if (!data.status) throw new Error(data.message);
+      if (!data.status) {
+        toast({ title: 'Login', description: data.message, variant: 'destructive' });
+        return;
+      }
       setCookie('access-token', data.accessToken);
       setCookie('refresh-token', data.refreshToken);
       if (data?.isAdmin) {
@@ -47,6 +50,7 @@ const LoginPage = () => {
       toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
       navigate(dashboardForRole(role));
     } catch (e) {
+      console.log('object', e);
       toast({
         title: 'Login failed',
         description: getApiErrorMessage(e),

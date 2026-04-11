@@ -2,10 +2,11 @@ import { getCaseDetails } from '@/api-client';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
+import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
   TooltipContent,
@@ -48,7 +49,7 @@ const CaseDetail = () => {
     isLawyer ? 'lawyer' : 'user'
   );
 
-  const { data: caseData } = useQuery({
+  const { data: caseData, isLoading } = useQuery({
     queryKey: ['case-details', id],
     queryFn: async () => {
       const response = await getCaseDetails(id);
@@ -72,6 +73,14 @@ const CaseDetail = () => {
   };
 
   const isLawyerAssigned = caseData?.assignedLawyerId;
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <CaseDetailSkeleton />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -235,11 +244,12 @@ const CaseDetail = () => {
             )}
           </div>
           <div className="flex shrink-0 gap-2 border-t p-3">
-            <Input
+            <Textarea
               placeholder="Type a message..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="flex-1"
+              className="max-h-[120px] min-h-[40px] flex-1 resize-none"
+              rows={1}
             />
             <input
               ref={chatFileInputRef}
