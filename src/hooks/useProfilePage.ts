@@ -258,10 +258,11 @@ export function useProfilePage() {
 
   const handleSaveChanges = useCallback(
     (isLawyer: boolean) => {
-      const { fullName, phone } = form;
-      updateProfileMutation.mutate({ fullName, phone });
       if (isLawyer) {
         updateLawyerMutation.mutate(buildLawyerUpdatePayload(form));
+      } else {
+        const { fullName, phone } = form;
+        updateProfileMutation.mutate({ fullName, phone });
       }
     },
     [form, updateLawyerMutation, updateProfileMutation]

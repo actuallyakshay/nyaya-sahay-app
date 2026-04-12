@@ -1,11 +1,43 @@
 import { getLawyersList } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
 import WithShimmer from '@/components/WithShimmer';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useIsTruncated } from '@/hooks/useIsTruncated';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import { Award, Briefcase, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+
+const LawyerBio = ({ bio }: { bio?: string }) => {
+  const { ref, isTruncated } = useIsTruncated<HTMLParagraphElement>();
+
+  if (!bio) return null;
+
+  const bioElement = (
+    <p ref={ref} className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+      {bio}
+    </p>
+  );
+
+  if (!isTruncated) return bioElement;
+
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>{bioElement}</TooltipTrigger>
+        <TooltipContent className="max-w-xs whitespace-pre-wrap bg-black text-white text-xs">
+          {bio}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const LawyersDirectory = () => {
   const [page, setPage] = useState(1);
@@ -154,9 +186,7 @@ const LawyersDirectory = () => {
                     </span>
                   )}
                 </div>
-                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                  {l?.bio}
-                </p>
+                <LawyerBio bio={l?.bio} />
               </div>
             ))
           )}
