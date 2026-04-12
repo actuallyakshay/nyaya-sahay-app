@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
-import {
-  splitWords,
-  truncateToWords,
-} from '@/lib/caseDescriptionPreview';
+import { splitWords, truncateToWords } from '@/lib/caseDescriptionPreview';
 import { PAGE_SIZE } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
 import { CaseStatus, CasesResponse, LEGAL_CATEGORIES } from '@/types';
@@ -109,7 +106,7 @@ const AdminCaseRequests = () => {
 
         {isFetching && <CaseCardSkeleton />}
 
-        {!isFetching && cases.length === 0 ? (
+        {!isFetching && cases?.length === 0 ? (
           <div className="rounded-xl border bg-card p-12 text-center">
             <p className="text-muted-foreground">
               No new case requests at the moment.
@@ -118,7 +115,7 @@ const AdminCaseRequests = () => {
         ) : (
           <div className="space-y-3">
             {!isFetching &&
-              cases.map((c) => {
+              cases?.map((c) => {
                 const isAcceptLoading =
                   loading.caseId === c.id && loading.action === 'accept';
                 const isRejectLoading =
@@ -143,7 +140,9 @@ const AdminCaseRequests = () => {
                             {c.isEmergency ? 'Emergency' : 'Normal Priority'}
                           </span>
                         </div>
-                        <h3 className="font-semibold">{c.title}</h3>
+                        <h3 className="line-clamp-2 min-w-0 break-words font-semibold">
+                          {c.title}
+                        </h3>
                         {c.description?.trim() &&
                         splitWords(c.description).length > 50 ? (
                           <button

@@ -169,14 +169,14 @@ const UserDashboard = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {activeCases.map((c) => (
+              {activeCases?.map((c) => (
                 <Link
                   key={c.id}
                   to={path.caseDetail(c.id)}
                   className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-xs text-muted-foreground">
                           {c.caseCode}
@@ -188,7 +188,9 @@ const UserDashboard = () => {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 truncate font-medium">{c.title}</p>
+                      <p className="mt-1 min-w-0 line-clamp-2 break-words font-medium">
+                        {c.title}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {c.practiceArea?.name}
                       </p>

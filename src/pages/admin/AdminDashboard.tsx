@@ -130,13 +130,17 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-4 py-3">{c.user?.fullName || '-'}</td>
                     <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                      {c.title}
+                      <p className="line-clamp-2 min-w-0 break-words font-medium">
+                        {c.title}
+                      </p>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={c.status} />
                     </td>
                     <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                      {c.description?.slice(0, 50)}...
+                      <p className="line-clamp-2 min-w-0 break-words text-xs">
+                        {c.description?.slice(0, 50)}...
+                      </p>
                     </td>
                   </tr>
                 ))}

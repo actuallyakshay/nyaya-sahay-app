@@ -1,8 +1,8 @@
 import { getLawyerAnalytics } from '@/api-client';
-import { path, ROUTES } from '@/constants';
 import { SkeletonCard } from '@/components/SkeletonCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
+import { path, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
@@ -110,14 +110,14 @@ const LawyerDashboard = () => {
                 <p className="text-muted-foreground">No assigned cases yet.</p>
               </div>
             ) : (
-              assignedCases.map((c) => (
+              assignedCases?.map((c) => (
                 <Link
                   key={c.id}
                   to={path.caseDetail(c.id)}
                   className="block rounded-xl border bg-card p-4 transition-shadow hover:shadow-md"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-xs text-muted-foreground">
                           {c.caseCode}
@@ -130,7 +130,9 @@ const LawyerDashboard = () => {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 font-medium">{c.title}</p>
+                      <p className="mt-1 line-clamp-2 min-w-0 break-words font-medium">
+                        {c.title}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {c?.user?.fullName} • {c.practiceArea?.name}
                       </p>
