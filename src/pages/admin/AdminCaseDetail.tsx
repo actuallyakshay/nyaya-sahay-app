@@ -27,11 +27,7 @@ import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { AdminLayout } from '@/layouts/AdminLayout';
-import {
-  DESCRIPTION_PREVIEW_MAX_WORDS,
-  splitWords,
-  truncateToWords,
-} from '@/lib/caseDescriptionPreview';
+import { DESCRIPTION_PREVIEW_MAX_WORDS, splitWords, truncateToWords } from '@/lib/caseDescriptionPreview';
 import { CASE_DOCUMENT_ACCEPT } from '@/lib/helpers';
 import {
   AlertTriangle,

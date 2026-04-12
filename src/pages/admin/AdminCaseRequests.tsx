@@ -1,4 +1,5 @@
 import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
+import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { PaginationControls } from '@/components/PaginationControls';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
@@ -6,6 +7,10 @@ import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import {
+  splitWords,
+  truncateToWords,
+} from '@/lib/caseDescriptionPreview';
 import { PAGE_SIZE } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
 import { CaseStatus, CasesResponse, LEGAL_CATEGORIES } from '@/types';
@@ -35,6 +40,11 @@ const AdminCaseRequests = () => {
     caseId: null,
     action: null,
   });
+  const [descriptionModal, setDescriptionModal] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+  }>({ open: false, title: '', description: '' });
 
   const { data, isFetching } = useQuery<CasesResponse>({
     queryKey: ['case-requests', page],
@@ -134,9 +144,31 @@ const AdminCaseRequests = () => {
                           </span>
                         </div>
                         <h3 className="font-semibold">{c.title}</h3>
-                        <p className="mt-0.5 text-sm text-muted-foreground">
-                          {c.description}
-                        </p>
+                        {c.description?.trim() &&
+                        splitWords(c.description).length > 50 ? (
+                          <button
+                            type="button"
+                            className="group mt-0.5 w-full rounded-md text-left text-sm leading-relaxed text-foreground/90 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            onClick={() =>
+                              setDescriptionModal({
+                                open: true,
+                                title: c.title,
+                                description: c.description!,
+                              })
+                            }
+                          >
+                            <span className="block whitespace-pre-wrap">
+                              {truncateToWords(c.description, 50)}
+                            </span>
+                            <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold">
+                              Show full description
+                            </span>
+                          </button>
+                        ) : (
+                          <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                            {c.description}
+                          </p>
+                        )}
                         <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
                           <span>
                             By:{' '}
@@ -207,6 +239,15 @@ const AdminCaseRequests = () => {
           </div>
         )}
       </div>
+
+      <CaseDescriptionModal
+        open={descriptionModal.open}
+        onOpenChange={(open) =>
+          setDescriptionModal((prev) => ({ ...prev, open }))
+        }
+        caseTitle={descriptionModal.title}
+        description={descriptionModal.description}
+      />
     </AdminLayout>
   );
 };
