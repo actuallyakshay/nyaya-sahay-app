@@ -3,6 +3,7 @@ import {
   logout as logoutApi,
 } from '@/api-client';
 import { getCookie, removeCookie, resetCookies } from '@/lib/helpers';
+import { queryClient } from '@/lib/query-client';
 import type { AuthUser, UserRole } from '@/types';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
@@ -68,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     setUser(null);
     clearStoredUser();
+    queryClient.clear();
     setIsLoading(false);
   }, []);
 
