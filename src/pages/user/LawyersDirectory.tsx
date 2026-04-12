@@ -1,4 +1,5 @@
 import { getLawyersList } from '@/api-client';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
 import WithShimmer from '@/components/WithShimmer';
 import {
@@ -31,7 +32,7 @@ const LawyerBio = ({ bio }: { bio?: string }) => {
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>{bioElement}</TooltipTrigger>
-        <TooltipContent className="max-w-xs whitespace-pre-wrap bg-black text-white text-xs">
+        <TooltipContent className="max-w-xs whitespace-pre-wrap bg-black text-xs text-white">
           {bio}
         </TooltipContent>
       </Tooltip>
@@ -186,7 +187,7 @@ const LawyersDirectory = () => {
                     </span>
                   )}
                 </div>
-                <LawyerBio bio={l?.bio} />
+                <GenericTooltip content={l?.bio} />
               </div>
             ))
           )}
