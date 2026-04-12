@@ -20,7 +20,7 @@ export const GenericTooltip = ({
         <TooltipTrigger asChild>
           <p
             className={cn(
-              'mt-2 line-clamp-2 text-xs text-muted-foreground',
+              'mt-2 line-clamp-2 cursor-pointer text-xs text-muted-foreground',
               className
             )}
           >

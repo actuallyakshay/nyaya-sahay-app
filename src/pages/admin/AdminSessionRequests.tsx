@@ -2,10 +2,10 @@ import {
   getAdminSessionRequests,
   updateCaseSessionRequestStatus,
 } from '@/api-client';
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
+import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { getFirstLetterCapitalized } from '@/lib/helpers';
@@ -181,7 +181,12 @@ const AdminSessionRequests = () => {
                         </div>
                       </div>
                       <div className="flex shrink-0 gap-2">
-                        <Button variant="outline" size="sm" asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          disabled={isDisabled}
+                        >
                           <Link to={path.adminCase(req?.case?.id ?? '')}>
                             <Eye className="mr-1.5 h-3.5 w-3.5" />
                             View Case
