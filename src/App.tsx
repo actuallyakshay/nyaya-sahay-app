@@ -27,6 +27,7 @@ import UpcomingSessions from "./pages/user/UpcomingSessions";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
+import LawyerProfile from "./pages/lawyer/LawyerProfile";
 
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
