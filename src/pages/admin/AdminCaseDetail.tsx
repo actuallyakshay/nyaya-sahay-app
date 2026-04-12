@@ -27,8 +27,14 @@ import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { AdminLayout } from '@/layouts/AdminLayout';
-import { DESCRIPTION_PREVIEW_MAX_WORDS, splitWords, truncateToWords } from '@/lib/caseDescriptionPreview';
+import {
+  DESCRIPTION_PREVIEW_MAX_WORDS,
+  splitWords,
+  truncateToWords,
+} from '@/lib/caseDescriptionPreview';
 import { CASE_DOCUMENT_ACCEPT } from '@/lib/helpers';
+import { queryClient } from '@/lib/query-client';
+import { QueryKey } from '@tanstack/react-query';
 import {
   AlertTriangle,
   CalendarDays,
@@ -79,6 +85,7 @@ const AdminCaseDetail = () => {
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const drawerFileInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
+  const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
 
   const rawDescription = caseData?.description?.trim() ?? '';
   const descriptionIsLong = useMemo(() => {
@@ -132,6 +139,7 @@ const AdminCaseDetail = () => {
     e.target.value = '';
     if (!file) return;
     await uploadFromSource(file, 'Documents drawer');
+    await queryClient.invalidateQueries({ queryKey });
   };
 
   const priorityKey = (caseData?.priority ??
@@ -511,9 +519,10 @@ const AdminCaseDetail = () => {
         caseClientName={caseData?.user?.fullName}
         caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
         loading={isUploadingDocument}
-        onUploadClick={() => {
+        onUploadClick={(queryKey) => {
           if (isUploadingDocument) return;
           drawerFileInputRef.current?.click();
+          setQueryKey(queryKey);
         }}
       />
       <TimelineDrawer
