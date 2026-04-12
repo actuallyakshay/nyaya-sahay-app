@@ -39,10 +39,6 @@ function GoogleGMark({ className }: { className?: string }) {
   );
 }
 
-/**
- * Shared look for Google sign-in (loading + decorative layer).
- * Hover matches homepage trust pill / CTAs: gold border + soft gold wash (see Index hero).
- */
 const googleSignInChrome =
   'flex h-10 w-full items-center justify-center gap-3 rounded-full border border-border bg-card text-sm font-medium text-muted-foreground shadow-sm transition-colors group-hover:border-gold/40 group-hover:bg-gold/10 group-hover:text-foreground';
 
@@ -68,8 +64,6 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
     try {
       const data = await googleLogin(idToken, role);
       if (!data.status) throw new Error(data.message);
-      setCookie('access-token', data.accessToken);
-      setCookie('refresh-token', data.refreshToken);
       if (data?.isAdmin) {
         setCookie('x-active-role', 'admin');
         return navigate(ROUTES.admin.dashboard);

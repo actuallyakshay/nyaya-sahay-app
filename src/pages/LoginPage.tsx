@@ -4,7 +4,7 @@ import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { dashboardForRole, ROUTES } from '@/constants';
+import { ROUTES, dashboardForRole } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getCookie, setCookie } from '@/lib/helpers';
@@ -26,7 +26,7 @@ const LoginPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (authUser) {
+    if (authUser || activeRole) {
       navigate(dashboardForRole(activeRole));
     }
   }, [user, navigate, activeRole, authUser]);
@@ -44,8 +44,6 @@ const LoginPage = () => {
         });
         return;
       }
-      setCookie('access-token', data.accessToken);
-      setCookie('refresh-token', data.refreshToken);
       if (data?.isAdmin) {
         setCookie('x-active-role', 'admin');
         return navigate(ROUTES.admin.dashboard);
@@ -55,7 +53,6 @@ const LoginPage = () => {
       toast({ title: 'Welcome back!', description: `Logged in as ${role}.` });
       navigate(dashboardForRole(role));
     } catch (e) {
-      console.log('object', e);
       toast({
         title: 'Login failed',
         description: getApiErrorMessage(e),
