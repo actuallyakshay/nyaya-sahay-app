@@ -27,6 +27,7 @@ import UpcomingSessions from "./pages/user/UpcomingSessions";
 
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
+import LawyerProfile from "./pages/lawyer/LawyerProfile";
 
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -80,7 +81,7 @@ const App = () => (
             <Route path="/lawyer/cases" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerCases /></ProtectedRoute>} />
             <Route path="/lawyer/cases/:id" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseDetail /></ProtectedRoute>} />
             <Route path="/lawyer/sessions" element={<ProtectedRoute allowedRoles={['lawyer']}><UpcomingSessions /></ProtectedRoute>} />
-            <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><UserProfile /></ProtectedRoute>} />
+            <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerProfile /></ProtectedRoute>} />
 
             {/* Admin */}
             <Route path="/admin/login" element={<AdminLoginPage />} />

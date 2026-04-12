@@ -11,6 +11,22 @@ export interface User {
   isActive: boolean;
 }
 
+export type DocumentVerificationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface LawyerDocument {
+  id: string;
+  name: string;
+  type: 'law_degree' | 'bar_council' | 'additional';
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  uploadedAt: string;
+  status: DocumentVerificationStatus;
+  rejectionReason?: string;
+  label: string;
+  mandatory: boolean;
+}
+
 export interface Lawyer {
   id: string;
   name: string;
@@ -27,6 +43,19 @@ export interface Lawyer {
   rating: number;
   casesHandled: number;
   createdAt: string;
+  // New fields
+  firm?: string;
+  languages: string[];
+  consultationFee?: number;
+  city: string;
+  state: string;
+  gender?: string;
+  dateOfBirth?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  pincode?: string;
+  careerStartedFrom?: string;
+  documents: LawyerDocument[];
 }
 
 export type LegalCategory =
