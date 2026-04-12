@@ -26,7 +26,6 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout>
-      Heyy Heyy hey
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">Admin Dashboard</h1>
