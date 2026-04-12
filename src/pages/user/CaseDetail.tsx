@@ -24,7 +24,8 @@ import {
   truncateToWords,
 } from '@/lib/caseDescriptionPreview';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
-import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '@/lib/query-client';
+import { QueryKey, useQuery } from '@tanstack/react-query';
 import {
   Clock,
   FileText,
@@ -51,7 +52,7 @@ const CaseDetail = () => {
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
-
+  const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
   const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
     id,
     isLawyer ? 'lawyer' : 'user'
@@ -91,6 +92,7 @@ const CaseDetail = () => {
     e.target.value = '';
     if (!file) return;
     await uploadFromSource(file, 'Documents drawer');
+    await queryClient.invalidateQueries({ queryKey });
   };
 
   const isLawyerAssigned = caseData?.assignedLawyerId;
@@ -344,10 +346,12 @@ const CaseDetail = () => {
         open={docsDrawerOpen}
         caseClientName={caseData?.user?.fullName}
         caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
+        caseStatus={caseData?.status}
         onOpenChange={setDocsDrawerOpen}
-        onUploadClick={() => {
+        onUploadClick={(queryKey) => {
           if (isUploadingDocument) return;
           drawerFileInputRef.current?.click();
+          setQueryKey(queryKey);
         }}
         loading={isUploadingDocument}
       />

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { buildGenericQueryParams } from '@/lib/helpers';
 import { CaseStatus } from '@/types';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, QueryKey, useQuery } from '@tanstack/react-query';
 import { Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -19,7 +19,7 @@ import { PaginationControls } from './PaginationControls';
 interface DocumentsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUploadClick?: () => void;
+  onUploadClick?: (queryKey: QueryKey) => void;
   caseClientName?: string;
   caseLawyerName?: string;
   loading?: boolean;
@@ -99,7 +99,9 @@ export const DocumentsDrawer = ({
           <Button
             variant="outline"
             className="w-full"
-            onClick={onUploadClick}
+            onClick={() => {
+              if (onUploadClick) onUploadClick(queryKey);
+            }}
             disabled={loading || isCaseClosed}
           >
             {loading ? (
