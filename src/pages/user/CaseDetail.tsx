@@ -344,6 +344,7 @@ const CaseDetail = () => {
         open={docsDrawerOpen}
         caseClientName={caseData?.user?.fullName}
         caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
+        caseStatus={caseData?.status}
         onOpenChange={setDocsDrawerOpen}
         onUploadClick={() => {
           if (isUploadingDocument) return;
