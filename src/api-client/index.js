@@ -25,6 +25,22 @@ export const adminLogin = (body) => {
   });
 };
 
+export const adminLoginVerifyOtp = (body) => {
+  return apiClient({
+    method: routes.ADMIN_LOGIN_VERIFY_OTP.METHOD,
+    url: routes.ADMIN_LOGIN_VERIFY_OTP.URL,
+    data: body,
+  });
+};
+
+export const adminLoginResendOtp = (body) => {
+  return apiClient({
+    method: routes.ADMIN_LOGIN_RESEND_OTP.METHOD,
+    url: routes.ADMIN_LOGIN_RESEND_OTP.URL,
+    data: body,
+  });
+};
+
 export const refreshAuthToken = () => {
   return apiClient({
     method: routes.REFRESH_TOKEN.METHOD,

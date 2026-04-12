@@ -13,6 +13,8 @@ const skipAccessTokenPaths = new Set([
   routes.GOOGLE_AUTH_LOGIN.URL,
   routes.LOGIN.URL,
   routes.ADMIN_LOGIN.URL,
+  routes.ADMIN_LOGIN_VERIFY_OTP.URL,
+  routes.ADMIN_LOGIN_RESEND_OTP.URL,
 ]);
 
 // --- Axios instance ---

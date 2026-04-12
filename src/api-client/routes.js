@@ -11,6 +11,14 @@ const routes = {
     URL: '/api/auth/admin/login',
     METHOD: 'POST',
   },
+  ADMIN_LOGIN_VERIFY_OTP: {
+    URL: '/api/auth/admin/login/verify-otp',
+    METHOD: 'POST',
+  },
+  ADMIN_LOGIN_RESEND_OTP: {
+    URL: '/api/auth/admin/login/resend-otp',
+    METHOD: 'POST',
+  },
   REFRESH_TOKEN: {
     URL: '/api/auth/refresh',
     METHOD: 'POST',
