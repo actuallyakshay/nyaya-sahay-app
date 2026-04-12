@@ -74,6 +74,22 @@ export const mockLawyers: Lawyer[] = [
     rating: 4.8,
     casesHandled: 214,
     createdAt: '2023-01-10',
+    firm: 'Sharma & Associates',
+    languages: ['Hindi', 'English', 'Punjabi'],
+    consultationFee: 1500,
+    city: 'New Delhi',
+    state: 'Delhi',
+    gender: 'Female',
+    dateOfBirth: '1990-03-15',
+    addressLine1: '45, Connaught Place',
+    addressLine2: 'Near District Court',
+    pincode: '110001',
+    careerStartedFrom: '2015-07-01',
+    documents: [
+      { id: 'doc1', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLB_Certificate_Priya.pdf', fileType: 'pdf', fileSize: 520000, uploadedAt: '2023-01-10', status: 'approved', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc2', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_ID_Priya.pdf', fileType: 'pdf', fileSize: 340000, uploadedAt: '2023-01-10', status: 'approved', label: 'Bar Council Certificate', mandatory: true },
+      { id: 'doc3', name: 'Mediation Certificate', type: 'additional', fileName: 'Mediation_Cert.pdf', fileType: 'pdf', fileSize: 180000, uploadedAt: '2023-02-15', status: 'approved', label: 'Mediation Training Certificate', mandatory: false },
+    ],
   },
   {
     id: 'l2',
@@ -90,6 +106,15 @@ export const mockLawyers: Lawyer[] = [
     rating: 4.9,
     casesHandled: 347,
     createdAt: '2022-06-20',
+    firm: 'Desai Legal Chambers',
+    languages: ['Hindi', 'English', 'Marathi'],
+    consultationFee: 2500,
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    documents: [
+      { id: 'doc4', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLM_Certificate_Vikram.pdf', fileType: 'pdf', fileSize: 490000, uploadedAt: '2022-06-20', status: 'approved', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc5', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_ID_Vikram.pdf', fileType: 'pdf', fileSize: 310000, uploadedAt: '2022-06-20', status: 'approved', label: 'Bar Council Certificate', mandatory: true },
+    ],
   },
   {
     id: 'l3',
@@ -106,6 +131,13 @@ export const mockLawyers: Lawyer[] = [
     rating: 4.7,
     casesHandled: 156,
     createdAt: '2023-03-15',
+    languages: ['English', 'Hindi', 'Kannada'],
+    city: 'Bangalore',
+    state: 'Karnataka',
+    documents: [
+      { id: 'doc6', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'BALLB_Ananya.pdf', fileType: 'pdf', fileSize: 600000, uploadedAt: '2023-03-15', status: 'approved', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc7', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_Ananya.pdf', fileType: 'pdf', fileSize: 280000, uploadedAt: '2023-03-15', status: 'approved', label: 'Bar Council Certificate', mandatory: true },
+    ],
   },
   {
     id: 'l4',
@@ -122,6 +154,13 @@ export const mockLawyers: Lawyer[] = [
     rating: 0,
     casesHandled: 0,
     createdAt: '2024-11-01',
+    languages: ['Hindi', 'English'],
+    city: 'Lucknow',
+    state: 'Uttar Pradesh',
+    documents: [
+      { id: 'doc8', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLB_Neha.pdf', fileType: 'pdf', fileSize: 450000, uploadedAt: '2024-11-01', status: 'pending', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc9', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_Neha.jpg', fileType: 'jpg', fileSize: 1200000, uploadedAt: '2024-11-01', status: 'rejected', rejectionReason: 'Image is blurry, please re-upload a clear scan.', label: 'Bar Council Certificate', mandatory: true },
+    ],
   },
   {
     id: 'l5',
@@ -138,6 +177,10 @@ export const mockLawyers: Lawyer[] = [
     rating: 0,
     casesHandled: 0,
     createdAt: '2024-11-05',
+    languages: ['Hindi', 'English', 'Gujarati'],
+    city: 'Ahmedabad',
+    state: 'Gujarat',
+    documents: [],
   },
   {
     id: 'l6',
@@ -154,6 +197,13 @@ export const mockLawyers: Lawyer[] = [
     rating: 4.6,
     casesHandled: 189,
     createdAt: '2023-05-20',
+    languages: ['English', 'Hindi', 'Tamil'],
+    city: 'Chennai',
+    state: 'Tamil Nadu',
+    documents: [
+      { id: 'doc10', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLM_Kavita.pdf', fileType: 'pdf', fileSize: 510000, uploadedAt: '2023-05-20', status: 'approved', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc11', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_Kavita.pdf', fileType: 'pdf', fileSize: 290000, uploadedAt: '2023-05-20', status: 'approved', label: 'Bar Council Certificate', mandatory: true },
+    ],
   },
   {
     id: 'l7',
@@ -170,6 +220,14 @@ export const mockLawyers: Lawyer[] = [
     rating: 4.5,
     casesHandled: 231,
     createdAt: '2023-02-10',
+    firm: 'Patil & Partners',
+    languages: ['Hindi', 'English', 'Marathi'],
+    city: 'Pune',
+    state: 'Maharashtra',
+    documents: [
+      { id: 'doc12', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLB_Sanjay.pdf', fileType: 'pdf', fileSize: 480000, uploadedAt: '2023-02-10', status: 'approved', label: 'Law Degree Certificate', mandatory: true },
+      { id: 'doc13', name: 'Bar Council Certificate', type: 'bar_council', fileName: 'Bar_Council_Sanjay.pdf', fileType: 'pdf', fileSize: 350000, uploadedAt: '2023-02-10', status: 'approved', label: 'Bar Council Certificate', mandatory: true },
+    ],
   },
   {
     id: 'l8',
@@ -186,6 +244,12 @@ export const mockLawyers: Lawyer[] = [
     rating: 0,
     casesHandled: 0,
     createdAt: '2024-12-01',
+    languages: ['English', 'Hindi', 'Malayalam'],
+    city: 'Kochi',
+    state: 'Kerala',
+    documents: [
+      { id: 'doc14', name: 'Law Degree Certificate', type: 'law_degree', fileName: 'LLB_Deepa.pdf', fileType: 'pdf', fileSize: 430000, uploadedAt: '2024-12-01', status: 'pending', label: 'Law Degree Certificate', mandatory: true },
+    ],
   },
 ];
 
