@@ -32,7 +32,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               <Link to={ROUTES.login}>Log In</Link>
             </Button>
             <Button asChild>
-              <Link to={ROUTES.register}>Get Started</Link>
+              <Link to={ROUTES.login}>Get Started</Link>
             </Button>
           </div>
 
@@ -108,7 +108,10 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   </Link>
                 </li>
                 <li>
-                  <Link to={ROUTES.faq} className="hover:text-primary-foreground">
+                  <Link
+                    to={ROUTES.faq}
+                    className="hover:text-primary-foreground"
+                  >
                     FAQ
                   </Link>
                 </li>
@@ -145,8 +148,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
           <div className="mt-8 border-t border-primary-foreground/10 pt-6 text-center text-xs text-primary-foreground/50">
             © {new Date().getFullYear()} Samvidhan Legal Advisory. All rights
-            reserved. An
-            initiative towards accessible legal aid in India.
+            reserved. An initiative towards accessible legal aid in India.
           </div>
         </div>
       </footer>
