@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
 interface PasswordResetModalProps {
@@ -24,6 +25,7 @@ const PasswordResetModal = ({
 }: PasswordResetModalProps) => {
   const { toast } = useToast();
   const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Reset password mutation
   const resetPasswordMutation = useMutation({
@@ -82,14 +84,27 @@ const PasswordResetModal = ({
         <div className="space-y-4 pt-2">
           <div className="space-y-2">
             <Label htmlFor="newPassword">New Password</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              disabled={resetPasswordMutation.isPending}
-            />
+            <div className="relative">
+              <Input
+                id="newPassword"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={resetPasswordMutation.isPending}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button
