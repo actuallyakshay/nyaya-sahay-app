@@ -37,6 +37,7 @@ import AdminLawyers from "./pages/admin/AdminLawyers";
 import AdminLawyerDetail from "./pages/admin/AdminLawyerDetail";
 import AdminCases from "./pages/admin/AdminCases";
 import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
+import CaseChat from "./pages/shared/CaseChat";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
