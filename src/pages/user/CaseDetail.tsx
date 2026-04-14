@@ -3,7 +3,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { mockCases } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/StatusBadge';
 import { LEGAL_CATEGORIES } from '@/types';
-import { Send, User, Scale, Upload, Video, Phone, Calendar, ExternalLink, StickyNote, FileText, Clock } from 'lucide-react';
+import { Send, User, Scale, Video, Phone, Calendar, ExternalLink, StickyNote, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -163,35 +163,22 @@ const CaseDetail = () => {
           </div>
         )}
 
-        {/* Chat — full width now */}
-        <div className="rounded-xl border bg-card flex flex-col" style={{ height: '600px' }}>
-          <div className="border-b p-3 shrink-0 flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Case Communication</h3>
-            <span className="text-xs text-muted-foreground">{caseData.messages.length} messages</span>
+        {/* Chat link */}
+        <Link
+          to={`${isLawyer ? '/lawyer' : '/app'}/cases/${id}/chat`}
+          className="rounded-xl border bg-card p-4 flex items-center justify-between hover:bg-muted/50 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-navy/10 flex items-center justify-center">
+              <Send className="h-4 w-4 text-navy" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold">Case Communication</h3>
+              <p className="text-xs text-muted-foreground">{caseData.messages.length} messages</p>
+            </div>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {caseData.messages.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">No messages yet. Start the conversation.</p>
-            ) : caseData.messages.map((m) => (
-              <div key={m.id} className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}>
-                <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}>
-                  {m.senderRole === 'lawyer' ? <Scale className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
-                </div>
-                <div className={`max-w-[75%] rounded-xl px-4 py-2.5 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}>
-                  <p className="mb-0.5 text-xs font-medium opacity-70">{m.senderName}</p>
-                  <p>{m.content}</p>
-                  <p className="mt-1 text-[10px] opacity-50">{new Date(m.timestamp).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="border-t p-3 flex gap-2 shrink-0">
-            <Input placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} className="flex-1" />
-            <input ref={fileInputRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden" onChange={handleUpload} />
-            <Button size="icon" variant="ghost" onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4" /></Button>
-            <Button size="icon"><Send className="h-4 w-4" /></Button>
-          </div>
-        </div>
+          <span className="text-xs text-primary font-medium group-hover:underline">Open Chat →</span>
+        </Link>
       </div>
 
       {/* Booking dialog */}

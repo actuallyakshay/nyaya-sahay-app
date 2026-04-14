@@ -182,28 +182,22 @@ const AdminCaseDetail = () => {
           <p className="text-sm leading-relaxed text-foreground/90">{caseData.description}</p>
         </div>
 
-        {/* Full-width message box */}
-        <div className="rounded-xl border bg-card flex flex-col" style={{ height: 'calc(100vh - 420px)', minHeight: '360px' }}>
-          <div className="border-b px-4 py-2.5 flex items-center justify-between bg-muted/20">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Messages</h3>
-            <span className="text-[11px] text-muted-foreground">{caseData.messages.length} messages</span>
+        {/* Chat link */}
+        <Link
+          to={`/admin/cases/${id}/chat`}
+          className="rounded-xl border bg-card p-4 flex items-center justify-between hover:bg-muted/50 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-navy/10 flex items-center justify-center">
+              <Scale className="h-4 w-4 text-navy" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold">Case Messages</h3>
+              <p className="text-xs text-muted-foreground">{caseData.messages.length} messages</p>
+            </div>
           </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {caseData.messages.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">No messages yet.</p>
-            ) : caseData.messages.map((m) => (
-              <div key={m.id} className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}>
-                <div className={`h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}>
-                  {m.senderRole === 'lawyer' ? <Scale className="h-3 w-3" /> : <User className="h-3 w-3" />}
-                </div>
-                <div className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}>
-                  <p className="mb-0.5 text-[11px] font-medium opacity-60">{m.senderName}</p>
-                  <p className="text-[13px] leading-relaxed">{m.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <span className="text-xs text-primary font-medium group-hover:underline">View Chat →</span>
+        </Link>
       </div>
 
       {/* Dialogs & Drawers */}

@@ -37,6 +37,7 @@ import AdminLawyers from "./pages/admin/AdminLawyers";
 import AdminLawyerDetail from "./pages/admin/AdminLawyerDetail";
 import AdminCases from "./pages/admin/AdminCases";
 import AdminCaseDetail from "./pages/admin/AdminCaseDetail";
+import CaseChat from "./pages/shared/CaseChat";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -69,6 +70,7 @@ const App = () => (
             <Route path="/app/dashboard" element={<ProtectedRoute allowedRoles={['user']}><UserDashboard /></ProtectedRoute>} />
             <Route path="/app/cases" element={<ProtectedRoute allowedRoles={['user']}><UserCases /></ProtectedRoute>} />
             <Route path="/app/cases/:id" element={<ProtectedRoute allowedRoles={['user']}><CaseDetail /></ProtectedRoute>} />
+            <Route path="/app/cases/:id/chat" element={<ProtectedRoute allowedRoles={['user']}><CaseChat /></ProtectedRoute>} />
             <Route path="/app/new-case" element={<ProtectedRoute allowedRoles={['user']}><NewCase /></ProtectedRoute>} />
             <Route path="/app/subscription" element={<ProtectedRoute allowedRoles={['user']}><UserSubscription /></ProtectedRoute>} />
             <Route path="/app/sessions" element={<ProtectedRoute allowedRoles={['user']}><UpcomingSessions /></ProtectedRoute>} />
@@ -80,6 +82,7 @@ const App = () => (
             <Route path="/lawyer/dashboard" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} />
             <Route path="/lawyer/cases" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerCases /></ProtectedRoute>} />
             <Route path="/lawyer/cases/:id" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseDetail /></ProtectedRoute>} />
+            <Route path="/lawyer/cases/:id/chat" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseChat /></ProtectedRoute>} />
             <Route path="/lawyer/sessions" element={<ProtectedRoute allowedRoles={['lawyer']}><UpcomingSessions /></ProtectedRoute>} />
             <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerProfile /></ProtectedRoute>} />
 
@@ -95,6 +98,7 @@ const App = () => (
             <Route path="/admin/lawyers/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminLawyerDetail /></ProtectedRoute>} />
             <Route path="/admin/cases" element={<ProtectedRoute allowedRoles={['admin']}><AdminCases /></ProtectedRoute>} />
             <Route path="/admin/cases/:id" element={<ProtectedRoute allowedRoles={['admin']}><AdminCaseDetail /></ProtectedRoute>} />
+            <Route path="/admin/cases/:id/chat" element={<ProtectedRoute allowedRoles={['admin']}><CaseChat /></ProtectedRoute>} />
             <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={['admin']}><AdminSubscriptions /></ProtectedRoute>} />
             <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={['admin']}><AdminPayments /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
