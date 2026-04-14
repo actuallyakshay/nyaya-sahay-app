@@ -21,7 +21,7 @@ const skipAccessTokenPaths = new Set([
 
 const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
-  timeout: 15000,
+  timeout: env.apiTimeoutMs,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });

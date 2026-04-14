@@ -23,5 +23,7 @@ export function createCaseChatSocket(): Socket | null {
     withCredentials: true,
     auth: { activeRole: activeRole || undefined },
     transports: ['websocket'],
+    /** Match HTTP client — free-tier hosts can be slow to accept the WS handshake. */
+    timeout: env.apiTimeoutMs,
   });
 }
