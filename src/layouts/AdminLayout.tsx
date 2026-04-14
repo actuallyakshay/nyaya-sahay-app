@@ -2,6 +2,7 @@ import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
 import { ADMIN_NAV, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
 import { resetCookies } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
@@ -17,6 +18,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, logout, isLoading } = useAuth();
+  const { data: inboxUnread } = useCaseChatUnreadSummary(user?.id);
+  const inboxCount = inboxUnread?.totalUnread ?? 0;
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -123,6 +126,9 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               const active =
                 location.pathname === item.to ||
                 location.pathname.startsWith(item.to + '/');
+              const isMessagesNav = item.to === ROUTES.admin.notifications;
+              const showInboxBadge = isMessagesNav && inboxCount > 0;
+              const badgeLabel = inboxCount > 99 ? '99+' : String(inboxCount);
               return (
                 <Link
                   key={item.to}
@@ -130,14 +136,21 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                   onClick={() => setSidebarOpen(false)}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                    'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     collapsed && 'lg:justify-center lg:px-0',
                     active
                       ? 'bg-sidebar-accent text-primary-foreground'
                       : 'text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground'
                   )}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <span className="relative inline-flex shrink-0">
+                    <item.icon className="h-4 w-4" />
+                    {showInboxBadge ? (
+                      <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-0.5 text-[9px] font-bold leading-none text-accent-foreground">
+                        {badgeLabel}
+                      </span>
+                    ) : null}
+                  </span>
                   <span className={cn(collapsed && 'lg:hidden')}>
                     {item.label}
                   </span>

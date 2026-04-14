@@ -71,6 +71,18 @@ const routes = {
     URL: '/api/cases/:id',
     METHOD: 'GET',
   },
+  CASE_MESSAGES: {
+    URL: '/api/cases/:caseId/messages',
+    METHOD: 'GET',
+  },
+  CASE_CHAT_UNREAD: {
+    URL: '/api/cases/chat-unread',
+    METHOD: 'GET',
+  },
+  CASE_MARK_CHAT_READ: {
+    URL: '/api/cases/:caseId/read-chat',
+    METHOD: 'POST',
+  },
   LAWYER_ANALYTICS: {
     URL: '/api/lawyers/analytics',
     METHOD: 'GET',
@@ -138,6 +150,18 @@ const routes = {
   ADMIN_CASE_BY_ID: {
     URL: '/api/admin/cases/:caseId',
     METHOD: 'GET',
+  },
+  ADMIN_CASE_MESSAGES: {
+    URL: '/api/admin/cases/:caseId/messages',
+    METHOD: 'GET',
+  },
+  ADMIN_CASE_CHAT_UNREAD: {
+    URL: '/api/admin/cases/chat-unread',
+    METHOD: 'GET',
+  },
+  ADMIN_CASE_MARK_CHAT_READ: {
+    URL: '/api/admin/cases/:caseId/read-chat',
+    METHOD: 'POST',
   },
   ADMIN_USERS: {
     URL: '/api/admin/users',

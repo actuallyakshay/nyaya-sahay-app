@@ -102,6 +102,21 @@ export default {
           from: { opacity: '0', transform: 'translateX(-16px)' },
           to: { opacity: '1', transform: 'translateX(0)' },
         },
+        'notify-pop': {
+          '0%': { transform: 'scale(0.2)', opacity: '0' },
+          '55%': { transform: 'scale(1.12)', opacity: '1' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'notify-ring': {
+          '0%, 100%': {
+            boxShadow:
+              '0 0 0 0 hsl(var(--primary) / 0.35), 0 8px 24px hsl(220 25% 14% / 0.12)',
+          },
+          '50%': {
+            boxShadow:
+              '0 0 0 10px hsl(var(--primary) / 0), 0 10px 28px hsl(220 25% 14% / 0.16)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -109,6 +124,8 @@ export default {
         'fade-in': 'fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-in-left':
           'slide-in-left 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'notify-pop': 'notify-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'notify-ring': 'notify-ring 2.2s ease-in-out infinite',
       },
     },
   },

@@ -1,3 +1,5 @@
+import type { CSSProperties, ReactNode } from 'react';
+
 export type UserRole = 'user' | 'lawyer' | 'admin';
 
 export interface User {
@@ -114,14 +116,108 @@ export interface TimelineEvent {
   type: 'status_change' | 'message' | 'document' | 'note' | 'assignment';
 }
 
+/** Aligns with backend `MessageType` for case thread rows. */
+export type CaseChatMessageType = 'text' | 'image' | 'document' | 'audio';
+
 export interface CaseMessage {
   id: string;
-  senderId: string;
-  senderName: string;
   senderRole: UserRole;
   content: string;
   timestamp: string;
+  messageType?: CaseChatMessageType;
+  /** Chat attachment URL (GCS etc.) — no join to case documents. */
+  assetUrl?: string | null;
+  assetName?: string | null;
   attachments?: CaseDocument[];
+  /** Echoed on Socket.IO only; omitted from REST. Used to match outbound sends. */
+  clientMessageId?: string;
+}
+
+/** GET /api/cases/:caseId/messages (and admin equivalent). */
+export interface CaseMessagesPage {
+  messages: CaseMessage[];
+  hasMore: boolean;
+  oldestMessageId: string | null;
+}
+
+/** GET /api/cases/chat-unread and GET /api/admin/cases/chat-unread */
+export interface CaseChatUnreadItem {
+  caseId: string;
+  caseCode: string;
+  title: string;
+  unreadCount: number;
+}
+
+export interface CaseChatUnreadSummary {
+  items: CaseChatUnreadItem[];
+  totalUnread: number;
+}
+
+/** Socket.IO `chat.notify` — new case message for users not in that case room. */
+export interface CaseChatNotifyPayload {
+  caseId: string;
+  caseCode: string;
+  message: Omit<CaseMessage, 'clientMessageId' | 'attachments'>;
+}
+
+/** User vs admin API/socket variant for case thread messages. */
+export type CaseChatVariant = 'user' | 'admin';
+
+export type CaseChatConnectionStatus =
+  | 'idle'
+  | 'connecting'
+  | 'open'
+  | 'error';
+
+export type CaseChatMarkReadFn = (
+  caseId: string,
+  body: { messageId: string }
+) => Promise<unknown>;
+
+export interface UseCaseChatSocketOptions {
+  caseId: string | undefined;
+  variant: CaseChatVariant;
+  enabled: boolean;
+  /** When opening a thread: keep read cursor aligned with the last loaded message. */
+  markRead?: CaseChatMarkReadFn;
+  isMessagesPending?: boolean;
+  tailMessageId?: string;
+  /** True when the last loaded message was sent by the current viewer. */
+  tailFromViewer?: boolean;
+}
+
+/** Transient toast state in `CaseChatGlobalNotifier` for cross-route message peek. */
+export interface CaseChatNotifierLivePeek {
+  key: string;
+  payload: CaseChatNotifyPayload;
+  target: string;
+}
+
+export interface CaseChatThreadProps {
+  variant: CaseChatVariant;
+  title: string;
+  messages: CaseMessage[];
+  /** When set, bubbles align by participant role (your role = yours on the right). */
+  viewerParticipant?: UserRole | null;
+  draft: string;
+  onDraftChange: (value: string) => void;
+  onSend: () => void;
+  composer: 'textarea' | 'input';
+  status: CaseChatConnectionStatus;
+  /** Outbound text still being confirmed by the server. */
+  sendingText?: string | null;
+  hasOlderMessages?: boolean;
+  isLoadingOlder?: boolean;
+  onLoadOlder?: () => void;
+  isLoadingMessages?: boolean;
+  beforeSendActions?: ReactNode;
+  panelStyle?: CSSProperties;
+  /** When false, hide the built-in title/status header (page supplies its own chrome). */
+  showThreadHeader?: boolean;
+  /** `stack` = compact bubbles; `conversation` = avatar row + rounded bubbles. */
+  messageLayout?: 'stack' | 'conversation';
+  /** Merged onto the outer panel (e.g. `flex-1 min-h-0 border-0 shadow-none rounded-none`). */
+  rootClassName?: string;
 }
 
 export interface SubscriptionPlan {
@@ -233,13 +329,6 @@ export interface CaseItem {
   user?: { fullName: string };
   isEmergency?: boolean;
   createdAt: string;
-}
-
-export interface CaseMessage {
-  id: string;
-  senderName: string;
-  content: string;
-  timestamp: string;
 }
 
 /** Full case payload from GET /api/cases/:id and GET /api/admin/cases/:caseId */

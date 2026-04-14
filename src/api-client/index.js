@@ -224,10 +224,56 @@ export const getCaseDetails = (id) => {
   });
 };
 
+export const getCaseMessages = (caseId, { params } = {}) => {
+  return apiClient({
+    method: routes.CASE_MESSAGES.METHOD,
+    url: routes.CASE_MESSAGES.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
+export const getCaseChatUnread = () => {
+  return apiClient({
+    method: routes.CASE_CHAT_UNREAD.METHOD,
+    url: routes.CASE_CHAT_UNREAD.URL,
+  });
+};
+
+export const markCaseChatRead = (caseId, body = {}) => {
+  return apiClient({
+    method: routes.CASE_MARK_CHAT_READ.METHOD,
+    url: routes.CASE_MARK_CHAT_READ.URL.replace(':caseId', caseId),
+    data: body,
+  });
+};
+
 export const getAdminCaseById = (caseId) => {
   return apiClient({
     method: routes.ADMIN_CASE_BY_ID.METHOD,
     url: routes.ADMIN_CASE_BY_ID.URL.replace(':caseId', caseId),
+  });
+};
+
+export const getAdminCaseMessages = (caseId, { params } = {}) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_MESSAGES.METHOD,
+    url: routes.ADMIN_CASE_MESSAGES.URL.replace(':caseId', caseId),
+    params,
+  });
+};
+
+export const getAdminCaseChatUnread = () => {
+  return apiClient({
+    method: routes.ADMIN_CASE_CHAT_UNREAD.METHOD,
+    url: routes.ADMIN_CASE_CHAT_UNREAD.URL,
+  });
+};
+
+export const markAdminCaseChatRead = (caseId, body = {}) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_MARK_CHAT_READ.METHOD,
+    url: routes.ADMIN_CASE_MARK_CHAT_READ.URL.replace(':caseId', caseId),
+    data: body,
   });
 };
 
