@@ -30,6 +30,7 @@ const ROUTE_LABELS: Record<string, string> = {
   'case-requests': 'Case Requests',
   'session-requests': 'Session Requests',
   'lawyer-verifications': 'Verifications',
+  notifications: 'Messages',
 };
 
 function dashboardHref(pathname: string, activeRole: string | undefined) {

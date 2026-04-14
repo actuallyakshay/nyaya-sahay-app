@@ -14,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
@@ -44,12 +43,11 @@ import {
   Gavel,
   Hash,
   Loader2,
+  MessageCircle,
   RotateCcw,
   Scale,
-  Send,
   StickyNote,
   Tag,
-  Upload,
   User,
   Video,
   XCircle,
@@ -75,8 +73,6 @@ const priorityConfig = {
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
-  const [message, setMessage] = useState('');
-  const chatFileInputRef = useRef<HTMLInputElement>(null);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
@@ -127,13 +123,6 @@ const AdminCaseDetail = () => {
     await resetCase();
   };
 
-  const handleChatUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    await uploadFromSource(file, 'Chat');
-  };
-
   const handleDrawerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -150,7 +139,6 @@ const AdminCaseDetail = () => {
     caseData?.assignedLawyerId ?? caseData?.assignedLawyer?.id;
   const lawyerDisplayName = caseData?.assignedLawyer?.user?.fullName;
   const userId = caseData?.user?.id;
-  const messages = caseData?.messages ?? [];
   const timelineUpdatedAt = caseData?.updatedAt ?? caseData?.createdAt;
 
   if (isLoading) {
@@ -321,6 +309,17 @@ const AdminCaseDetail = () => {
               <div className="ml-auto flex shrink-0 items-center gap-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <Link to={id ? path.adminCaseChat(id) : '#'}>
+                        <MessageCircle className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Case chat</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -374,91 +373,13 @@ const AdminCaseDetail = () => {
           </div>
         </div>
 
-        {/* Lawyer assignment + Drawer triggers bar */}
-
-        {/* Full-width message box */}
-        <div
-          className="flex flex-col rounded-xl border bg-card"
-          style={{ height: 'calc(100vh - 220px)', minHeight: '360px' }}
-        >
-          <div className="flex items-center justify-between border-b bg-muted/20 px-4 py-2.5">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Messages
-            </h3>
-            <span className="text-[11px] text-muted-foreground">
-              {messages.length} messages
-            </span>
-          </div>
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
-            {messages.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No messages yet.
-              </p>
-            ) : (
-              messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`flex gap-3 ${m.senderRole === 'user' ? '' : 'flex-row-reverse'}`}
-                >
-                  <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${m.senderRole === 'lawyer' ? 'bg-gold/20 text-gold' : 'bg-muted text-muted-foreground'}`}
-                  >
-                    {m.senderRole === 'lawyer' ? (
-                      <Scale className="h-3 w-3" />
-                    ) : (
-                      <User className="h-3 w-3" />
-                    )}
-                  </div>
-                  <div
-                    className={`max-w-[75%] rounded-lg px-3.5 py-2 text-sm ${m.senderRole === 'user' ? 'bg-muted' : 'bg-navy text-primary-foreground'}`}
-                  >
-                    <p className="mb-0.5 text-[11px] font-medium opacity-60">
-                      {m.senderName}
-                    </p>
-                    <p className="text-[13px] leading-relaxed">{m.content}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          <div className="flex shrink-0 gap-2 border-t p-3">
-            <Input
-              placeholder="Type a message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1"
-            />
-            <input
-              ref={chatFileInputRef}
-              type="file"
-              accept={CASE_DOCUMENT_ACCEPT}
-              className="hidden"
-              onChange={handleChatUpload}
-            />
-            <input
-              ref={drawerFileInputRef}
-              type="file"
-              accept={CASE_DOCUMENT_ACCEPT}
-              className="hidden"
-              onChange={handleDrawerUpload}
-            />
-            <Button
-              size="icon"
-              variant="ghost"
-              disabled={isUploadingDocument}
-              onClick={() => chatFileInputRef.current?.click()}
-            >
-              {isUploadingDocument ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Upload className="h-4 w-4" />
-              )}
-            </Button>
-            <Button size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <input
+          ref={drawerFileInputRef}
+          type="file"
+          accept={CASE_DOCUMENT_ACCEPT}
+          className="hidden"
+          onChange={handleDrawerUpload}
+        />
       </div>
 
       {/* Dialogs & Drawers */}

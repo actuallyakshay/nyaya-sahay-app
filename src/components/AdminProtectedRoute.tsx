@@ -7,16 +7,17 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
   const [isChecking, setIsChecking] = useState(true);
-  const adminToken = getCookie('access-token');
+  const activeRole = getCookie('x-active-role');
   const navigate = useNavigate();
+  const isAdminRole = activeRole === 'admin';
 
   useEffect(() => {
-    if (!adminToken) {
+    if (!isAdminRole) {
       navigate(ROUTES.login, { replace: true });
     } else {
       setIsChecking(false);
     }
-  }, [adminToken, navigate]);
+  }, [isAdminRole, navigate]);
 
   if (isChecking) return <DashboardSkeleton />;
 

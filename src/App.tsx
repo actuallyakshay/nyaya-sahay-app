@@ -1,4 +1,5 @@
 import AdminProtectedRoute from '@/components/AdminProtectedRoute';
+import { CaseChatGlobalNotifier } from '@/components/case-chat/CaseChatGlobalNotifier';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -43,6 +44,8 @@ import NotFound from './pages/NotFound';
 import AdminCaseRequests from './pages/admin/AdminCaseRequests';
 import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
 import AdminSessionRequests from './pages/admin/AdminSessionRequests';
+import CaseChatPage from './pages/ChatChat';
+import CaseNotificationsPage from './pages/CaseNotificationsPage';
 
 const App = () => (
   <GoogleOAuthProvider clientId={env.googleClientId}>
@@ -51,6 +54,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <BrowserRouter>
+            <CaseChatGlobalNotifier />
             <Routes>
               {/* Public */}
               <Route path={ROUTES.home} element={<Index />} />
@@ -71,6 +75,14 @@ const App = () => (
                 }
               />
               <Route
+                path={ROUTES.user.notifications}
+                element={
+                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                    <CaseNotificationsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path={ROUTES.user.cases}
                 element={
                   <ProtectedRoute allowedRoles={['user']}>
@@ -83,6 +95,14 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={['user', 'lawyer']}>
                     <CaseDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.caseChat}
+                element={
+                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                    <CaseChatPage />
                   </ProtectedRoute>
                 }
               />
@@ -153,6 +173,14 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboard />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.admin.notifications}
+                element={
+                  <AdminProtectedRoute>
+                    <CaseNotificationsPage />
                   </AdminProtectedRoute>
                 }
               />
@@ -228,6 +256,14 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <AdminCaseDetail />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.adminCaseChat}
+                element={
+                  <AdminProtectedRoute>
+                    <CaseChatPage />
                   </AdminProtectedRoute>
                 }
               />

@@ -1,6 +1,7 @@
 import { ROUTES } from '@/constants/routes';
 import type { LucideIcon } from 'lucide-react';
 import {
+  Bell,
   Briefcase,
   CalendarCheck,
   CreditCard,
@@ -23,6 +24,7 @@ export interface NavItem {
 
 export const USER_NAV: NavItem[] = [
   { label: 'Dashboard', to: ROUTES.user.dashboard, icon: LayoutDashboard },
+  { label: 'Messages', to: ROUTES.user.notifications, icon: Bell },
   { label: 'My Cases', to: ROUTES.user.cases, icon: Briefcase },
   { label: 'New Case', to: ROUTES.user.newCase, icon: Plus },
   { label: 'Our Lawyers', to: ROUTES.user.lawyers, icon: Users },
@@ -32,6 +34,7 @@ export const USER_NAV: NavItem[] = [
 
 export const LAWYER_NAV: NavItem[] = [
   { label: 'Dashboard', to: ROUTES.lawyer.dashboard, icon: LayoutDashboard },
+  { label: 'Messages', to: ROUTES.user.notifications, icon: Bell },
   { label: 'Cases', to: ROUTES.lawyer.cases, icon: Briefcase },
   { label: 'Profile', to: ROUTES.lawyer.profile, icon: User },
 ];
@@ -47,6 +50,7 @@ export const PUBLIC_NAV_LINKS = [
 
 export const ADMIN_NAV: NavItem[] = [
   { label: 'Dashboard', to: ROUTES.admin.dashboard, icon: LayoutDashboard },
+  { label: 'Case messages', to: ROUTES.admin.notifications, icon: Bell },
   { label: 'Users', to: ROUTES.admin.users, icon: Users },
   { label: 'Lawyers', to: ROUTES.admin.lawyers, icon: UserCheck },
   {

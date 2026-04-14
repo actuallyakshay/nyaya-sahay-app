@@ -9,6 +9,9 @@ export {
   PATH_PREFIX,
   ROUTES,
   ROUTE_PATTERNS,
+  caseNotificationsHubPath,
   dashboardForRole,
+  isCaseChatPathname,
+  isCaseNotificationsHubPathname,
   path,
 } from './routes';

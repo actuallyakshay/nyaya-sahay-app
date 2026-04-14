@@ -21,6 +21,8 @@ export const ROUTES = {
   user: {
     dashboard: `/dashboard`,
     cases: `/cases`,
+    /** Unread case messages (user + lawyer shells). */
+    notifications: `/notifications`,
     newCase: `/new-case`,
     subscription: `/subscription`,
     profile: `/profile`,
@@ -42,6 +44,8 @@ export const ROUTES = {
     subscriptions: `${PATH_PREFIX.admin}/subscriptions`,
     payments: `${PATH_PREFIX.admin}/payments`,
     settings: `${PATH_PREFIX.admin}/settings`,
+    /** Unread case messages (admin shell). */
+    notifications: `${PATH_PREFIX.admin}/notifications`,
     login: `${PATH_PREFIX.admin}/login`,
   },
 } as const;
@@ -49,14 +53,18 @@ export const ROUTES = {
 /** Route patterns for `<Route path={...} />` (includes param tokens). */
 export const ROUTE_PATTERNS = {
   caseDetail: '/cases/:id',
+  caseChat: '/cases/:id/chat',
   adminUserDetail: `${PATH_PREFIX.admin}/users/:id`,
   adminLawyerDetail: `${PATH_PREFIX.admin}/lawyers/:id`,
   adminCaseDetail: `${PATH_PREFIX.admin}/cases/:id`,
+  adminCaseChat: `${PATH_PREFIX.admin}/cases/:id/chat`,
 } as const;
 
 export const path = {
   caseDetail: (id: string) => `/cases/${id}`,
+  caseChat: (id: string) => `/cases/${id}/chat`,
   adminCase: (id: string) => `${ROUTES.admin.cases}/${id}`,
+  adminCaseChat: (id: string) => `${ROUTES.admin.cases}/${id}/chat`,
   adminUser: (id: string) => `${ROUTES.admin.users}/${id}`,
   adminLawyer: (id: string) => `${ROUTES.admin.lawyers}/${id}`,
 } as const;
@@ -67,4 +75,24 @@ export function dashboardForRole(
   if (role === 'admin') return ROUTES.admin.dashboard;
   if (role === 'lawyer') return ROUTES.lawyer.dashboard;
   return ROUTES.user.dashboard;
+}
+
+/** Full-screen case chat — hide global inbox UI and skip unread polling. */
+export function isCaseChatPathname(pathname: string) {
+  return /^\/cases\/[^/]+\/chat\/?$/.test(pathname) ||
+    /^\/admin\/cases\/[^/]+\/chat\/?$/.test(pathname);
+}
+
+/** Dedicated inbox page — floating bubble hidden (sidebar link is enough). */
+export function isCaseNotificationsHubPathname(pathname: string) {
+  return (
+    pathname === ROUTES.user.notifications ||
+    pathname === ROUTES.admin.notifications
+  );
+}
+
+export function caseNotificationsHubPath(pathname: string) {
+  return pathname.startsWith(PATH_PREFIX.admin)
+    ? ROUTES.admin.notifications
+    : ROUTES.user.notifications;
 }
