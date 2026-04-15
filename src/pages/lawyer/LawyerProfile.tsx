@@ -15,6 +15,7 @@ import {
   Eye, ChevronDown, ChevronUp, Shield
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 const DocStatusBadge = ({ status }: { status: DocumentVerificationStatus }) => {
   const map = {
@@ -204,95 +205,36 @@ const LawyerProfile = () => {
           </div>
         )}
 
-        {/* ─── Documents ─────────────────────────────────── */}
-        <div className="rounded-xl border bg-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold flex items-center gap-2">
-              <Shield className="h-4 w-4 text-gold" /> Documents & Verification
-            </h2>
-            {allApproved && (
-              <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
-                <CheckCircle2 className="h-3.5 w-3.5" /> All verified
-              </span>
-            )}
-          </div>
-
-          {/* Mandatory */}
-          <div className="space-y-2">
-            {[
-              { type: 'law_degree' as const, label: 'Law Degree Certificate', required: true },
-              { type: 'bar_council' as const, label: 'Bar Council Certificate', required: true },
-            ].map(item => {
-              const docs = documents.filter(d => d.type === item.type);
-              return (
-                <div key={item.type} className="rounded-lg border p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <Badge variant="destructive" className="text-[10px] h-4 px-1.5">Required</Badge>
-                    </div>
-                    {docs.length === 0 && (
-                      <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => triggerUpload(item.type)}>
-                        <Upload className="mr-1 h-3 w-3" /> Upload
-                      </Button>
-                    )}
-                  </div>
-                  {docs.map(doc => (
-                    <div key={doc.id} className="flex items-center justify-between mt-2 pl-6">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-muted-foreground truncate">{doc.fileName}</span>
-                        <span className="text-[10px] text-muted-foreground">{formatSize(doc.fileSize)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DocStatusBadge status={doc.status} />
-                        <button onClick={() => setPreviewDoc(doc)} className="text-muted-foreground hover:text-foreground">
-                          <Eye className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {docs.some(d => d.rejectionReason) && (
-                    <p className="text-xs text-destructive mt-1.5 pl-6">
-                      ⚠ {docs.find(d => d.rejectionReason)?.rejectionReason}
-                    </p>
-                  )}
+        {/* ─── Documents Summary Card ─────────────────── */}
+        <Link to="/lawyer/documents" className="block">
+          <div className="rounded-xl border bg-card p-5 hover:border-gold/40 transition-colors group cursor-pointer">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-gold" />
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Additional */}
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-sm text-muted-foreground">Additional Certifications</span>
-            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => triggerUpload('additional')}>
-              <Upload className="mr-1 h-3 w-3" /> Add
-            </Button>
-          </div>
-          {documents.filter(d => d.type === 'additional').map(doc => (
-            <div key={doc.id} className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="text-sm truncate">{doc.fileName}</span>
-                <span className="text-[10px] text-muted-foreground">{formatSize(doc.fileSize)}</span>
+                <div>
+                  <h2 className="font-semibold flex items-center gap-2">
+                    Documents & Verification
+                    {allApproved ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+                        <CheckCircle2 className="h-3 w-3" /> Verified
+                      </span>
+                    ) : (
+                      <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-600">Action needed</Badge>
+                    )}
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {documents.length} document{documents.length !== 1 ? 's' : ''} uploaded
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <DocStatusBadge status={doc.status} />
-                <button onClick={() => setPreviewDoc(doc)} className="text-muted-foreground hover:text-foreground">
-                  <Eye className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <span className="text-sm text-muted-foreground group-hover:text-gold transition-colors">
+                Manage →
+              </span>
             </div>
-          ))}
-
-          {/* Verification note */}
-          {!allApproved && (
-            <p className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-              <AlertCircle className="h-3 w-3 inline mr-1" />
-              Upload all mandatory documents and get them approved to publish your profile. Documents are reviewed within 24–48 hours.
-            </p>
-          )}
-        </div>
+          </div>
+        </Link>
 
         {/* ─── Contact & Security ────────────────────────── */}
         <div className="grid sm:grid-cols-2 gap-4">

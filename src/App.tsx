@@ -28,6 +28,7 @@ import UpcomingSessions from "./pages/user/UpcomingSessions";
 import LawyerDashboard from "./pages/lawyer/LawyerDashboard";
 import LawyerCases from "./pages/lawyer/LawyerCases";
 import LawyerProfile from "./pages/lawyer/LawyerProfile";
+import LawyerDocuments from "./pages/lawyer/LawyerDocuments";
 
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -85,6 +86,7 @@ const App = () => (
             <Route path="/lawyer/cases/:id/chat" element={<ProtectedRoute allowedRoles={['lawyer']}><CaseChat /></ProtectedRoute>} />
             <Route path="/lawyer/sessions" element={<ProtectedRoute allowedRoles={['lawyer']}><UpcomingSessions /></ProtectedRoute>} />
             <Route path="/lawyer/profile" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerProfile /></ProtectedRoute>} />
+            <Route path="/lawyer/documents" element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDocuments /></ProtectedRoute>} />
 
             {/* Admin */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
