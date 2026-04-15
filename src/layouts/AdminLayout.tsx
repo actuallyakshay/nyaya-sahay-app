@@ -4,6 +4,7 @@ import { ADMIN_NAV, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
 import { resetCookies } from '@/lib/helpers';
+import { queryClient } from '@/lib/query-client';
 import { cn } from '@/lib/utils';
 import {
   Loader2,
@@ -11,6 +12,7 @@ import {
   Menu,
   PanelLeft,
   PanelLeftClose,
+  RefreshCcw,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -24,11 +26,29 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [isClearingCache, setIsClearingCache] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     resetCookies();
     navigate(ROUTES.login);
+  };
+
+  const handleClearQueryCache = async () => {
+    if (isClearingCache) return;
+    setIsClearingCache(true);
+    const started = performance.now();
+    // Let React paint the spinner; clear() is synchronous otherwise.
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+    queryClient.clear();
+    const minSpinnerMs = 220;
+    const remaining = minSpinnerMs - (performance.now() - started);
+    if (remaining > 0) {
+      await new Promise((r) => setTimeout(r, remaining));
+    }
+    setIsClearingCache(false);
   };
 
   return (
@@ -158,6 +178,28 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               );
             })}
           </nav>
+
+          <div className="border-t border-sidebar-border p-3">
+            <button
+              type="button"
+              disabled={isClearingCache}
+              onClick={() => void handleClearQueryCache()}
+              title={collapsed ? 'Clear cache' : undefined}
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-primary-foreground/60 hover:bg-sidebar-accent/50 hover:text-primary-foreground disabled:pointer-events-none disabled:opacity-50',
+                collapsed && 'lg:justify-center lg:px-0'
+              )}
+            >
+              {isClearingCache ? (
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+              ) : (
+                <RefreshCcw className="h-4 w-4 shrink-0" />
+              )}
+              <span className={cn(collapsed && 'lg:hidden')}>
+                {isClearingCache ? 'Clearing…' : 'Clear cache'}
+              </span>
+            </button>
+          </div>
 
           <div className="hidden border-t border-sidebar-border p-2 lg:block">
             <button
