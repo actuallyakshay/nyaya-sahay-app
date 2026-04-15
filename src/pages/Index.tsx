@@ -456,8 +456,7 @@ const Homepage = () => {
               className="mx-auto mt-4 max-w-lg text-base text-primary-foreground/70 sm:text-lg"
             >
               Join thousands of Indians who trust Samvidhan Legal Advisory for
-              reliable,
-              affordable legal assistance.
+              reliable, affordable legal assistance.
             </motion.p>
             <motion.div
               variants={fadeUp}

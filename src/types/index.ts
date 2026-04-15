@@ -305,6 +305,7 @@ export interface LawyerListItem {
   updatedAt: string;
   user: LawyersListUser;
   lawyerPracticeAreas: LawyerPracticeAreaRow[];
+  isVerified: boolean;
 }
 
 export interface LawyersPagination {

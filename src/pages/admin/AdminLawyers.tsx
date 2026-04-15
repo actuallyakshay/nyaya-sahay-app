@@ -1,23 +1,20 @@
-import {
-  getAdminLawyerVerifications,
-  updateLawyerRoleStatus,
-} from '@/api-client';
-import { path } from '@/constants';
+import { getAdminLawyerVerifications, updateAdminLawyer } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge } from '@/components/StatusBadge';
 import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import { calculateYearsOfExperience } from '@/lib/helpers';
 import { PAGE_SIZE } from '@/lib/mock-data';
 import { queryClient } from '@/lib/query-client';
 import { LawyerListItem, LawyersListResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { CheckCircle, Edit, Loader2, Search, UserPlus } from 'lucide-react';
+import { CheckCircle, Edit, Loader2, Search, UserPlus, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -32,7 +29,7 @@ const buildQueryParams = (page: number, search: string) => {
   return params;
 };
 
-type PendingAction = { lawyerId: string; kind: 'active' | 'rejected' };
+type PendingVerification = { lawyerId: string };
 
 const AdminLawyers = () => {
   const { toast } = useToast();
@@ -43,7 +40,8 @@ const AdminLawyers = () => {
   );
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 500);
-  const [pending, setPending] = useState<PendingAction | null>(null);
+  const [pendingVerification, setPendingVerification] =
+    useState<PendingVerification | null>(null);
 
   const { data, isFetching } = useQuery<LawyersListResponse>({
     queryKey: ['admin-lawyers', page, debouncedSearch],
@@ -61,38 +59,30 @@ const AdminLawyers = () => {
     setPage(1);
   };
 
-  const handleUpdateLawyerRoleStatus = async (
+  const handleUpdateLawyerVerification = async (
     lawyerId: string,
-    userId: string,
-    roleCode: string,
-    status: string
+    isVerified: boolean,
+    lawyerName: string
   ) => {
-    const kind = status === 'inactive' ? 'active' : 'rejected';
-    console.log('Updating lawyer role status:', {
-      lawyerId,
-      userId,
-      roleCode,
-      status,
-    });
-    setPending({ lawyerId, kind });
+    setPendingVerification({ lawyerId });
     try {
-      await updateLawyerRoleStatus(userId, roleCode, status);
+      await updateAdminLawyer(lawyerId, { isVerified });
       toast({
-        title: 'Lawyer Role Status Updated',
-        description: `${userId} has been updated to ${status}.`,
+        title: isVerified ? 'Lawyer verified' : 'Verification removed',
+        description: isVerified
+          ? `${lawyerName} is now marked as verified.`
+          : `${lawyerName} is no longer marked as verified.`,
       });
-      await queryClient.invalidateQueries({
-        queryKey: ['admin-lawyers', page],
-      });
+      await queryClient.invalidateQueries({ queryKey: ['admin-lawyers'] });
     } catch (error) {
       toast({
-        title: 'Error Updating Lawyer Role Status',
+        title: 'Could not update verification',
         description:
           error instanceof Error ? error.message : 'Something went wrong.',
         variant: 'destructive',
       });
     } finally {
-      setPending(null);
+      setPendingVerification(null);
     }
   };
 
@@ -155,9 +145,6 @@ const AdminLawyers = () => {
                   Verified
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                  Active
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Actions
                 </th>
               </tr>
@@ -165,9 +152,9 @@ const AdminLawyers = () => {
             <tbody>
               {!isFetching &&
                 lawyers.map((l) => {
-                  const rowBusy = pending !== null && pending.lawyerId === l.id;
-                  const activating = rowBusy && pending?.kind === 'active';
-                  const deactivating = rowBusy && pending?.kind === 'rejected';
+                  const rowBusy =
+                    pendingVerification !== null &&
+                    pendingVerification.lawyerId === l.id;
 
                   return (
                     <tr
@@ -199,8 +186,7 @@ const AdminLawyers = () => {
                             {l.user?.fullName}
                           </Link>
                           <p className="text-xs text-muted-foreground">
-                            {/* {l.experience} yrs exp */}
-                            10 yrs exp
+                            {calculateYearsOfExperience(l?.careerStartDate)}
                           </p>
                         </div>
                       </td>
@@ -222,32 +208,14 @@ const AdminLawyers = () => {
                         {l.barCouncilId}
                       </td>
                       <td className="px-4 py-3">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      </td>
-                      <td className="px-4 py-3">
-                        {activating || deactivating ? (
-                          <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                        {l?.isVerified ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
                         ) : (
-                          <Switch
-                            checked={l.user?.userRole?.status === 'active'}
-                            onCheckedChange={() => {
-                              const currentStatus = l.user?.userRole?.status;
-                              const newStatus =
-                                currentStatus === 'active'
-                                  ? 'inactive'
-                                  : 'active';
-                              handleUpdateLawyerRoleStatus(
-                                l.id,
-                                l.user?.id,
-                                'lawyer',
-                                newStatus
-                              );
-                            }}
-                          />
+                          <X className="h-4 w-4 text-red-600" />
                         )}
                       </td>
 
-                      <td className="flex gap-1 px-4 py-3">
+                      <td className="flex flex-wrap items-center gap-1 px-4 py-3">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -258,11 +226,26 @@ const AdminLawyers = () => {
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Link to={path.adminLawyer(l.id)}>
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
-                        </Link>
+                        <Button
+                          variant={l.isVerified ? 'outline' : 'secondary'}
+                          size="sm"
+                          disabled={rowBusy}
+                          onClick={() =>
+                            handleUpdateLawyerVerification(
+                              l.id,
+                              !l.isVerified,
+                              l.user?.fullName ?? 'Lawyer'
+                            )
+                          }
+                        >
+                          {rowBusy ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : l.isVerified ? (
+                            'Unverify'
+                          ) : (
+                            'Verify'
+                          )}
+                        </Button>
                       </td>
                     </tr>
                   );

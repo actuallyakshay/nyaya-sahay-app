@@ -3,6 +3,7 @@ import WithShimmer from '@/components/WithShimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { queryClient } from '@/lib/query-client';
@@ -13,6 +14,7 @@ import { useState } from 'react';
 const AdminSettings = () => {
   const [supportEmail, setSupportEmail] = useState('');
   const [supportPhone, setSupportPhone] = useState('');
+  const [supportAddress, setSupportAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -22,6 +24,7 @@ const AdminSettings = () => {
       const { data } = await getAdminSettings();
       setSupportEmail(data.supportEmail);
       setSupportPhone(data.supportPhone);
+      setSupportAddress(data.supportAddress);
     },
   });
 
@@ -31,6 +34,7 @@ const AdminSettings = () => {
       await updateAdminSettings({
         supportEmail,
         supportPhone,
+        supportAddress,
       });
       await queryClient.invalidateQueries({ queryKey: ['adminSettings'] });
       toast({
@@ -70,6 +74,20 @@ const AdminSettings = () => {
                   value={supportEmail}
                   onChange={(e) => setSupportEmail(e.target.value)}
                   placeholder="support@nyayasetu.in"
+                />
+              </WithShimmer>
+            </div>
+            <div className="space-y-2">
+              <Label>Support Address</Label>
+              <WithShimmer
+                loading={isSettingsLoading}
+                className="h-10 w-full rounded-md"
+              >
+                <Textarea
+                  rows={3}
+                  value={supportAddress}
+                  onChange={(e) => setSupportAddress(e.target.value)}
+                  placeholder="123 Main St, Anytown, USA"
                 />
               </WithShimmer>
             </div>
