@@ -1,14 +1,16 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
+import { Button } from '@/components/ui/button';
 import WithShimmer from '@/components/WithShimmer';
 import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { useDebounce } from '@/hooks/useDebounce';
+import { path } from '@/constants';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Award, Mail, Phone } from 'lucide-react';
+import { Award, FileText, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { buildLawyerCasesQueryParams } from '../lawyer/LawyerCases';
 
 const AdminLawyerDetail = () => {
@@ -24,6 +26,7 @@ const AdminLawyerDetail = () => {
       const response = await getAdminLawyerDetails(id);
       return response.data;
     },
+    enabled: Boolean(id),
   });
 
   const {
@@ -31,7 +34,7 @@ const AdminLawyerDetail = () => {
     isFetching,
     isError,
   } = useQuery<CasesResponse>({
-    queryKey: ['lawyerCases', page, debouncedSearch, statusFilter],
+    queryKey: ['adminLawyerCases', id, page, debouncedSearch, statusFilter],
     queryFn: async () => {
       const params = buildLawyerCasesQueryParams(
         page,
@@ -41,6 +44,7 @@ const AdminLawyerDetail = () => {
       const response = await getAdminLawyerCases(id, params);
       return response.data;
     },
+    enabled: Boolean(id),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -183,6 +187,26 @@ const AdminLawyerDetail = () => {
             </div>
           </div>
         </div>
+
+        {id ? (
+          <div className="rounded-xl border bg-card p-5 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Professional documents</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Review and approve uploads on a full page when there are many
+                  files.
+                </p>
+              </div>
+              <Button asChild variant="secondary" className="shrink-0">
+                <Link to={path.adminLawyerDocuments(id)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Open documents
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <LawyerCasesTable
           cases={cases}

@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   CreditCard,
   FilePlus,
+  FileStack,
   FileText,
   LayoutDashboard,
   Plus,
@@ -36,6 +37,7 @@ export const LAWYER_NAV: NavItem[] = [
   { label: 'Dashboard', to: ROUTES.lawyer.dashboard, icon: LayoutDashboard },
   { label: 'Messages', to: ROUTES.user.notifications, icon: Bell },
   { label: 'Cases', to: ROUTES.lawyer.cases, icon: Briefcase },
+  { label: 'Documents', to: ROUTES.lawyer.documents, icon: FileText },
   { label: 'Profile', to: ROUTES.lawyer.profile, icon: User },
 ];
 
@@ -64,6 +66,11 @@ export const ADMIN_NAV: NavItem[] = [
     label: 'Session Requests',
     to: ROUTES.admin.sessionRequests,
     icon: CalendarCheck,
+  },
+  {
+    label: 'Lawyer pending documents',
+    to: ROUTES.admin.lawyerPendingDocuments,
+    icon: FileStack,
   },
   { label: 'Subscriptions', to: ROUTES.admin.subscriptions, icon: FileText },
   { label: 'Payments', to: ROUTES.admin.payments, icon: CreditCard },

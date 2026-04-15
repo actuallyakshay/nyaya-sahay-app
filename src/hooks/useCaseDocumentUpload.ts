@@ -1,10 +1,8 @@
-import { uploadAsset, uploadCaseDocument } from '@/api-client';
+import { uploadCaseDocument } from '@/api-client';
 import { useToast } from '@/hooks/use-toast';
+import { uploadAssetFile } from '@/hooks/useAssetUpload';
 import { queryClient } from '@/lib/query-client';
-import {
-  getApiErrorMessage,
-  normalizeCaseDocumentAssetType,
-} from '@/lib/utils';
+import { getApiErrorMessage } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
 
 export type CaseDocumentAuthor = 'lawyer' | 'user' | 'admin';
@@ -18,11 +16,11 @@ export function useCaseDocumentUpload(
   const { mutateAsync: uploadSingleDocument, isPending: isUploadingDocument } =
     useMutation({
       mutationFn: async (file: File) => {
-        const { data } = await uploadAsset(file);
+        const uploaded = await uploadAssetFile(file);
         await uploadCaseDocument(caseId, {
-          assetUrl: data.assetUrl,
-          assetType: normalizeCaseDocumentAssetType(data.assetType, file),
-          assetName: data.assetName,
+          assetUrl: uploaded.assetUrl,
+          assetType: uploaded.assetType,
+          assetName: uploaded.assetName,
           author,
         });
       },

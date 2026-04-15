@@ -8,12 +8,7 @@ import { useProfilePage } from '@/hooks/useProfilePage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getCookie } from '@/lib/helpers';
 import { mockPlans, mockSubscription } from '@/lib/mock-data';
-import {
-  Calendar,
-  CheckCircle2,
-  CreditCard,
-  Shield,
-} from 'lucide-react';
+import { Calendar, CheckCircle2, CreditCard, Shield } from 'lucide-react';
 import { useState } from 'react';
 
 const UserProfile = () => {

@@ -108,6 +108,24 @@ export interface CaseDocument {
   createdAt: string;
 }
 
+/** Lawyer vault row from GET /api/lawyers/documents */
+export interface LawyerDocument {
+  id: string;
+  lawyerProfileId: string;
+  assetUrl: string;
+  assetName?: string | null;
+  isApproved: boolean;
+  rejectionReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** PATCH /api/admin/lawyers/documents/:documentId/review */
+export interface ReviewLawyerDocumentBody {
+  isApproved: boolean;
+  rejectionReason?: string | null;
+}
+
 export interface TimelineEvent {
   id: string;
   title: string;
@@ -163,11 +181,7 @@ export interface CaseChatNotifyPayload {
 /** User vs admin API/socket variant for case thread messages. */
 export type CaseChatVariant = 'user' | 'admin';
 
-export type CaseChatConnectionStatus =
-  | 'idle'
-  | 'connecting'
-  | 'open'
-  | 'error';
+export type CaseChatConnectionStatus = 'idle' | 'connecting' | 'open' | 'error';
 
 export type CaseChatMarkReadFn = (
   caseId: string,
@@ -350,6 +364,16 @@ export interface Pagination {
   totalPages: number;
   next: number | null;
   prev: number | null;
+}
+
+/** GET /api/admin/lawyers/pending-documents — row may include nested lawyer for display */
+export type PendingLawyerDocumentListItem = LawyerDocument & {
+  lawyerProfile?: { id?: string; user?: { fullName?: string | null } };
+};
+
+export interface PendingLawyerDocumentsListResponse {
+  data: PendingLawyerDocumentListItem[];
+  pagination: Pagination;
 }
 
 export interface CasesResponse {

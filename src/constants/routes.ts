@@ -16,7 +16,7 @@ export const ROUTES = {
   howItWorks: '/how-it-works',
   faq: '/faq',
   login: '/login',
-  register: '/register',
+  register: '/login',
   forgotPassword: '/forgot-password',
   user: {
     dashboard: `/dashboard`,
@@ -32,6 +32,7 @@ export const ROUTES = {
     dashboard: `${PATH_PREFIX.lawyer}/dashboard`,
     cases: `${PATH_PREFIX.lawyer}/cases`,
     profile: `${PATH_PREFIX.lawyer}/profile`,
+    documents: `${PATH_PREFIX.lawyer}/documents`,
   },
   admin: {
     dashboard: `${PATH_PREFIX.admin}/dashboard`,
@@ -41,6 +42,7 @@ export const ROUTES = {
     cases: `${PATH_PREFIX.admin}/cases`,
     caseRequests: `${PATH_PREFIX.admin}/case-requests`,
     sessionRequests: `${PATH_PREFIX.admin}/session-requests`,
+    lawyerPendingDocuments: `${PATH_PREFIX.admin}/lawyer-pending-documents`,
     subscriptions: `${PATH_PREFIX.admin}/subscriptions`,
     payments: `${PATH_PREFIX.admin}/payments`,
     settings: `${PATH_PREFIX.admin}/settings`,
@@ -56,6 +58,7 @@ export const ROUTE_PATTERNS = {
   caseChat: '/cases/:id/chat',
   adminUserDetail: `${PATH_PREFIX.admin}/users/:id`,
   adminLawyerDetail: `${PATH_PREFIX.admin}/lawyers/:id`,
+  adminLawyerDocuments: `${PATH_PREFIX.admin}/lawyers/:id/documents`,
   adminCaseDetail: `${PATH_PREFIX.admin}/cases/:id`,
   adminCaseChat: `${PATH_PREFIX.admin}/cases/:id/chat`,
 } as const;
@@ -67,6 +70,8 @@ export const path = {
   adminCaseChat: (id: string) => `${ROUTES.admin.cases}/${id}/chat`,
   adminUser: (id: string) => `${ROUTES.admin.users}/${id}`,
   adminLawyer: (id: string) => `${ROUTES.admin.lawyers}/${id}`,
+  adminLawyerDocuments: (id: string) =>
+    `${ROUTES.admin.lawyers}/${id}/documents`,
 } as const;
 
 export function dashboardForRole(
@@ -79,8 +84,10 @@ export function dashboardForRole(
 
 /** Full-screen case chat — hide global inbox UI and skip unread polling. */
 export function isCaseChatPathname(pathname: string) {
-  return /^\/cases\/[^/]+\/chat\/?$/.test(pathname) ||
-    /^\/admin\/cases\/[^/]+\/chat\/?$/.test(pathname);
+  return (
+    /^\/cases\/[^/]+\/chat\/?$/.test(pathname) ||
+    /^\/admin\/cases\/[^/]+\/chat\/?$/.test(pathname)
+  );
 }
 
 /** Dedicated inbox page — floating bubble hidden (sidebar link is enough). */

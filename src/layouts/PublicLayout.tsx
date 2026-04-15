@@ -1,13 +1,24 @@
+import { getAdminSettings } from '@/api-client';
 import { BrandLogo } from '@/components/BrandLogo';
 import { Button } from '@/components/ui/button';
 import { PUBLIC_NAV_LINKS, ROUTES } from '@/constants';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const [settings, setSettings] = useState(null);
+
+  const getSettings = useCallback(async () => {
+    const response = await getAdminSettings();
+    setSettings(response.data);
+  }, []);
+
+  useEffect(() => {
+    void getSettings();
+  }, [getSettings]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -28,11 +39,8 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
           </nav>
 
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="ghost" asChild>
-              <Link to={ROUTES.login}>Log In</Link>
-            </Button>
             <Button asChild>
-              <Link to={ROUTES.login}>Get Started</Link>
+              <Link to={ROUTES.login}>Log In</Link>
             </Button>
           </div>
 
@@ -140,8 +148,8 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h4 className="mb-3 text-sm font-semibold text-gold">Contact</h4>
               <ul className="space-y-2 text-sm text-primary-foreground/70">
-                <li>support@samvidhanlegaladvisory.in</li>
-                <li>+91 11 4000 XXXX</li>
+                <li>{settings?.supportEmail}</li>
+                <li>{settings?.supportPhone}</li>
                 <li>New Delhi, India</li>
               </ul>
             </div>

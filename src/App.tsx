@@ -28,11 +28,13 @@ import UserSubscription from './pages/user/UserSubscription';
 
 import LawyerCases from './pages/lawyer/LawyerCases';
 import LawyerDashboard from './pages/lawyer/LawyerDashboard';
+import LawyerDocuments from './pages/lawyer/LawyerDocuments';
 
 import AdminCaseDetail from './pages/admin/AdminCaseDetail';
 import AdminCases from './pages/admin/AdminCases';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLawyerDetail from './pages/admin/AdminLawyerDetail';
+import AdminLawyerDocumentsPage from './pages/admin/AdminLawyerDocumentsPage';
 import AdminLawyers from './pages/admin/AdminLawyers';
 import AdminPayments from './pages/admin/AdminPayments';
 import AdminSettings from './pages/admin/AdminSettings';
@@ -40,12 +42,13 @@ import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminUsers from './pages/admin/AdminUsers';
 
-import NotFound from './pages/NotFound';
 import AdminCaseRequests from './pages/admin/AdminCaseRequests';
 import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
+import AdminLawyerPendingDocumentsPage from './pages/admin/AdminLawyerPendingDocumentsPage';
 import AdminSessionRequests from './pages/admin/AdminSessionRequests';
-import CaseChatPage from './pages/ChatChat';
 import CaseNotificationsPage from './pages/CaseNotificationsPage';
+import CaseChatPage from './pages/ChatChat';
+import NotFound from './pages/NotFound';
 
 const App = () => (
   <GoogleOAuthProvider clientId={env.googleClientId}>
@@ -157,6 +160,14 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path={ROUTES.lawyer.documents}
+                element={
+                  <ProtectedRoute allowedRoles={['lawyer']}>
+                    <LawyerDocuments />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route
                 path={ROUTES.lawyer.profile}
@@ -203,6 +214,14 @@ const App = () => (
                 }
               />
               <Route
+                path={ROUTES.admin.lawyerPendingDocuments}
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLawyerPendingDocumentsPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
                 path={ROUTES.admin.users}
                 element={
                   <AdminProtectedRoute>
@@ -223,6 +242,14 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <AdminLawyers />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.adminLawyerDocuments}
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLawyerDocumentsPage />
                   </AdminProtectedRoute>
                 }
               />

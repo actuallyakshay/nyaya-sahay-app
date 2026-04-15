@@ -346,6 +346,28 @@ export const updateLawyerProfile = (data) => {
   });
 };
 
+export const getLawyerDocuments = () => {
+  return apiClient({
+    method: routes.LAWYER_DOCUMENTS.METHOD,
+    url: routes.LAWYER_DOCUMENTS.URL,
+  });
+};
+
+export const createLawyerDocument = (body) => {
+  return apiClient({
+    method: routes.CREATE_LAWYER_DOCUMENT.METHOD,
+    url: routes.CREATE_LAWYER_DOCUMENT.URL,
+    data: body,
+  });
+};
+
+export const deleteLawyerDocument = (documentId) => {
+  return apiClient({
+    method: routes.DELETE_LAWYER_DOCUMENT.METHOD,
+    url: routes.DELETE_LAWYER_DOCUMENT.URL.replace(':documentId', documentId),
+  });
+};
+
 export const getAdminUserDetails = (id) => {
   return apiClient({
     method: routes.ADMIN_USER_DETAILS.METHOD,
@@ -365,6 +387,32 @@ export const getAdminLawyerCases = (lawyerId, params) => {
   return apiClient({
     method: routes.ADMIN_LAWYER_CASES.METHOD,
     url: routes.ADMIN_LAWYER_CASES.URL.replace(':lawyerId', lawyerId),
+    params,
+  });
+};
+
+export const getAdminLawyerDocuments = (lawyerId) => {
+  return apiClient({
+    method: routes.ADMIN_LAWYER_DOCUMENTS.METHOD,
+    url: routes.ADMIN_LAWYER_DOCUMENTS.URL.replace(':lawyerId', lawyerId),
+  });
+};
+
+export const reviewAdminLawyerDocument = (documentId, body) => {
+  return apiClient({
+    method: routes.ADMIN_REVIEW_LAWYER_DOCUMENT.METHOD,
+    url: routes.ADMIN_REVIEW_LAWYER_DOCUMENT.URL.replace(
+      ':documentId',
+      documentId
+    ),
+    data: body,
+  });
+};
+
+export const getAdminLawyerPendingDocuments = (params) => {
+  return apiClient({
+    method: routes.ADMIN_LAWYER_PENDING_DOCUMENTS.METHOD,
+    url: routes.ADMIN_LAWYER_PENDING_DOCUMENTS.URL,
     params,
   });
 };

@@ -23,12 +23,14 @@ const ROUTE_LABELS: Record<string, string> = {
   sessions: 'Sessions',
   subscription: 'Subscription',
   profile: 'Profile',
+  documents: 'Documents',
   users: 'Users',
   payments: 'Payments',
   settings: 'Settings',
   subscriptions: 'Subscriptions',
   'case-requests': 'Case Requests',
   'session-requests': 'Session Requests',
+  'lawyer-pending-documents': 'Lawyer pending documents',
   'lawyer-verifications': 'Verifications',
   notifications: 'Messages',
 };
@@ -56,11 +58,13 @@ function segmentLabel(
   seg: string,
   i: number,
   segments: string[],
-  params: Set<string>
+  params: Set<string>,
+  pathname: string
 ) {
   if (params.has(seg)) return seg;
   const next = segments[i + 1];
   if (seg === 'cases' && next && params.has(next)) return 'Case';
+  if (seg === 'lawyers' && pathname.includes('/admin/')) return 'Lawyers';
   return (
     ROUTE_LABELS[seg] ??
     seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' ')
@@ -92,7 +96,7 @@ function pathCrumbs(
     if (i === 0 && ROLE_PREFIX_SEGMENTS.has(seg)) continue;
 
     const last = i === segments.length - 1;
-    const label = segmentLabel(seg, i, segments, params);
+    const label = segmentLabel(seg, i, segments, params, pathname);
     const to = last ? undefined : prefix === '/cases' ? casesList : prefix;
 
     out.push({ label, to });

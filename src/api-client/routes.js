@@ -111,6 +111,18 @@ const routes = {
     URL: '/api/lawyers',
     METHOD: 'PATCH',
   },
+  LAWYER_DOCUMENTS: {
+    URL: '/api/lawyers/documents',
+    METHOD: 'GET',
+  },
+  CREATE_LAWYER_DOCUMENT: {
+    URL: '/api/lawyers/documents',
+    METHOD: 'POST',
+  },
+  DELETE_LAWYER_DOCUMENT: {
+    URL: '/api/lawyers/documents/:documentId',
+    METHOD: 'DELETE',
+  },
   ADMIN_CASE_REQUESTS: {
     URL: '/api/admin/cases',
     METHOD: 'GET',
@@ -185,6 +197,18 @@ const routes = {
   },
   ADMIN_LAWYER_CASES: {
     URL: '/api/admin/lawyers/:lawyerId/cases',
+    METHOD: 'GET',
+  },
+  ADMIN_LAWYER_DOCUMENTS: {
+    URL: '/api/admin/lawyers/:lawyerId/documents',
+    METHOD: 'GET',
+  },
+  ADMIN_REVIEW_LAWYER_DOCUMENT: {
+    URL: '/api/admin/lawyers/documents/:documentId/review',
+    METHOD: 'PATCH',
+  },
+  ADMIN_LAWYER_PENDING_DOCUMENTS: {
+    URL: '/api/admin/lawyers/pending-documents',
     METHOD: 'GET',
   },
   ADMIN_SETTINGS: {
