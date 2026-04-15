@@ -15,6 +15,7 @@ import {
   Eye, ChevronDown, ChevronUp, Shield
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 const DocStatusBadge = ({ status }: { status: DocumentVerificationStatus }) => {
   const map = {
