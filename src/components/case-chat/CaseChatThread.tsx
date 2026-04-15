@@ -1,17 +1,24 @@
 import { FileViewer } from '@/components/FileViewer';
+import { ChatSkeleton } from '@/components/skeletons/ChatSkeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { getFileIcon } from '@/lib/helpers';
+import { cn } from '@/lib/utils';
 import type {
   CaseChatConnectionStatus,
   CaseChatThreadProps,
   CaseMessage,
   UserRole,
 } from '@/types';
-import { getFileIcon } from '@/lib/helpers';
-import { cn } from '@/lib/utils';
 import { Loader2, Scale, Send, Shield, User } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 function statusLabel(status: CaseChatConnectionStatus): string {
   switch (status) {
@@ -56,6 +63,38 @@ function formatMessageDigest(ts: string) {
   });
 }
 
+/** Returns a date-only key like "2025-04-15" for grouping. */
+function getDateKey(ts: string): string {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** WhatsApp-style date label: Today / Yesterday / "15 Apr 2025". */
+function formatDateSeparator(ts: string): string {
+  const d = new Date(ts);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = (today.getTime() - msgDay.getTime()) / 86400000;
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function DateSeparator({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-center py-2">
+      <span className="rounded-full bg-muted/80 px-3 py-1 text-[11px] font-medium text-muted-foreground shadow-sm">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 /** Align own side by viewer role (same model as internal notes: user / lawyer / admin). */
 function isOwnBubble(
   m: CaseMessage,
@@ -79,7 +118,13 @@ function isChatInlineImage(m: CaseMessage) {
   return /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(hint);
 }
 
-function MessageAttachmentRow({ m, onOpen }: { m: CaseMessage; onOpen: () => void }) {
+function MessageAttachmentRow({
+  m,
+  onOpen,
+}: {
+  m: CaseMessage;
+  onOpen: () => void;
+}) {
   if (!m.assetUrl) return null;
   const label = chatAttachmentLabel(m);
   const icon = getFileIcon(m.assetName || m.assetUrl || 'file');
@@ -136,8 +181,7 @@ export function CaseChatThread({
   const compact = variant === 'admin';
   const conversation = messageLayout === 'conversation';
   const isSending = Boolean(sendingText?.trim());
-  const canSend =
-    status === 'open' && draft.trim().length > 0 && !isSending;
+  const canSend = status === 'open' && draft.trim().length > 0 && !isSending;
   const live = statusLabel(status);
 
   const [attachmentViewerOpen, setAttachmentViewerOpen] = useState(false);
@@ -151,6 +195,25 @@ export function CaseChatThread({
     setAttachmentViewer({ name: chatAttachmentLabel(m), url: m.assetUrl });
     setAttachmentViewerOpen(true);
   };
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoGrow = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  const resetTextarea = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+  }, []);
+
+  useEffect(() => {
+    if (!draft) resetTextarea();
+  }, [draft, resetTextarea]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const preLoadHeightRef = useRef<number | null>(null);
@@ -199,18 +262,34 @@ export function CaseChatThread({
     }
   };
 
+  const isFirstInGroup = (index: number): boolean => {
+    if (index === 0) return true;
+    return messages[index].senderRole !== messages[index - 1].senderRole;
+  };
+
+  const isNewDate = (index: number): boolean => {
+    if (index === 0) return true;
+    return (
+      getDateKey(messages[index].timestamp) !==
+      getDateKey(messages[index - 1].timestamp)
+    );
+  };
+
   const scrollAreaClass = conversation
-    ? 'flex-1 min-h-0 space-y-3 overflow-y-auto px-1 py-2'
-    : 'flex-1 space-y-3 overflow-y-auto p-4';
+    ? 'flex-1 min-h-0 overflow-y-auto px-1 py-2'
+    : 'flex-1 overflow-y-auto p-4';
 
   return (
     <div
-      className={cn('flex min-h-0 flex-col rounded-xl border bg-card', rootClassName)}
+      className={cn(
+        'flex min-h-0 flex-col rounded-xl border bg-card',
+        rootClassName
+      )}
       style={panelStyle}
     >
       {showThreadHeader ? (
         <div
-          className={`flex shrink-0 items-center justify-between border-b ${compact ? 'bg-muted/20 px-4 py-2.5' : 'p-3'}`}
+          className={`flex shrink-0 items-center justify-between gap-2 overflow-hidden border-b ${compact ? 'bg-muted/20 px-4 py-2.5' : 'p-3'}`}
         >
           <h3
             className={
@@ -221,7 +300,7 @@ export function CaseChatThread({
           >
             {title}
           </h3>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
             {live ? (
               <span
                 className={
@@ -245,11 +324,7 @@ export function CaseChatThread({
         </div>
       ) : null}
 
-      <div
-        ref={scrollRef}
-        className={scrollAreaClass}
-        onScroll={onScroll}
-      >
+      <div ref={scrollRef} className={scrollAreaClass} onScroll={onScroll}>
         {hasOlderMessages && !isLoadingOlder && onLoadOlder ? (
           <div className="flex justify-center pb-2 pt-0">
             <Button
@@ -272,9 +347,7 @@ export function CaseChatThread({
           </div>
         ) : null}
         {isLoadingMessages && messages.length === 0 && !isSending ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
+          <ChatSkeleton />
         ) : null}
         {!isLoadingMessages && messages.length === 0 && !isSending ? (
           <p className="py-8 text-center text-sm text-muted-foreground">
@@ -285,17 +358,19 @@ export function CaseChatThread({
         ) : null}
         {(messages.length > 0 || isSending) && !isLoadingMessages ? (
           <>
-            {messages.map((m) => {
+            {messages.map((m, index) => {
               const role = m.senderRole ?? 'user';
               const own = isOwnBubble(m, viewerParticipant, variant);
               const darkBubble = role === 'admin' || role === 'lawyer';
+              const firstInGroup = isFirstInGroup(index);
 
               if (conversation) {
+                const showDate = isNewDate(index);
                 const ownBubble =
                   variant === 'admin' && own
                     ? 'bg-violet-950/90 text-primary-foreground'
                     : own
-                      ? 'bg-navy text-primary-foreground'
+                      ? 'bg-amber-50 text-amber-950 border border-amber-200/60'
                       : 'bg-muted';
                 const avatarRing =
                   role === 'lawyer'
@@ -304,95 +379,146 @@ export function CaseChatThread({
                       ? 'bg-violet-950/40 text-violet-100'
                       : 'bg-muted text-muted-foreground';
                 return (
-                  <div
-                    key={m.id}
-                    className={cn('flex gap-3', own && 'flex-row-reverse')}
-                  >
+                  <div key={m.id}>
+                    {showDate ? (
+                      <DateSeparator label={formatDateSeparator(m.timestamp)} />
+                    ) : null}
                     <div
                       className={cn(
-                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                        avatarRing
+                        'flex gap-3',
+                        own && 'flex-row-reverse',
+                        firstInGroup && !showDate
+                          ? 'mt-3'
+                          : !firstInGroup
+                            ? 'mt-0.5'
+                            : 'mt-1',
+                        !firstInGroup && (own ? 'pr-11' : 'pl-11')
                       )}
                     >
-                      {role === 'lawyer' ? (
-                        <Scale className="h-3.5 w-3.5" />
-                      ) : role === 'admin' ? (
-                        <Shield className="h-3.5 w-3.5" />
-                      ) : (
-                        <User className="h-3.5 w-3.5" />
-                      )}
-                    </div>
-                    <div className={cn('max-w-[70%] rounded-2xl px-4 py-2.5 text-sm', ownBubble)}>
-                      <p
-                        className={cn(
-                          'mb-0.5 text-[11px] font-medium opacity-60',
-                          own && 'text-primary-foreground/80'
-                        )}
-                      >
-                        {roleLabel(role)}
-                      </p>
-                      {m.content?.trim() ? (
-                        <p className="leading-relaxed">{m.content}</p>
+                      {firstInGroup ? (
+                        <div
+                          className={cn(
+                            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                            avatarRing
+                          )}
+                        >
+                          {role === 'lawyer' ? (
+                            <Scale className="h-3.5 w-3.5" />
+                          ) : role === 'admin' ? (
+                            <Shield className="h-3.5 w-3.5" />
+                          ) : (
+                            <User className="h-3.5 w-3.5" />
+                          )}
+                        </div>
                       ) : null}
-                      <MessageAttachmentRow m={m} onOpen={() => openChatAttachment(m)} />
-                      <p
+                      <div
                         className={cn(
-                          'mt-1 text-[10px] opacity-40',
-                          own && 'text-primary-foreground/70'
+                          'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
+                          ownBubble
                         )}
                       >
-                        {formatMessageDigest(m.timestamp)}
-                      </p>
+                        {firstInGroup ? (
+                          <p
+                            className={cn(
+                              'mb-0.5 text-[11px] font-medium opacity-60',
+                              own &&
+                                variant === 'admin' &&
+                                'text-primary-foreground/80'
+                            )}
+                          >
+                            {roleLabel(role)}
+                          </p>
+                        ) : null}
+                        {m.content?.trim() ? (
+                          <p className="leading-relaxed">{m.content}</p>
+                        ) : null}
+                        <MessageAttachmentRow
+                          m={m}
+                          onOpen={() => openChatAttachment(m)}
+                        />
+                        <p
+                          className={cn(
+                            'mt-1 text-right text-[10px] opacity-40',
+                            own &&
+                              variant === 'admin' &&
+                              'text-primary-foreground/70'
+                          )}
+                        >
+                          {formatMessageTimeOnly(m.timestamp)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 );
               }
 
+              const showDate = isNewDate(index);
               return (
-                <div
-                  key={m.id}
-                  className={cn('flex flex-col gap-1', own ? 'items-end' : 'items-start')}
-                >
+                <div key={m.id}>
+                  {showDate ? (
+                    <DateSeparator label={formatDateSeparator(m.timestamp)} />
+                  ) : null}
                   <div
                     className={cn(
-                      'max-w-[85%] rounded-xl text-sm',
-                      bubbleClasses(role),
-                      compact ? 'rounded-lg px-3.5 py-2.5' : 'px-4 py-3'
+                      'flex flex-col',
+                      own ? 'items-end' : 'items-start',
+                      firstInGroup && !showDate
+                        ? 'mt-3'
+                        : !firstInGroup
+                          ? 'mt-0.5'
+                          : 'mt-1'
                     )}
                   >
-                    {m.content?.trim() ? (
-                      <p
-                        className={cn(
-                          'leading-relaxed',
-                          compact ? 'text-[13px]' : 'text-[15px]'
-                        )}
-                      >
-                        {m.content}
-                      </p>
-                    ) : null}
-                    <MessageAttachmentRow m={m} onOpen={() => openChatAttachment(m)} />
                     <div
                       className={cn(
-                        'mt-1.5 flex items-center justify-between gap-2 border-t border-current/10 pt-1 text-[9px] leading-none opacity-75',
-                        darkBubble ? 'text-primary-foreground/75' : 'text-muted-foreground'
+                        'max-w-[85%] rounded-xl text-sm',
+                        bubbleClasses(role),
+                        compact ? 'rounded-lg px-3.5 py-2.5' : 'px-4 py-3'
                       )}
                     >
-                      <span className="flex min-w-0 items-center gap-1">
-                        <Send
-                          className="size-2.5 shrink-0 opacity-80"
-                          strokeWidth={2.5}
-                          aria-hidden
-                        />
-                        <span className="truncate font-medium uppercase tracking-wide">
-                          {roleLabel(role)}
-                        </span>
-                      </span>
-                      <time
-                        className="shrink-0 tabular-nums"
-                        dateTime={m.timestamp}
+                      {m.content?.trim() ? (
+                        <p
+                          className={cn(
+                            'leading-relaxed',
+                            compact ? 'text-[13px]' : 'text-[15px]'
+                          )}
+                        >
+                          {m.content}
+                        </p>
+                      ) : null}
+                      <MessageAttachmentRow
+                        m={m}
+                        onOpen={() => openChatAttachment(m)}
+                      />
+                      <div
+                        className={cn(
+                          'border-current/10 mt-1.5 flex items-center justify-between gap-2 border-t pt-1 text-[9px] leading-none opacity-75',
+                          darkBubble
+                            ? 'text-primary-foreground/75'
+                            : 'text-muted-foreground'
+                        )}
                       >
-                        {formatMessageTimeOnly(m.timestamp)}
-                      </time>
+                        {firstInGroup ? (
+                          <span className="flex min-w-0 items-center gap-1">
+                            <Send
+                              className="size-2.5 shrink-0 opacity-80"
+                              strokeWidth={2.5}
+                              aria-hidden
+                            />
+                            <span className="truncate font-medium uppercase tracking-wide">
+                              {roleLabel(role)}
+                            </span>
+                          </span>
+                        ) : (
+                          <span />
+                        )}
+                        <time
+                          className="shrink-0 tabular-nums"
+                          dateTime={m.timestamp}
+                        >
+                          {formatMessageTimeOnly(m.timestamp)}
+                        </time>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -405,7 +531,9 @@ export function CaseChatThread({
                     <User className="h-3.5 w-3.5" />
                   </div>
                   <div className="max-w-[70%] rounded-2xl border border-dashed border-border/80 bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground">
-                    <p className="mb-0.5 text-[11px] font-medium opacity-60">You</p>
+                    <p className="mb-0.5 text-[11px] font-medium opacity-60">
+                      You
+                    </p>
                     <p className="leading-relaxed">{sendingText}</p>
                     <p className="mt-1 text-[10px] opacity-40">Sending…</p>
                   </div>
@@ -426,8 +554,14 @@ export function CaseChatThread({
                     <div className="mt-1.5 flex items-center justify-between gap-2 border-t border-border/40 pt-1 text-[9px] leading-none text-muted-foreground opacity-80">
                       <span className="flex min-w-0 items-center gap-1">
                         <Loader2 className="size-2.5 shrink-0 animate-spin" />
-                        <Send className="size-2.5 shrink-0 opacity-70" strokeWidth={2.5} aria-hidden />
-                        <span className="font-medium uppercase tracking-wide">You</span>
+                        <Send
+                          className="size-2.5 shrink-0 opacity-70"
+                          strokeWidth={2.5}
+                          aria-hidden
+                        />
+                        <span className="font-medium uppercase tracking-wide">
+                          You
+                        </span>
                       </span>
                       <span className="shrink-0 tabular-nums">…</span>
                     </div>
@@ -442,15 +576,22 @@ export function CaseChatThread({
       <div className="flex shrink-0 gap-2 border-t p-3">
         {composer === 'textarea' ? (
           <Textarea
-            placeholder="Type a message..."
+            ref={textareaRef}
+            placeholder="Type a message... "
             value={draft}
-            onChange={(e) => onDraftChange(e.target.value)}
-            className="max-h-[120px] min-h-[40px] flex-1 resize-none"
+            onChange={(e) => {
+              onDraftChange(e.target.value);
+              autoGrow();
+            }}
+            className="min-h-[40px] flex-1 overflow-y-auto"
             rows={1}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                if (canSend) onSend();
+                if (canSend) {
+                  onSend();
+                  resetTextarea();
+                }
               }
             }}
           />

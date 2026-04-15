@@ -1,5 +1,6 @@
 import { getCaseDetails } from '@/api-client';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseInternalNotesContent } from '@/components/case-detail/CaseInternalNotesContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
@@ -33,7 +34,14 @@ import {
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import { QueryKey, useQuery } from '@tanstack/react-query';
-import { Clock, MessageCircle, Scale, StickyNote, User, Video } from 'lucide-react';
+import {
+  Clock,
+  MessageCircle,
+  Scale,
+  StickyNote,
+  User,
+  Video,
+} from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -73,7 +81,9 @@ const CaseDetail = () => {
     [rawDescription]
   );
 
-  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
@@ -109,9 +119,11 @@ const CaseDetail = () => {
               </span>
             )}
           </div>
-          <h1 className="mt-1 text-xl font-bold sm:text-2xl">
-            {caseData?.title}
-          </h1>
+          <GenericTooltip content={caseData?.title}>
+            <h1 className="mt-1 line-clamp-2 text-xl font-bold sm:text-2xl lg:line-clamp-1">
+              {caseData?.title}
+            </h1>
+          </GenericTooltip>
           {rawDescription ? (
             descriptionIsLong ? (
               <button
@@ -159,8 +171,13 @@ const CaseDetail = () => {
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                    <Link to={id ? path.caseChat(id) : '#'}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    asChild
+                  >
+                    <Link to={id ? path.caseChat(id) : '#'} state={{ title: caseData?.title }}>
                       <MessageCircle className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -216,7 +233,9 @@ const CaseDetail = () => {
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <CardHeader className="shrink-0 pb-3">
               <CardTitle className="text-lg">Documents</CardTitle>
-              <CardDescription>All files attached to this case.</CardDescription>
+              <CardDescription>
+                All files attached to this case.
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
               <CaseDocumentsContent

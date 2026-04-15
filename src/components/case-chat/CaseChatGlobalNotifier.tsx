@@ -98,11 +98,11 @@ export function CaseChatGlobalNotifier() {
   }, []);
 
   const goToChat = useCallback(
-    (target: string, caseId: string) => {
+    (target: string, caseId: string, title?: string) => {
       invalidateCaseMessagesForCase(queryClient, caseId);
       invalidateCaseChatUnread(queryClient);
       dismissPeek();
-      navigate(target);
+      navigate(target, { state: { title } });
     },
     [dismissPeek, navigate]
   );

@@ -184,7 +184,7 @@ export const DashboardLayout = ({
           )}
 
           <nav
-            className={cn('flex-1 space-y-0.5', collapsed ? 'px-1.5' : 'px-3')}
+            className={cn('min-h-0 flex-1 space-y-0.5 overflow-y-auto', collapsed ? 'px-1.5' : 'px-3')}
           >
             {nav.map((item) => {
               const active =

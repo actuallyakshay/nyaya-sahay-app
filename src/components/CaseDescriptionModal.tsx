@@ -1,3 +1,4 @@
+import { GenericTooltip } from '@/components/GenericTooltip';
 import {
   Dialog,
   DialogContent,
@@ -23,9 +24,11 @@ export const CaseDescriptionModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[min(80vh,720px)] w-full max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogHeader className="shrink-0 space-y-1 border-b px-6 py-4 pr-14 text-left">
-          <DialogTitle className="text-left text-base font-semibold leading-snug">
-            {caseTitle || 'Case'}
-          </DialogTitle>
+          <GenericTooltip content={caseTitle || 'Case'} side="bottom">
+            <DialogTitle className="line-clamp-2 text-left text-base font-semibold leading-snug">
+              {caseTitle || 'Case'}
+            </DialogTitle>
+          </GenericTooltip>
           <DialogDescription className="text-left text-xs">
             Case description
           </DialogDescription>
