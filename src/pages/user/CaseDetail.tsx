@@ -1,13 +1,20 @@
 import { getCaseDetails } from '@/api-client';
+import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
+import { CaseInternalNotesContent } from '@/components/case-detail/CaseInternalNotesContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
-import { DocumentsDrawer } from '@/components/DocumentsDrawer';
-import { InternalNotesDrawer } from '@/components/InternalNotesDrawer';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Tooltip,
   TooltipContent,
@@ -15,9 +22,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { SessionBookingModal } from '@/components/user/SessionBookingModal';
+import { path } from '@/constants';
 import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { path } from '@/constants';
 import {
   DESCRIPTION_PREVIEW_MAX_WORDS,
   splitWords,
@@ -26,15 +33,7 @@ import {
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import { QueryKey, useQuery } from '@tanstack/react-query';
-import {
-  Clock,
-  FileText,
-  MessageCircle,
-  Scale,
-  StickyNote,
-  User,
-  Video,
-} from 'lucide-react';
+import { Clock, MessageCircle, Scale, StickyNote, User, Video } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -42,10 +41,8 @@ const CaseDetail = () => {
   const { id } = useParams();
   const activeRole = getCookie('x-active-role');
   const isLawyer = activeRole === 'lawyer' ? true : false;
-  const drawerFileInputRef = useRef<HTMLInputElement>(null);
+  const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
-  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
@@ -76,11 +73,11 @@ const CaseDetail = () => {
     [rawDescription]
   );
 
-  const handleDrawerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    await uploadFromSource(file, 'Documents drawer');
+    await uploadFromSource(file, 'Case page');
     await queryClient.invalidateQueries({ queryKey });
   };
 
@@ -89,16 +86,18 @@ const CaseDetail = () => {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <CaseDetailSkeleton />
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <CaseDetailSkeleton isLawyer={isLawyer} />
+        </div>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         {/* Header */}
-        <div>
+        <div className="shrink-0">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-muted-foreground">
               {caseData?.caseCode}
@@ -138,7 +137,7 @@ const CaseDetail = () => {
         </div>
 
         {/* Action bar */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           {isLawyerAssigned && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20">
               <Scale className="h-3 w-3" />
@@ -175,20 +174,6 @@ const CaseDetail = () => {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => setDocsDrawerOpen(true)}
-                  >
-                    <FileText className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Documents</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
                     onClick={() => setTimelineDrawerOpen(true)}
                   >
                     <Clock className="h-4 w-4" />
@@ -196,22 +181,6 @@ const CaseDetail = () => {
                 </TooltipTrigger>
                 <TooltipContent>Timeline</TooltipContent>
               </Tooltip>
-
-              {isLawyer && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setNotesDrawerOpen(true)}
-                    >
-                      <StickyNote className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Internal Notes</TooltipContent>
-                </Tooltip>
-              )}
 
               {isLawyerAssigned && (
                 <Tooltip>
@@ -232,14 +201,62 @@ const CaseDetail = () => {
           </TooltipProvider>
         </div>
 
-        <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+        <div className="shrink-0">
+          <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+        </div>
+
+        {/* Documents + internal notes — flex-1 fills remaining viewport height */}
+        <div
+          className={
+            isLawyer
+              ? 'flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch'
+              : 'flex min-h-0 flex-1 flex-col gap-4'
+          }
+        >
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CardHeader className="shrink-0 pb-3">
+              <CardTitle className="text-lg">Documents</CardTitle>
+              <CardDescription>All files attached to this case.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+              <CaseDocumentsContent
+                caseClientName={caseData?.user?.fullName}
+                caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
+                caseStatus={caseData?.status}
+                loading={isUploadingDocument}
+                onUploadClick={(qk) => {
+                  if (isUploadingDocument) return;
+                  documentUploadInputRef.current?.click();
+                  setQueryKey(qk);
+                }}
+              />
+            </CardContent>
+          </Card>
+
+          {isLawyer ? (
+            <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <CardHeader className="shrink-0 pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <StickyNote className="h-4 w-4 shrink-0" />
+                  Internal Notes
+                </CardTitle>
+                <CardDescription>
+                  Private notes visible only to lawyers and admins.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+                <CaseInternalNotesContent />
+              </CardContent>
+            </Card>
+          ) : null}
+        </div>
 
         <input
-          ref={drawerFileInputRef}
+          ref={documentUploadInputRef}
           type="file"
           accept={CASE_DOCUMENT_ACCEPT}
           className="hidden"
-          onChange={handleDrawerUpload}
+          onChange={handleDocumentUpload}
         />
       </div>
 
@@ -250,27 +267,11 @@ const CaseDetail = () => {
         description={rawDescription}
       />
 
-      {/* Booking dialog */}
       <SessionBookingModal
         bookingOpen={bookingOpen}
         setBookingOpen={setBookingOpen}
         caseId={id}
         lawyerName={caseData?.assignedLawyer?.user?.fullName}
-      />
-
-      {/* Drawers */}
-      <DocumentsDrawer
-        open={docsDrawerOpen}
-        caseClientName={caseData?.user?.fullName}
-        caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
-        caseStatus={caseData?.status}
-        onOpenChange={setDocsDrawerOpen}
-        onUploadClick={(queryKey) => {
-          if (isUploadingDocument) return;
-          drawerFileInputRef.current?.click();
-          setQueryKey(queryKey);
-        }}
-        loading={isUploadingDocument}
       />
 
       <TimelineDrawer
@@ -279,13 +280,6 @@ const CaseDetail = () => {
         status={caseData?.status}
         updatedAt={caseData?.updatedAt}
       />
-
-      {isLawyer && (
-        <InternalNotesDrawer
-          open={notesDrawerOpen}
-          onOpenChange={setNotesDrawerOpen}
-        />
-      )}
     </DashboardLayout>
   );
 };

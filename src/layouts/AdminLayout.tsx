@@ -32,7 +32,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
+    <div className="flex min-h-screen flex-col lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:flex-row lg:overflow-hidden">
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 lg:hidden">
         <button
           type="button"
@@ -194,10 +194,12 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <main className="min-h-screen flex-1">
-        <div className="p-4 md:p-6 lg:p-8">
-          <Breadcrumbs />
-          {children}
+      <main className="flex min-h-screen flex-1 flex-col overflow-y-auto lg:min-h-0">
+        <div className="flex min-h-0 flex-1 flex-col p-4 md:p-6 lg:p-8">
+          <div className="shrink-0">
+            <Breadcrumbs />
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         </div>
       </main>
     </div>

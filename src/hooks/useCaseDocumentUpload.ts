@@ -28,11 +28,16 @@ export function useCaseDocumentUpload(
 
   const uploadFromSource = async (
     file: File,
-    source: 'Chat' | 'Documents drawer'
+    source: 'Chat' | 'Documents drawer' | 'Case page'
   ) => {
     try {
       await uploadSingleDocument(file);
       await queryClient.invalidateQueries({ queryKey: ['case-documents'] });
+      if (author === 'admin') {
+        await queryClient.invalidateQueries({
+          queryKey: ['admin-case-documents'],
+        });
+      }
       toast({
         title: 'Document uploaded',
         description: `${file.name} uploaded from ${source}.`,

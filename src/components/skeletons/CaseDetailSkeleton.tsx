@@ -1,9 +1,13 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const CaseDetailSkeleton = () => (
-  <div className="space-y-4">
+type CaseDetailSkeletonProps = {
+  isLawyer?: boolean;
+};
+
+export const CaseDetailSkeleton = ({ isLawyer = false }: CaseDetailSkeletonProps) => (
+  <div className="flex min-h-0 flex-1 flex-col gap-4">
     {/* Header */}
-    <div>
+    <div className="shrink-0">
       <div className="flex flex-wrap items-center gap-2">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-5 w-20 rounded-full" />
@@ -14,70 +18,51 @@ export const CaseDetailSkeleton = () => (
     </div>
 
     {/* Action bar */}
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex shrink-0 flex-wrap items-center gap-2">
       <Skeleton className="h-7 w-36 rounded-full" />
       <Skeleton className="h-4 w-24" />
       <div className="flex-1" />
       <div className="flex items-center gap-1">
-        {Array.from({ length: 3 }).map((_, i) => (
+        {Array.from({ length: isLawyer ? 3 : 2 }).map((_, i) => (
           <Skeleton key={i} className="h-8 w-8 rounded-md" />
         ))}
       </div>
     </div>
 
-    {/* Chat section */}
+    {/* Meeting URI line (optional on real page) */}
+    <div className="shrink-0">
+      <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+    </div>
+
+    {/* Documents + optional internal notes */}
     <div
-      className="flex flex-col rounded-xl border bg-card"
-      style={{ height: '600px' }}
+      className={
+        isLawyer
+          ? 'flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch'
+          : 'flex min-h-0 flex-1 flex-col gap-4'
+      }
     >
-      {/* Chat header */}
-      <div className="flex shrink-0 items-center justify-between border-b p-3">
-        <Skeleton className="h-4 w-36" />
-        <Skeleton className="h-3 w-20" />
+      <div className="flex min-h-0 flex-1 flex-col rounded-lg border bg-card p-6 shadow-sm">
+        <Skeleton className="h-5 w-28" />
+        <Skeleton className="mt-2 h-3 w-full max-w-xs" />
+        <div className="mt-6 flex min-h-0 flex-1 flex-col gap-3">
+          <Skeleton className="h-16 w-full rounded-md" />
+          <Skeleton className="h-16 w-full rounded-md" />
+        </div>
+        <Skeleton className="mt-6 h-9 w-full rounded-md" />
+        <Skeleton className="mt-3 h-10 w-full rounded-md" />
       </div>
-
-      {/* Chat messages area */}
-      <div className="flex-1 space-y-4 overflow-hidden p-4">
-        {/* Left-aligned message */}
-        <div className="flex gap-3">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-          <div className="space-y-1.5">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-16 w-56 rounded-xl" />
+      {isLawyer ? (
+        <div className="flex min-h-0 flex-1 flex-col rounded-lg border bg-card p-6 shadow-sm">
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="mt-2 h-3 w-full max-w-sm" />
+          <div className="mt-6 flex min-h-0 flex-1 flex-col gap-3">
+            <Skeleton className="h-20 w-full rounded-md" />
           </div>
+          <Skeleton className="mt-6 h-20 w-full rounded-md" />
+          <Skeleton className="mt-3 h-10 w-full rounded-md" />
         </div>
-        {/* Right-aligned message */}
-        <div className="flex flex-row-reverse gap-3">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-          <div className="space-y-1.5">
-            <Skeleton className="ml-auto h-3 w-16" />
-            <Skeleton className="h-12 w-48 rounded-xl" />
-          </div>
-        </div>
-        {/* Left-aligned message */}
-        <div className="flex gap-3">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-          <div className="space-y-1.5">
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-20 w-64 rounded-xl" />
-          </div>
-        </div>
-        {/* Right-aligned message */}
-        <div className="flex flex-row-reverse gap-3">
-          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-          <div className="space-y-1.5">
-            <Skeleton className="ml-auto h-3 w-16" />
-            <Skeleton className="h-14 w-52 rounded-xl" />
-          </div>
-        </div>
-      </div>
-
-      {/* Chat input bar */}
-      <div className="flex shrink-0 gap-2 border-t p-3">
-        <Skeleton className="h-10 flex-1 rounded-md" />
-        <Skeleton className="h-10 w-10 rounded-md" />
-        <Skeleton className="h-10 w-10 rounded-md" />
-      </div>
+      ) : null}
     </div>
   </div>
 );

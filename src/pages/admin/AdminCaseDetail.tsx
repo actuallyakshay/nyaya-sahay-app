@@ -1,12 +1,19 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
-import { AdminInternalNotesDrawer } from '@/components/admin/AdminInternalNotesDrawer';
+import { AdminCaseInternalNotesContent } from '@/components/case-detail/AdminCaseInternalNotesContent';
+import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
-import { DocumentsDrawer } from '@/components/DocumentsDrawer';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -39,13 +46,11 @@ import {
   CalendarDays,
   Clock,
   ExternalLink,
-  FileText,
   Gavel,
   Hash,
   Loader2,
   MessageCircle,
   RotateCcw,
-  Scale,
   StickyNote,
   Tag,
   User,
@@ -76,10 +81,8 @@ const AdminCaseDetail = () => {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
-  const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
-  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
-  const drawerFileInputRef = useRef<HTMLInputElement>(null);
+  const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
 
@@ -123,11 +126,13 @@ const AdminCaseDetail = () => {
     await resetCase();
   };
 
-  const handleDrawerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    await uploadFromSource(file, 'Documents drawer');
+    await uploadFromSource(file, 'Case page');
     await queryClient.invalidateQueries({ queryKey });
   };
 
@@ -144,245 +149,264 @@ const AdminCaseDetail = () => {
   if (isLoading) {
     return (
       <AdminLayout>
-        <CaseDetailSkeleton />
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <CaseDetailSkeleton isLawyer />
+        </div>
       </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-      <div className="space-y-4">
-        {/* Header card */}
-        <div className="overflow-hidden rounded-xl border bg-card">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-5 py-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-lg font-bold tracking-tight">
-                {caseData?.title}
-              </h1>
-              <StatusBadge status={caseData?.status} />
-              {caseData?.isEmergency && (
-                <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
-                  Urgent
-                </span>
-              )}
-              <Badge
-                variant="outline"
-                className={`gap-1 text-[11px] ${pConfig.color}`}
-              >
-                {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
-                {(caseData?.priority ?? 'normal').toUpperCase()}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-1.5">
-              {caseData?.status !== 'closed' &&
-                caseData?.status !== 'resolved' && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs"
-                      disabled={isCaseActionPending}
-                      onClick={() => void handleResetCase()}
-                    >
-                      {isResetting ? (
-                        <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <RotateCcw className="mr-1 h-3.5 w-3.5" />
-                      )}
-                      Reset
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="h-8 text-xs"
-                      disabled={isCaseActionPending}
-                      onClick={() => setCloseDialogOpen(true)}
-                    >
-                      <XCircle className="mr-1 h-3.5 w-3.5" />
-                      Close
-                    </Button>
-                  </>
-                )}
-            </div>
-          </div>
-
-          {/* Meta: one wrapped row; description full-width below (avoids stretched / misaligned columns) */}
-          <div className="space-y-4 px-5 py-4">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Hash className="h-3.5 w-3.5 shrink-0" />
-                <span className="font-mono text-foreground">
-                  {caseData?.caseCode}
-                </span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Tag className="h-3.5 w-3.5 shrink-0" />
-                <span className="text-foreground">
-                  {caseData?.practiceArea?.name}
-                </span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                Created{' '}
-                {new Date(caseData?.createdAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                Updated{' '}
-                {new Date(timelineUpdatedAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <User className="h-3.5 w-3.5 shrink-0" />
-                <span className="font-medium text-foreground">
-                  {caseData?.user?.fullName ?? '—'}
-                </span>
-                {userId ? (
-                  <Link
-                    to={path.adminUser(userId)}
-                    className="text-primary hover:underline"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                  </Link>
-                ) : null}
-              </span>
-              {lawyerDisplayName ? (
-                <span className="flex items-center gap-1.5">
-                  <Gavel className="h-3.5 w-3.5 shrink-0" />
-                  <span className="font-medium text-foreground">
-                    Adv. {lawyerDisplayName}
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
+        <div className="shrink-0 space-y-4">
+          {/* Header card */}
+          <div className="overflow-hidden rounded-xl border bg-card">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-5 py-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-lg font-bold tracking-tight">
+                  {caseData?.title}
+                </h1>
+                <StatusBadge status={caseData?.status} />
+                {caseData?.isEmergency && (
+                  <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
+                    Urgent
                   </span>
-                  {lawyerProfileId ? (
+                )}
+                <Badge
+                  variant="outline"
+                  className={`gap-1 text-[11px] ${pConfig.color}`}
+                >
+                  {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
+                  {(caseData?.priority ?? 'normal').toUpperCase()}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {caseData?.status !== 'closed' &&
+                  caseData?.status !== 'resolved' && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs"
+                        disabled={isCaseActionPending}
+                        onClick={() => void handleResetCase()}
+                      >
+                        {isResetting ? (
+                          <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <RotateCcw className="mr-1 h-3.5 w-3.5" />
+                        )}
+                        Reset
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 text-xs"
+                        disabled={isCaseActionPending}
+                        onClick={() => setCloseDialogOpen(true)}
+                      >
+                        <XCircle className="mr-1 h-3.5 w-3.5" />
+                        Close
+                      </Button>
+                    </>
+                  )}
+              </div>
+            </div>
+
+            <div className="space-y-4 px-5 py-4">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Hash className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-mono text-foreground">
+                    {caseData?.caseCode}
+                  </span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Tag className="h-3.5 w-3.5 shrink-0" />
+                  <span className="text-foreground">
+                    {caseData?.practiceArea?.name}
+                  </span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  Created{' '}
+                  {new Date(caseData?.createdAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  Updated{' '}
+                  {new Date(timelineUpdatedAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium text-foreground">
+                    {caseData?.user?.fullName ?? '—'}
+                  </span>
+                  {userId ? (
                     <Link
-                      to={path.adminLawyer(lawyerProfileId)}
+                      to={path.adminUser(userId)}
                       className="text-primary hover:underline"
                     >
                       <ExternalLink className="h-3 w-3" />
                     </Link>
                   ) : null}
                 </span>
-              ) : null}
-            </div>
-            <div className="rounded-lg border bg-muted/30 px-4 py-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Description
-              </h3>
-              {rawDescription ? (
-                descriptionIsLong ? (
-                  <button
-                    type="button"
-                    className="group mt-2 w-full rounded-md text-left text-sm leading-relaxed text-foreground/90 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    onClick={() => setDescriptionModalOpen(true)}
-                  >
-                    <span className="block whitespace-pre-wrap">
-                      {descriptionPreviewText}
+                {lawyerDisplayName ? (
+                  <span className="flex items-center gap-1.5">
+                    <Gavel className="h-3.5 w-3.5 shrink-0" />
+                    <span className="font-medium text-foreground">
+                      Adv. {lawyerDisplayName}
                     </span>
-                    <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold">
-                      Show full description
-                    </span>
-                  </button>
-                ) : (
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                    {rawDescription}
-                  </p>
-                )
-              ) : (
-                <p className="mt-2 text-sm text-muted-foreground">—</p>
-              )}
-            </div>
-          </div>
-          <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3">
-            <div className="w-full min-w-0 flex-1 basis-full sm:basis-0">
-              <AdminCaseLawyerAssign
-                caseId={id}
-                caseStatus={caseData?.status}
-              />
-            </div>
-            <TooltipProvider delayDuration={300}>
-              <div className="ml-auto flex shrink-0 items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                      <Link to={id ? path.adminCaseChat(id) : '#'}>
-                        <MessageCircle className="h-4 w-4" />
+                    {lawyerProfileId ? (
+                      <Link
+                        to={path.adminLawyer(lawyerProfileId)}
+                        className="text-primary hover:underline"
+                      >
+                        <ExternalLink className="h-3 w-3" />
                       </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Case chat</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setDocsDrawerOpen(true)}
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Documents</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setTimelineDrawerOpen(true)}
-                    >
-                      <Clock className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Timeline</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setNotesDrawerOpen(true)}
-                    >
-                      <StickyNote className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Internal Notes</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Video className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Book Session</TooltipContent>
-                </Tooltip>
+                    ) : null}
+                  </span>
+                ) : null}
               </div>
-            </TooltipProvider>
+              <div className="rounded-lg border bg-muted/30 px-4 py-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Description
+                </h3>
+                {rawDescription ? (
+                  descriptionIsLong ? (
+                    <button
+                      type="button"
+                      className="group mt-2 w-full rounded-md text-left text-sm leading-relaxed text-foreground/90 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      onClick={() => setDescriptionModalOpen(true)}
+                    >
+                      <span className="block whitespace-pre-wrap">
+                        {descriptionPreviewText}
+                      </span>
+                      <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold">
+                        Show full description
+                      </span>
+                    </button>
+                  ) : (
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                      {rawDescription}
+                    </p>
+                  )
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">—</p>
+                )}
+              </div>
+            </div>
+            <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3">
+              <div className="w-full min-w-0 flex-1 basis-full sm:basis-0">
+                <AdminCaseLawyerAssign
+                  caseId={id}
+                  caseStatus={caseData?.status}
+                />
+              </div>
+              <TooltipProvider delayDuration={300}>
+                <div className="ml-auto flex shrink-0 items-center gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        asChild
+                      >
+                        <Link to={id ? path.adminCaseChat(id) : '#'}>
+                          <MessageCircle className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Case chat</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setTimelineDrawerOpen(true)}
+                      >
+                        <Clock className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Timeline</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Video className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Book Session</TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipProvider>
+            </div>
           </div>
         </div>
 
+        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch">
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CardHeader className="shrink-0 pb-3">
+              <CardTitle className="text-lg">Documents</CardTitle>
+              <CardDescription>
+                All files attached to this case.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+              <CaseDocumentsContent
+                isAdmin
+                caseClientName={caseData?.user?.fullName}
+                caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
+                caseStatus={caseData?.status}
+                loading={isUploadingDocument}
+                onUploadClick={(qk) => {
+                  if (isUploadingDocument) return;
+                  documentUploadInputRef.current?.click();
+                  setQueryKey(qk);
+                }}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CardHeader className="shrink-0 pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <StickyNote className="h-4 w-4 shrink-0" />
+                Internal Notes
+              </CardTitle>
+              <CardDescription>
+                Private notes visible only to lawyers and admins.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+              <AdminCaseInternalNotesContent caseStatus={caseData?.status} />
+            </CardContent>
+          </Card>
+        </div>
+
         <input
-          ref={drawerFileInputRef}
+          ref={documentUploadInputRef}
           type="file"
           accept={CASE_DOCUMENT_ACCEPT}
           className="hidden"
-          onChange={handleDrawerUpload}
+          onChange={handleDocumentUpload}
         />
       </div>
 
-      {/* Dialogs & Drawers */}
       <CaseDescriptionModal
         open={descriptionModalOpen}
         onOpenChange={setDescriptionModalOpen}
@@ -427,25 +451,6 @@ const AdminCaseDetail = () => {
         </DialogContent>
       </Dialog>
 
-      <AdminInternalNotesDrawer
-        open={notesDrawerOpen}
-        caseStatus={caseData?.status}
-        onOpenChange={setNotesDrawerOpen}
-      />
-      <DocumentsDrawer
-        isAdmin={true}
-        caseStatus={caseData?.status}
-        open={docsDrawerOpen}
-        onOpenChange={setDocsDrawerOpen}
-        caseClientName={caseData?.user?.fullName}
-        caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
-        loading={isUploadingDocument}
-        onUploadClick={(queryKey) => {
-          if (isUploadingDocument) return;
-          drawerFileInputRef.current?.click();
-          setQueryKey(queryKey);
-        }}
-      />
       <TimelineDrawer
         open={timelineDrawerOpen}
         onOpenChange={setTimelineDrawerOpen}
