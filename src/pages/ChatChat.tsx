@@ -1,46 +1,45 @@
-import { getCaseDetails, markAdminCaseChatRead, markCaseChatRead, uploadAsset } from '@/api-client';
+import {
+  markAdminCaseChatRead,
+  markCaseChatRead,
+  uploadAsset,
+} from '@/api-client';
 import { CaseChatThread } from '@/components/case-chat/CaseChatThread';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
+import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatSocket } from '@/hooks/use-case-chat-socket';
 import { useCaseMessages } from '@/hooks/use-case-messages';
 import { useToast } from '@/hooks/use-toast';
-import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UserRole } from '@/types';
-import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Loader2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 
 export default function CaseChatPage() {
   const { id } = useParams();
-  const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith('/admin');
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
   const activeRole = getCookie('x-active-role');
-  const viewerParticipant: UserRole =
-    isAdmin ? 'admin' : activeRole === 'lawyer' ? 'lawyer' : 'user';
+  const viewerParticipant: UserRole = isAdmin
+    ? 'admin'
+    : activeRole === 'lawyer'
+      ? 'lawyer'
+      : 'user';
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  const caseTitle =
+    (location.state as { title?: string } | null)?.title || 'Case Chat';
+  const userName = user?.fullName?.trim() || 'Client';
 
   const [message, setMessage] = useState('');
   const [isUploadingChatFile, setIsUploadingChatFile] = useState(false);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
-
-  const { data: userCaseData, isLoading: userCaseLoading } = useQuery({
-    queryKey: ['case-details', id],
-    queryFn: async () => (await getCaseDetails(id)).data,
-    enabled: Boolean(id) && !isAdmin,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: adminCaseData, isLoading: adminCaseLoading } =
-    useAdminCaseDetails(isAdmin ? id : undefined);
-
-  const caseData = isAdmin ? adminCaseData : userCaseData;
-  const isCaseLoading = isAdmin ? adminCaseLoading : userCaseLoading;
 
   const messagesVariant = isAdmin ? 'admin' : 'user';
   const {
@@ -52,10 +51,14 @@ export default function CaseChatPage() {
   } = useCaseMessages(id, messagesVariant);
 
   const tailMessage = messages[messages.length - 1];
-  const { status: chatStatus, send: sendChat, sendingText } = useCaseChatSocket({
+  const {
+    status: chatStatus,
+    send: sendChat,
+    sendingText,
+  } = useCaseChatSocket({
     caseId: id,
     variant: messagesVariant,
-    enabled: Boolean(caseData && id),
+    enabled: Boolean(id),
     markRead: isAdmin ? markAdminCaseChatRead : markCaseChatRead,
     isMessagesPending,
     tailMessageId: tailMessage?.id,
@@ -67,7 +70,9 @@ export default function CaseChatPage() {
     setMessage('');
   };
 
-  const handleChatAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChatAttachment = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file || !id) return;
@@ -97,50 +102,39 @@ export default function CaseChatPage() {
   if (!id) {
     return (
       <Layout>
-        <div className="py-16 text-center text-muted-foreground">Invalid case.</div>
+        <div className="py-16 text-center text-muted-foreground">
+          Invalid case.
+        </div>
       </Layout>
     );
   }
 
   const backLink = isAdmin ? path.adminCase(id) : path.caseDetail(id);
 
-  if (isCaseLoading) {
-    return (
-      <Layout>
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      </Layout>
-    );
-  }
-
-  if (!caseData) {
-    return (
-      <Layout>
-        <div className="py-16 text-center">
-          <p className="text-muted-foreground">Case not found.</p>
-          <Button variant="outline" className="mt-4" asChild>
-            <Link to={backLink}>Go back</Link>
-          </Button>
-        </div>
-      </Layout>
-    );
-  }
-
-  const subtitle = `${caseData.caseCode ?? ''} · ${caseData.user?.fullName?.trim() || 'Client'}`;
-
   return (
     <Layout>
-      <div className="flex min-h-0 flex-col" style={{ height: 'calc(100vh - 80px)' }}>
+      <div
+        className="flex min-h-0 flex-col"
+        style={{ height: 'calc(100vh - 80px)' }}
+      >
         <div className="mb-3 flex shrink-0 items-center gap-3 border-b pb-3">
           <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
             <Link to={backLink} aria-label="Back to case">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div className="min-w-0 flex-1">
-            <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
-            <p className="truncate text-sm font-semibold text-foreground">{caseData.title}</p>
+
+          <div className="min-w-0">
+            <p className="mt-0.5 text-xs text-muted-foreground">{userName}</p>
+            <GenericTooltip
+              content={caseTitle}
+              side="bottom"
+              className="min-w-0 flex-1"
+            >
+              <p className="truncate text-sm font-semibold text-foreground">
+                {caseTitle}
+              </p>
+            </GenericTooltip>
           </div>
         </div>
 

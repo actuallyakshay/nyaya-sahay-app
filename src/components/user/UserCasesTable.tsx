@@ -1,4 +1,3 @@
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { path } from '@/constants';
 import { CASE_STATUS_FILTERS } from '@/lib/mock-data';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -66,9 +66,7 @@ export const UserCasesTable = ({
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                 Title
               </th>
-              <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
-                Category
-              </th>
+
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                 Status
               </th>
@@ -114,7 +112,9 @@ export const UserCasesTable = ({
                 >
                   <td className="px-4 py-3 font-mono text-xs">
                     <Link
-                      to={isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)}
+                      to={
+                        isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)
+                      }
                       className="hover:text-gold hover:underline"
                     >
                       {c.caseCode}
@@ -122,14 +122,13 @@ export const UserCasesTable = ({
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)}
+                      to={
+                        isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)
+                      }
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}
                     </Link>
-                  </td>
-                  <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
-                    {c.practiceArea?.name || '—'}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={c.status} />

@@ -26,7 +26,7 @@ export default function CaseNotificationsPage() {
     invalidateCaseMessagesForCase(queryClient, row.caseId);
     invalidateCaseChatUnread(queryClient);
     const target = isAdmin ? path.adminCaseChat(row.caseId) : path.caseChat(row.caseId);
-    navigate(target);
+    navigate(target, { state: { title: row.title } });
   };
 
   return (

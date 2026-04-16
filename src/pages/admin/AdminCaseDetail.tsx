@@ -2,6 +2,7 @@ import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign'
 import { AdminCaseInternalNotesContent } from '@/components/case-detail/AdminCaseInternalNotesContent';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
@@ -164,9 +165,11 @@ const AdminCaseDetail = () => {
           <div className="overflow-hidden rounded-xl border bg-card">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-5 py-3">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-lg font-bold tracking-tight">
-                  {caseData?.title}
-                </h1>
+                <GenericTooltip content={caseData?.title}>
+                  <h1 className="truncate text-lg font-bold tracking-tight">
+                    {caseData?.title}
+                  </h1>
+                </GenericTooltip>
                 <StatusBadge status={caseData?.status} />
                 {caseData?.isEmergency && (
                   <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
