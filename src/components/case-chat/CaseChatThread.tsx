@@ -395,6 +395,7 @@ export function CaseChatThread({
                         !firstInGroup && (own ? 'pr-11' : 'pl-11')
                       )}
                     >
+
                       {firstInGroup ? (
                         <div
                           className={cn(
@@ -412,6 +413,38 @@ export function CaseChatThread({
                         </div>
                       ) : null}
                       <div
+=======
+                      {role === 'lawyer' ? (
+                        <Scale className="h-3.5 w-3.5" />
+                      ) : role === 'admin' ? (
+                        <Shield className="h-3.5 w-3.5" />
+                      ) : (
+                        <User className="h-3.5 w-3.5" />
+                      )}
+                    </div>
+                    <div
+                      className={cn(
+                        'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
+                        ownBubble
+                      )}
+                    >
+                      <p
+                        className={cn(
+                          'mb-0.5 text-[11px] font-medium opacity-60',
+                          own && 'text-primary-foreground/80'
+                        )}
+                      >
+                        {roleLabel(role)}
+                      </p>
+                      {m.content?.trim() ? (
+                        <p className="leading-relaxed">{m.content}</p>
+                      ) : null}
+                      <MessageAttachmentRow
+                        m={m}
+                        onOpen={() => openChatAttachment(m)}
+                      />
+                      <p
+>>>>>>> d87771ce76c02655e66d2f06cefa35541d6fab3c
                         className={cn(
                           'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
                           ownBubble
@@ -458,6 +491,15 @@ export function CaseChatThread({
                   {showDate ? (
                     <DateSeparator label={formatDateSeparator(m.timestamp)} />
                   ) : null}
+=======
+                <div
+                  key={m.id}
+                  className={cn(
+                    'flex flex-col gap-1',
+                    own ? 'items-end' : 'items-start'
+                  )}
+                >
+>>>>>>> d87771ce76c02655e66d2f06cefa35541d6fab3c
                   <div
                     className={cn(
                       'flex flex-col',
@@ -474,6 +516,28 @@ export function CaseChatThread({
                         'max-w-[85%] rounded-xl text-sm',
                         bubbleClasses(role),
                         compact ? 'rounded-lg px-3.5 py-2.5' : 'px-4 py-3'
+=======
+                    {m.content?.trim() ? (
+                      <p
+                        className={cn(
+                          'leading-relaxed',
+                          compact ? 'text-[13px]' : 'text-[15px]'
+                        )}
+                      >
+                        {m.content}
+                      </p>
+                    ) : null}
+                    <MessageAttachmentRow
+                      m={m}
+                      onOpen={() => openChatAttachment(m)}
+                    />
+                    <div
+                      className={cn(
+                        'border-current/10 mt-1.5 flex items-center justify-between gap-2 border-t pt-1 text-[9px] leading-none opacity-75',
+                        darkBubble
+                          ? 'text-primary-foreground/75'
+                          : 'text-muted-foreground'
+>>>>>>> d87771ce76c02655e66d2f06cefa35541d6fab3c
                       )}
                     >
                       {m.content?.trim() ? (
