@@ -43,11 +43,13 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
     });
     queryClient.clear();
+
     const minSpinnerMs = 220;
     const remaining = minSpinnerMs - (performance.now() - started);
     if (remaining > 0) {
       await new Promise((r) => setTimeout(r, remaining));
     }
+    window.location.reload();
     setIsClearingCache(false);
   };
 

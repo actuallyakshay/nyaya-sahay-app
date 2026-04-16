@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { syncFcmToken } from '@/hooks/use-fcm-token';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
@@ -66,9 +67,11 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
       if (!data.status) throw new Error(data.message);
       if (data?.isAdmin) {
         setCookie('x-active-role', 'admin');
+        void syncFcmToken();
         return navigate(ROUTES.admin.dashboard);
       } else {
         setCookie('x-active-role', role as string);
+        void syncFcmToken();
       }
       toast({
         title: 'Welcome!',
