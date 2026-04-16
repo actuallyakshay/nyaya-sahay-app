@@ -1,5 +1,6 @@
 import { login } from '@/api-client';
 import { ROUTES, dashboardForRole } from '@/constants';
+import { syncFcmToken } from '@/hooks/use-fcm-token';
 import { useAdminLoginOtp } from '@/hooks/use-admin-login-otp';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
@@ -28,6 +29,7 @@ export function useLoginEmailAuth(role: LoginRole) {
 
   const finishAsAdmin = useCallback(() => {
     setCookie('x-active-role', 'admin');
+    void syncFcmToken();
     toast({ title: 'Welcome back!', description: 'Signed in to admin.' });
     navigate(ROUTES.admin.dashboard);
   }, [navigate, toast]);
@@ -36,6 +38,7 @@ export function useLoginEmailAuth(role: LoginRole) {
 
   const finishAsClientOrLawyer = useCallback(() => {
     setCookie('x-active-role', role);
+    void syncFcmToken();
     toast({
       title: 'Welcome back!',
       description: `Logged in as ${role}.`,
