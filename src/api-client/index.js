@@ -308,6 +308,14 @@ export const updateUserProfile = (data) => {
   });
 };
 
+export const updateUserFcmToken = (body) => {
+  return apiClient({
+    method: routes.UPDATE_FCM_TOKEN.METHOD,
+    url: routes.UPDATE_FCM_TOKEN.URL,
+    data: body,
+  });
+};
+
 export const getLawyersCases = (params) => {
   return apiClient({
     method: routes.LAWYERS_CASES.METHOD,

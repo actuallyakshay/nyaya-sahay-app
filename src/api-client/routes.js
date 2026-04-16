@@ -39,6 +39,10 @@ const routes = {
     URL: '/api/users',
     METHOD: 'PATCH',
   },
+  UPDATE_FCM_TOKEN: {
+    URL: '/api/users/update-fcm-token',
+    METHOD: 'PATCH',
+  },
   CATEGORIES: {
     URL: '/api/cases/categories',
     METHOD: 'GET',

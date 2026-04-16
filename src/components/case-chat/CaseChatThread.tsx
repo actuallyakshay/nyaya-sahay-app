@@ -2,14 +2,14 @@ import { FileViewer } from '@/components/FileViewer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { getFileIcon } from '@/lib/helpers';
+import { cn } from '@/lib/utils';
 import type {
   CaseChatConnectionStatus,
   CaseChatThreadProps,
   CaseMessage,
   UserRole,
 } from '@/types';
-import { getFileIcon } from '@/lib/helpers';
-import { cn } from '@/lib/utils';
 import { Loader2, Scale, Send, Shield, User } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
@@ -79,7 +79,13 @@ function isChatInlineImage(m: CaseMessage) {
   return /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(hint);
 }
 
-function MessageAttachmentRow({ m, onOpen }: { m: CaseMessage; onOpen: () => void }) {
+function MessageAttachmentRow({
+  m,
+  onOpen,
+}: {
+  m: CaseMessage;
+  onOpen: () => void;
+}) {
   if (!m.assetUrl) return null;
   const label = chatAttachmentLabel(m);
   const icon = getFileIcon(m.assetName || m.assetUrl || 'file');
@@ -136,8 +142,7 @@ export function CaseChatThread({
   const compact = variant === 'admin';
   const conversation = messageLayout === 'conversation';
   const isSending = Boolean(sendingText?.trim());
-  const canSend =
-    status === 'open' && draft.trim().length > 0 && !isSending;
+  const canSend = status === 'open' && draft.trim().length > 0 && !isSending;
   const live = statusLabel(status);
 
   const [attachmentViewerOpen, setAttachmentViewerOpen] = useState(false);
@@ -205,7 +210,10 @@ export function CaseChatThread({
 
   return (
     <div
-      className={cn('flex min-h-0 flex-col rounded-xl border bg-card', rootClassName)}
+      className={cn(
+        'flex min-h-0 flex-col rounded-xl border bg-card',
+        rootClassName
+      )}
       style={panelStyle}
     >
       {showThreadHeader ? (
@@ -245,11 +253,7 @@ export function CaseChatThread({
         </div>
       ) : null}
 
-      <div
-        ref={scrollRef}
-        className={scrollAreaClass}
-        onScroll={onScroll}
-      >
+      <div ref={scrollRef} className={scrollAreaClass} onScroll={onScroll}>
         {hasOlderMessages && !isLoadingOlder && onLoadOlder ? (
           <div className="flex justify-center pb-2 pt-0">
             <Button
@@ -322,7 +326,12 @@ export function CaseChatThread({
                         <User className="h-3.5 w-3.5" />
                       )}
                     </div>
-                    <div className={cn('max-w-[70%] rounded-2xl px-4 py-2.5 text-sm', ownBubble)}>
+                    <div
+                      className={cn(
+                        'max-w-[70%] rounded-2xl px-4 py-2.5 text-sm',
+                        ownBubble
+                      )}
+                    >
                       <p
                         className={cn(
                           'mb-0.5 text-[11px] font-medium opacity-60',
@@ -334,7 +343,10 @@ export function CaseChatThread({
                       {m.content?.trim() ? (
                         <p className="leading-relaxed">{m.content}</p>
                       ) : null}
-                      <MessageAttachmentRow m={m} onOpen={() => openChatAttachment(m)} />
+                      <MessageAttachmentRow
+                        m={m}
+                        onOpen={() => openChatAttachment(m)}
+                      />
                       <p
                         className={cn(
                           'mt-1 text-[10px] opacity-40',
@@ -351,7 +363,10 @@ export function CaseChatThread({
               return (
                 <div
                   key={m.id}
-                  className={cn('flex flex-col gap-1', own ? 'items-end' : 'items-start')}
+                  className={cn(
+                    'flex flex-col gap-1',
+                    own ? 'items-end' : 'items-start'
+                  )}
                 >
                   <div
                     className={cn(
@@ -370,11 +385,16 @@ export function CaseChatThread({
                         {m.content}
                       </p>
                     ) : null}
-                    <MessageAttachmentRow m={m} onOpen={() => openChatAttachment(m)} />
+                    <MessageAttachmentRow
+                      m={m}
+                      onOpen={() => openChatAttachment(m)}
+                    />
                     <div
                       className={cn(
-                        'mt-1.5 flex items-center justify-between gap-2 border-t border-current/10 pt-1 text-[9px] leading-none opacity-75',
-                        darkBubble ? 'text-primary-foreground/75' : 'text-muted-foreground'
+                        'border-current/10 mt-1.5 flex items-center justify-between gap-2 border-t pt-1 text-[9px] leading-none opacity-75',
+                        darkBubble
+                          ? 'text-primary-foreground/75'
+                          : 'text-muted-foreground'
                       )}
                     >
                       <span className="flex min-w-0 items-center gap-1">
@@ -405,7 +425,9 @@ export function CaseChatThread({
                     <User className="h-3.5 w-3.5" />
                   </div>
                   <div className="max-w-[70%] rounded-2xl border border-dashed border-border/80 bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground">
-                    <p className="mb-0.5 text-[11px] font-medium opacity-60">You</p>
+                    <p className="mb-0.5 text-[11px] font-medium opacity-60">
+                      You
+                    </p>
                     <p className="leading-relaxed">{sendingText}</p>
                     <p className="mt-1 text-[10px] opacity-40">Sending…</p>
                   </div>
@@ -426,8 +448,14 @@ export function CaseChatThread({
                     <div className="mt-1.5 flex items-center justify-between gap-2 border-t border-border/40 pt-1 text-[9px] leading-none text-muted-foreground opacity-80">
                       <span className="flex min-w-0 items-center gap-1">
                         <Loader2 className="size-2.5 shrink-0 animate-spin" />
-                        <Send className="size-2.5 shrink-0 opacity-70" strokeWidth={2.5} aria-hidden />
-                        <span className="font-medium uppercase tracking-wide">You</span>
+                        <Send
+                          className="size-2.5 shrink-0 opacity-70"
+                          strokeWidth={2.5}
+                          aria-hidden
+                        />
+                        <span className="font-medium uppercase tracking-wide">
+                          You
+                        </span>
                       </span>
                       <span className="shrink-0 tabular-nums">…</span>
                     </div>
