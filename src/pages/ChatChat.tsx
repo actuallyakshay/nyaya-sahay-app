@@ -18,11 +18,12 @@ import { getApiErrorMessage } from '@/lib/utils';
 import type { UserRole } from '@/types';
 import { ArrowLeft, Loader2, Upload } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 
 export default function CaseChatPage() {
   const { id } = useParams();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isAdmin = location.pathname.startsWith('/admin');
   const activeRole = getCookie('x-active-role');
   const viewerParticipant: UserRole = isAdmin
@@ -34,7 +35,9 @@ export default function CaseChatPage() {
   const { user } = useAuth();
 
   const caseTitle =
-    (location.state as { title?: string } | null)?.title || 'Case Chat';
+    searchParams.get('title') ||
+    (location.state as { title?: string } | null)?.title ||
+    'Case Chat';
   const userName = user?.fullName?.trim() || 'Client';
 
   const [message, setMessage] = useState('');

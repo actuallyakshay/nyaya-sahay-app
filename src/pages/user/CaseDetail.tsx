@@ -1,9 +1,9 @@
 import { getCaseDetails } from '@/api-client';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
-import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseInternalNotesContent } from '@/components/case-detail/CaseInternalNotesContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { TimelineDrawer } from '@/components/TimelineDrawer';
@@ -177,7 +177,7 @@ const CaseDetail = () => {
                     className="h-8 w-8"
                     asChild
                   >
-                    <Link to={id ? path.caseChat(id) : '#'} state={{ title: caseData?.title }}>
+                    <Link to={id ? path.caseChat(id, caseData?.title) : '#'}>
                       <MessageCircle className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -226,8 +226,8 @@ const CaseDetail = () => {
         <div
           className={
             isLawyer
-              ? 'flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch'
-              : 'flex min-h-0 flex-1 flex-col gap-4'
+              ? 'flex min-h-[420px] flex-1 flex-col gap-4 lg:flex-row lg:items-stretch'
+              : 'flex min-h-[420px] flex-1 flex-col gap-4'
           }
         >
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">

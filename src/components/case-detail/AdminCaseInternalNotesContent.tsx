@@ -58,7 +58,7 @@ export function AdminCaseInternalNotesContent({
         )}
       </div>
 
-      <div className="shrink-0 space-y-3 pt-4">
+      <div className="shrink-0 space-y-2 pt-3">
         <PaginationControls
           page={page}
           totalPages={totalPages}
@@ -72,7 +72,8 @@ export function AdminCaseInternalNotesContent({
           placeholder="Write a note..."
           value={noteText}
           onChange={(e) => setNoteText(e.target.value)}
-          className="min-h-[80px]"
+          className="min-h-[60px]"
+          rows={2}
           disabled={isCaseClosed}
         />
         <Button

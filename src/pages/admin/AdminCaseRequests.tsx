@@ -1,5 +1,6 @@
 import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
 import { StatusBadge } from '@/components/StatusBadge';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
@@ -140,9 +141,11 @@ const AdminCaseRequests = () => {
                             {c.isEmergency ? 'Emergency' : 'Normal Priority'}
                           </span>
                         </div>
-                        <h3 className="line-clamp-2 min-w-0 break-words font-semibold">
-                          {c.title}
-                        </h3>
+                        <GenericTooltip content={c.title} side="bottom" className="min-w-0">
+                          <h3 className="line-clamp-2 min-w-0 break-words font-semibold">
+                            {c.title}
+                          </h3>
+                        </GenericTooltip>
                         {c.description?.trim() &&
                         splitWords(c.description).length > 50 ? (
                           <button

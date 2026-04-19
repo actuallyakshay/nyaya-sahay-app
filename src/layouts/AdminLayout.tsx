@@ -3,6 +3,7 @@ import Breadcrumbs from '@/components/Breakcrumbs';
 import { ADMIN_NAV, ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
+import { useSidebarScrollRestore } from '@/hooks/useSidebarScrollRestore';
 import { resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const navRef = useSidebarScrollRestore('admin');
 
   const handleLogout = async () => {
     await logout();
@@ -139,8 +141,9 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           )}
 
           <nav
+            ref={navRef}
             className={cn(
-              'flex-1 space-y-0.5',
+              'min-h-0 flex-1 space-y-0.5 overflow-y-auto',
               collapsed ? 'mt-2 px-1.5' : 'px-3'
             )}
           >
@@ -238,12 +241,12 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <main className="flex min-h-screen flex-1 flex-col overflow-y-auto lg:min-h-0">
-        <div className="flex min-h-0 flex-1 flex-col p-4 md:p-6 lg:p-8">
-          <div className="shrink-0">
+      <main className="flex-1 overflow-y-auto lg:min-h-0">
+        <div className="p-4 md:p-6 lg:p-8">
+          <div className="mb-2">
             <Breadcrumbs />
           </div>
-          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          {children}
         </div>
       </main>
     </div>

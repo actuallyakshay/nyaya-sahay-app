@@ -1,5 +1,6 @@
 import { deleteLawyerDocument, getLawyerDocuments } from '@/api-client';
 import { FileViewer } from '@/components/FileViewer';
+import { LawyerDocumentsSkeleton } from '@/components/skeletons/LawyerDocumentsSkeleton';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -143,9 +144,7 @@ const LawyerDocuments = () => {
 
         <div className="rounded-xl border bg-card shadow-sm">
           {isLoading ? (
-            <p className="p-8 text-center text-sm text-muted-foreground">
-              Loading documents…
-            </p>
+            <LawyerDocumentsSkeleton />
           ) : isError ? (
             <p className="p-8 text-center text-sm text-destructive">
               Failed to load documents. Please try again.

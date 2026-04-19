@@ -2,6 +2,7 @@ import { getAdminCaseDocuments, getCaseDocuments } from '@/api-client';
 import { DocumentList } from '@/components/DocumentList';
 import { PaginationControls } from '@/components/PaginationControls';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { buildGenericQueryParams } from '@/lib/helpers';
 import { CaseStatus } from '@/types';
 import { keepPreviousData, QueryKey, useQuery } from '@tanstack/react-query';
@@ -27,11 +28,12 @@ export function CaseDocumentsContent({
   onUploadClick,
 }: CaseDocumentsContentProps) {
   const { id } = useParams();
+  const { toast } = useToast();
   const [page, setPage] = useState(1);
 
   const queryKey = isAdmin
-    ? ['admin-case-documents', page]
-    : ['case-documents', page];
+    ? ['admin-case-documents', id, page]
+    : ['case-documents', id, page];
 
   const queryFn = isAdmin ? getAdminCaseDocuments : getCaseDocuments;
 
@@ -51,7 +53,9 @@ export function CaseDocumentsContent({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
 
+  const MAX_DOCUMENTS = 5;
   const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
+  const isLimitReached = total >= MAX_DOCUMENTS;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -83,6 +87,14 @@ export function CaseDocumentsContent({
           variant="outline"
           className="mt-3 w-full"
           onClick={() => {
+            if (isLimitReached) {
+              toast({
+                title: 'Upload limit reached',
+                description: `You can only add up to ${MAX_DOCUMENTS} documents per case.`,
+                variant: 'destructive',
+              });
+              return;
+            }
             if (onUploadClick) onUploadClick(queryKey);
           }}
           disabled={loading || isCaseClosed}
