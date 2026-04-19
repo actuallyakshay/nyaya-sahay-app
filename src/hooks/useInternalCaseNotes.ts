@@ -41,8 +41,8 @@ export function useInternalCaseNotes(
   const skipFetch = options.variant === 'lawyer' && options.skipFetch;
 
   const queryKey = isAdmin
-    ? (['admin-case-notes', page] as const)
-    : (['case-notes', page] as const);
+    ? (['admin-case-notes', caseId, page] as const)
+    : (['case-notes', caseId, page] as const);
 
   const { data } = useQuery({
     queryKey,
@@ -70,14 +70,14 @@ export function useInternalCaseNotes(
           note: noteText.trim(),
         });
         await queryClient.invalidateQueries({
-          queryKey: ['admin-case-notes', page],
+          queryKey: ['admin-case-notes', caseId],
         });
       } else {
         await createCaseNote(caseId, {
           note: noteText.trim(),
           author: 'lawyer',
         });
-        await queryClient.invalidateQueries({ queryKey: ['case-notes', page] });
+        await queryClient.invalidateQueries({ queryKey: ['case-notes', caseId] });
       }
       toast({
         title: 'Note added',

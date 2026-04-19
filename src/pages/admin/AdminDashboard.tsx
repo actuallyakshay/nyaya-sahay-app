@@ -129,10 +129,8 @@ const AdminDashboard = () => {
                       </Link>
                     </td>
                     <td className="px-4 py-3">{c.user?.fullName || '-'}</td>
-                    <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                      <p className="line-clamp-2 min-w-0 break-words font-medium">
-                        {c.title}
-                      </p>
+                    <td className="hidden max-w-[200px] truncate px-4 py-3 font-medium text-muted-foreground sm:table-cell">
+                      {c.title}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={c.status} />

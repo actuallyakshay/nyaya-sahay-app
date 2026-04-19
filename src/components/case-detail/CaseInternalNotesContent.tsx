@@ -31,7 +31,7 @@ export function CaseInternalNotesContent() {
           </p>
         ) : (
           notes.map((n) => (
-            <div key={n.id} className="rounded-lg border bg-muted/30 p-3">
+            <div key={n.id} className="rounded-lg border border-border bg-muted/60 p-3 shadow-sm">
               <p className="whitespace-pre-wrap text-sm">{n.note}</p>
               <p className="mt-1.5 text-xs text-muted-foreground">
                 <span
@@ -51,7 +51,7 @@ export function CaseInternalNotesContent() {
         )}
       </div>
 
-      <div className="shrink-0 space-y-3 pt-4">
+      <div className="shrink-0 space-y-2 pt-3">
         <PaginationControls
           page={page}
           totalPages={totalPages}
@@ -65,7 +65,8 @@ export function CaseInternalNotesContent() {
           placeholder="Write a note..."
           value={noteText}
           onChange={(e) => setNoteText(e.target.value)}
-          className="min-h-[80px]"
+          className="min-h-[60px]"
+          rows={2}
         />
         <Button
           className="w-full"

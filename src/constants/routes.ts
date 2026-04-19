@@ -65,14 +65,20 @@ export const ROUTE_PATTERNS = {
 
 export const path = {
   caseDetail: (id: string) => `/cases/${id}`,
-  caseChat: (id: string) => `/cases/${id}/chat`,
+  caseChat: (id: string, title?: string) => {
+    const base = `/cases/${id}/chat`;
+    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
+  },
   adminCase: (id: string) => `${ROUTES.admin.cases}/${id}`,
-  adminCaseChat: (id: string) => `${ROUTES.admin.cases}/${id}/chat`,
+  adminCaseChat: (id: string, title?: string) => {
+    const base = `${ROUTES.admin.cases}/${id}/chat`;
+    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
+  },
   adminUser: (id: string) => `${ROUTES.admin.users}/${id}`,
   adminLawyer: (id: string) => `${ROUTES.admin.lawyers}/${id}`,
   adminLawyerDocuments: (id: string) =>
     `${ROUTES.admin.lawyers}/${id}/documents`,
-} as const;
+};
 
 export function dashboardForRole(
   role: 'user' | 'lawyer' | 'admin' | string | undefined

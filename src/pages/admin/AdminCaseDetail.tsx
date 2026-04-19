@@ -163,13 +163,13 @@ const AdminCaseDetail = () => {
         <div className="shrink-0 space-y-4">
           {/* Header card */}
           <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-5 py-3">
+            <div className="space-y-2 border-b bg-muted/30 px-5 py-3">
+              <GenericTooltip content={caseData?.title} side="bottom" className="min-w-0">
+                <h1 className="truncate text-lg font-bold tracking-tight">
+                  {caseData?.title}
+                </h1>
+              </GenericTooltip>
               <div className="flex flex-wrap items-center gap-3">
-                <GenericTooltip content={caseData?.title}>
-                  <h1 className="truncate text-lg font-bold tracking-tight">
-                    {caseData?.title}
-                  </h1>
-                </GenericTooltip>
                 <StatusBadge status={caseData?.status} />
                 {caseData?.isEmergency && (
                   <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
@@ -286,18 +286,18 @@ const AdminCaseDetail = () => {
                 </h3>
                 {rawDescription ? (
                   descriptionIsLong ? (
-                    <button
-                      type="button"
-                      className="group mt-2 w-full rounded-md text-left text-sm leading-relaxed text-foreground/90 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      onClick={() => setDescriptionModalOpen(true)}
-                    >
+                    <div className="mt-2 text-sm leading-relaxed text-foreground/90">
                       <span className="block whitespace-pre-wrap">
                         {descriptionPreviewText}
                       </span>
-                      <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold">
+                      <button
+                        type="button"
+                        className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold"
+                        onClick={() => setDescriptionModalOpen(true)}
+                      >
                         Show full description
-                      </span>
-                    </button>
+                      </button>
+                    </div>
                   ) : (
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
                       {rawDescription}
@@ -325,7 +325,7 @@ const AdminCaseDetail = () => {
                         className="h-8 w-8"
                         asChild
                       >
-                        <Link to={id ? path.adminCaseChat(id) : '#'}>
+                        <Link to={id ? path.adminCaseChat(id, caseData?.title) : '#'}>
                           <MessageCircle className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -361,7 +361,7 @@ const AdminCaseDetail = () => {
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch">
+        <div className="flex min-h-[420px] flex-1 flex-col gap-4 lg:flex-row lg:items-stretch">
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <CardHeader className="shrink-0 pb-3">
               <CardTitle className="text-lg">Documents</CardTitle>

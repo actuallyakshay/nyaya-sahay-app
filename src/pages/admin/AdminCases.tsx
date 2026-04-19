@@ -102,22 +102,22 @@ const AdminCases = () => {
           </Select>
         </div>
         <div className="overflow-x-auto rounded-xl border bg-card">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[900px] text-sm">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground">
                   Case #
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Title
                 </th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
+                <th className="hidden whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
                   Client
                 </th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
+                <th className="hidden whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
                   Lawyer
                 </th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
+                <th className="hidden whitespace-nowrap px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
                   Category
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
@@ -160,7 +160,7 @@ const AdminCases = () => {
                     key={c.id}
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
-                    <td className="px-4 py-3 font-mono text-xs">
+                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
                       <Link
                         to={path.adminCase(c.id)}
                         className="hover:text-gold hover:underline"
@@ -176,21 +176,21 @@ const AdminCases = () => {
                         {c.title}
                       </Link>
                     </td>
-                    <td className="hidden px-4 py-3 sm:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell">
                       {c.user?.fullName || '—'}
                     </td>
-                    <td className="hidden px-4 py-3 sm:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell">
                       {c.assignedLawyer?.user?.fullName || '—'}
                     </td>
-                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground md:table-cell">
                       <PracticeAreaBadge
                         practiceArea={c.practiceArea?.name as string}
                       />
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="whitespace-nowrap px-4 py-3">
                       <StatusBadge status={c.status} />
                     </td>
-                    <td className="hidden px-4 py-3 lg:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 lg:table-cell">
                       <span
                         className={
                           c.isEmergency
@@ -201,7 +201,7 @@ const AdminCases = () => {
                         {c.isEmergency ? 'Emergency' : 'Normal'}
                       </span>
                     </td>
-                    <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                       {new Date(c.createdAt).toLocaleDateString('en-IN')}
                     </td>
                   </tr>

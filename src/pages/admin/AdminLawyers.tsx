@@ -1,4 +1,5 @@
 import { getAdminLawyerVerifications, updateAdminLawyer } from '@/api-client';
+import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge } from '@/components/StatusBadge';
 import { LawyerFormModal } from '@/components/admin/LawyerFormModal';
@@ -177,14 +178,16 @@ const AdminLawyers = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <div>
-                          <Link
-                            to={path.adminLawyer(l.id)}
-                            className="font-medium hover:text-gold hover:underline"
-                          >
-                            {l.user?.fullName}
-                          </Link>
+                      <td className="max-w-[160px] px-4 py-3">
+                        <div className="min-w-0">
+                          <GenericTooltip content={l.user?.fullName} side="bottom" className="min-w-0">
+                            <Link
+                              to={path.adminLawyer(l.id)}
+                              className="block truncate font-medium hover:text-gold hover:underline"
+                            >
+                              {l.user?.fullName}
+                            </Link>
+                          </GenericTooltip>
                           <p className="text-xs text-muted-foreground">
                             {calculateYearsOfExperience(l?.careerStartDate)}
                           </p>
@@ -201,7 +204,7 @@ const AdminLawyers = () => {
                           </>
                         ))}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="whitespace-nowrap px-4 py-3">
                         {l.user?.phone ? `+91-${l.user.phone}` : '-'}
                       </td>
                       <td className="hidden px-4 py-3 font-mono text-xs text-muted-foreground md:table-cell">
@@ -215,7 +218,8 @@ const AdminLawyers = () => {
                         )}
                       </td>
 
-                      <td className="flex flex-wrap items-center gap-1 px-4 py-3">
+                      <td className="whitespace-nowrap px-4 py-3">
+                        <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -246,6 +250,7 @@ const AdminLawyers = () => {
                             'Verify'
                           )}
                         </Button>
+                        </div>
                       </td>
                     </tr>
                   );

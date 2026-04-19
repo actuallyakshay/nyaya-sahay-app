@@ -5,6 +5,7 @@ import {
 } from '@/components/admin/AdminLawyerDocumentsReviewList';
 import { FileViewer } from '@/components/FileViewer';
 import { PaginationControls } from '@/components/PaginationControls';
+import { LawyerDocumentsReviewSkeleton } from '@/components/skeletons/LawyerDocumentsReviewSkeleton';
 import { path } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -19,7 +20,6 @@ import type {
   PendingLawyerDocumentListItem,
   ReviewLawyerDocumentBody,
 } from '@/types';
-import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -111,10 +111,7 @@ const AdminLawyerPendingDocumentsPage = () => {
 
         <div className="rounded-xl border bg-card shadow-sm">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center gap-3 p-12 text-sm text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin text-gold" />
-              <span>Loading…</span>
-            </div>
+            <LawyerDocumentsReviewSkeleton />
           ) : isError ? (
             <p className="p-8 text-center text-sm text-destructive">
               Failed to load pending documents.

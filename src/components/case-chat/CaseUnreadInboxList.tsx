@@ -1,3 +1,4 @@
+import { CaseUnreadInboxSkeleton } from '@/components/skeletons/CaseUnreadInboxSkeleton';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { CaseChatUnreadItem } from '@/types';
@@ -22,7 +23,9 @@ export function CaseUnreadInboxList({
     <div className="rounded-xl border bg-card shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b px-4 py-3">
         <div>
-          <h1 className="text-lg font-semibold text-foreground">Case messages</h1>
+          <h1 className="text-lg font-semibold text-foreground">
+            Case messages
+          </h1>
           <p className="text-sm text-muted-foreground">
             {totalUnread === 0
               ? 'You are caught up.'
@@ -37,12 +40,18 @@ export function CaseUnreadInboxList({
             disabled={isLoading}
             onClick={() => onRefresh()}
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Refresh'}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              'Refresh'
+            )}
           </Button>
         ) : null}
       </div>
       <ScrollArea className="max-h-[min(70vh,32rem)]">
-        {items.length === 0 ? (
+        {isLoading ? (
+          <CaseUnreadInboxSkeleton />
+        ) : items.length === 0 ? (
           <p className="px-4 py-10 text-center text-sm text-muted-foreground">
             No unread case messages right now.
           </p>
@@ -63,7 +72,9 @@ export function CaseUnreadInboxList({
                       {row.unreadCount} new
                     </span>
                   </div>
-                  <span className="line-clamp-2 text-sm text-foreground">{row.title}</span>
+                  <span className="line-clamp-2 text-sm text-foreground">
+                    {row.title}
+                  </span>
                 </button>
               </li>
             ))}

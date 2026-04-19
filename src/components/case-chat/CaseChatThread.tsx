@@ -366,12 +366,9 @@ export function CaseChatThread({
 
               if (conversation) {
                 const showDate = isNewDate(index);
-                const ownBubble =
-                  variant === 'admin' && own
-                    ? 'bg-violet-950/90 text-primary-foreground'
-                    : own
-                      ? 'bg-amber-50 text-amber-950 border border-amber-200/60'
-                      : 'bg-muted';
+                const ownBubble = own
+                  ? 'bg-amber-50 text-amber-950 border border-amber-200/60'
+                  : 'bg-muted';
                 const avatarRing =
                   role === 'lawyer'
                     ? 'bg-gold/20 text-gold'
@@ -419,12 +416,7 @@ export function CaseChatThread({
                       >
                         {firstInGroup ? (
                           <p
-                            className={cn(
-                              'mb-0.5 text-[11px] font-medium opacity-60',
-                              own &&
-                                variant === 'admin' &&
-                                'text-primary-foreground/80'
-                            )}
+                            className="mb-0.5 text-[11px] font-medium opacity-60"
                           >
                             {roleLabel(role)}
                           </p>
@@ -437,12 +429,7 @@ export function CaseChatThread({
                           onOpen={() => openChatAttachment(m)}
                         />
                         <p
-                          className={cn(
-                            'mt-1 text-right text-[10px] opacity-40',
-                            own &&
-                              variant === 'admin' &&
-                              'text-primary-foreground/70'
-                          )}
+                          className="mt-1 text-right text-[10px] opacity-40"
                         >
                           {formatMessageTimeOnly(m.timestamp)}
                         </p>

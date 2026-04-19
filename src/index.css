@@ -82,6 +82,25 @@
   }
 }
 
+/* Sidebar scrollbar styling */
+.bg-navy nav {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--sidebar-border)) transparent;
+}
+.bg-navy nav::-webkit-scrollbar {
+  width: 4px;
+}
+.bg-navy nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bg-navy nav::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--sidebar-border));
+  border-radius: 4px;
+}
+.bg-navy nav::-webkit-scrollbar-button {
+  display: none;
+}
+
 @layer utilities {
   .font-serif {
     font-family: 'Source Serif 4', Georgia, serif;

@@ -3,6 +3,7 @@ import Breadcrumbs from '@/components/Breakcrumbs';
 import { LAWYER_NAV, ROUTES, USER_NAV } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
+import { useSidebarScrollRestore } from '@/hooks/useSidebarScrollRestore';
 import { getCookie, resetCookies, setCookie } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import {
@@ -31,6 +32,7 @@ export const DashboardLayout = ({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+  const navRef = useSidebarScrollRestore('dashboard');
 
   useEffect(() => {
     setAvatarLoadFailed(false);
@@ -184,6 +186,7 @@ export const DashboardLayout = ({
           )}
 
           <nav
+            ref={navRef}
             className={cn('min-h-0 flex-1 space-y-0.5 overflow-y-auto', collapsed ? 'px-1.5' : 'px-3')}
           >
             {nav.map((item) => {
