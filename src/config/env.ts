@@ -28,4 +28,6 @@ export const env = {
       }
 ,
   firebaseVapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY as string ?? '',
+  /** Razorpay Checkout (key id only — never put the secret in the frontend). */
+  razorpayKeyId: (import.meta.env.VITE_RAZORPAY_KEY_ID as string) ?? '',
 } as const;

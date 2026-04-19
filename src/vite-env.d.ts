@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID?: string;
   /** Web Push certificate (Key pair) from Firebase Console → Cloud Messaging */
   readonly VITE_FIREBASE_VAPID_KEY?: string;
+  /** Razorpay key id (public) for Checkout on the web app — never commit the secret. */
+  readonly VITE_RAZORPAY_KEY_ID?: string;
 }
 
 interface ImportMeta {

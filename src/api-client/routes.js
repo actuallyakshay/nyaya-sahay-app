@@ -99,6 +99,14 @@ const routes = {
     URL: '/api/subscriptions',
     METHOD: 'GET',
   },
+  RAZORPAY_MY_SUBSCRIPTION: {
+    URL: '/api/razorpay/subscriptions/me',
+    METHOD: 'GET',
+  },
+  RAZORPAY_START_SUBSCRIPTION: {
+    URL: '/api/razorpay/subscriptions/start',
+    METHOD: 'POST',
+  },
   LAWYERS_LIST: {
     URL: '/api/lawyers',
     METHOD: 'GET',

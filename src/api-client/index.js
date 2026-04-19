@@ -292,6 +292,21 @@ export const getSubscriptionPlans = () => {
   });
 };
 
+export const getMyRazorpaySubscription = () => {
+  return apiClient({
+    method: routes.RAZORPAY_MY_SUBSCRIPTION.METHOD,
+    url: routes.RAZORPAY_MY_SUBSCRIPTION.URL,
+  });
+};
+
+export const startRazorpaySubscription = (body) => {
+  return apiClient({
+    method: routes.RAZORPAY_START_SUBSCRIPTION.METHOD,
+    url: routes.RAZORPAY_START_SUBSCRIPTION.URL,
+    data: body,
+  });
+};
+
 export const getLawyersList = (params) => {
   return apiClient({
     method: routes.LAWYERS_LIST.METHOD,
