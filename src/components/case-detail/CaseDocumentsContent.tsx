@@ -53,9 +53,7 @@ export function CaseDocumentsContent({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
 
-  const MAX_DOCUMENTS = 5;
   const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
-  const isLimitReached = total >= MAX_DOCUMENTS;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -87,14 +85,6 @@ export function CaseDocumentsContent({
           variant="outline"
           className="mt-3 w-full"
           onClick={() => {
-            if (isLimitReached) {
-              toast({
-                title: 'Upload limit reached',
-                description: `You can only add up to ${MAX_DOCUMENTS} documents per case.`,
-                variant: 'destructive',
-              });
-              return;
-            }
             if (onUploadClick) onUploadClick(queryKey);
           }}
           disabled={loading || isCaseClosed}
