@@ -1,8 +1,8 @@
-const LAST_SENT_KEY = 'nyaya_sahay_fcm_last_sent';
+const CACHE_KEY = 'fcm_token_sent';
 
 export function getLastSentFcmToken(): string | null {
   try {
-    return localStorage.getItem(LAST_SENT_KEY);
+    return localStorage.getItem(CACHE_KEY);
   } catch {
     return null;
   }
@@ -10,16 +10,16 @@ export function getLastSentFcmToken(): string | null {
 
 export function rememberFcmTokenSent(token: string): void {
   try {
-    localStorage.setItem(LAST_SENT_KEY, token);
+    localStorage.setItem(CACHE_KEY, token);
   } catch {
-    /* ignore */
+    // ignore — storage quota or private browsing
   }
 }
 
 export function clearFcmTokenRegistrationCache(): void {
   try {
-    localStorage.removeItem(LAST_SENT_KEY);
+    localStorage.removeItem(CACHE_KEY);
   } catch {
-    /* ignore */
+    // ignore
   }
 }

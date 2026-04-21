@@ -1,6 +1,5 @@
 import AdminProtectedRoute from '@/components/AdminProtectedRoute';
 import { CaseChatGlobalNotifier } from '@/components/case-chat/CaseChatGlobalNotifier';
-import { FcmTokenSync } from '@/hooks/use-fcm-token';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -10,6 +9,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { queryClient } from '@/lib/query-client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { FcmTokenSync } from '@/hooks/use-fcm-token';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
