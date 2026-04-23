@@ -58,6 +58,8 @@ export default function CaseChatPage() {
     status: chatStatus,
     send: sendChat,
     sendingText,
+    failedMessages,
+    retryFailed,
   } = useCaseChatSocket({
     caseId: id,
     variant: messagesVariant,
@@ -153,6 +155,8 @@ export default function CaseChatPage() {
           composer={isAdmin ? 'input' : 'textarea'}
           status={chatStatus}
           sendingText={sendingText}
+          failedMessages={failedMessages}
+          onRetryFailed={retryFailed}
           hasOlderMessages={Boolean(hasNextPage)}
           isLoadingOlder={isFetchingNextPage}
           onLoadOlder={() => void fetchNextPage()}

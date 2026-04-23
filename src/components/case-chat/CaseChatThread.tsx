@@ -9,9 +9,12 @@ import type {
   CaseChatConnectionStatus,
   CaseChatThreadProps,
   CaseMessage,
+  FailedChatMessage,
   UserRole,
 } from '@/types';
-import { Loader2, Scale, Send, Shield, User } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw, Scale, Send, Shield, User } from 'lucide-react';
+
+const MAX_CHAT_TEXT_LENGTH = 4000;
 import {
   useCallback,
   useEffect,
@@ -24,13 +27,22 @@ function statusLabel(status: CaseChatConnectionStatus): string {
   switch (status) {
     case 'connecting':
       return 'Connecting…';
+    case 'reconnecting':
+      return 'Reconnecting…';
     case 'open':
       return 'Live';
     case 'error':
-      return 'Connection issue';
+      return 'Connection failed';
     default:
       return '';
   }
+}
+
+function statusColor(status: CaseChatConnectionStatus): string {
+  if (status === 'open') return 'text-emerald-600';
+  if (status === 'error') return 'text-destructive';
+  if (status === 'reconnecting') return 'text-amber-500';
+  return '';
 }
 
 function bubbleClasses(senderRole: UserRole): string {
@@ -157,6 +169,59 @@ function MessageAttachmentRow({
   );
 }
 
+function FailedMessageBubble({
+  msg,
+  conversation,
+  compact,
+  onRetry,
+}: {
+  msg: FailedChatMessage;
+  conversation: boolean;
+  compact: boolean;
+  onRetry?: () => void;
+}) {
+  const inner = (
+    <div className={cn(
+      'max-w-[85%] rounded-xl border border-destructive/40 bg-destructive/5 text-sm text-destructive',
+      compact ? 'rounded-lg px-3.5 py-2.5' : 'px-4 py-3',
+      conversation && 'max-w-[70%] rounded-2xl'
+    )}>
+      <div className="flex items-start gap-2">
+        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+        <div className="min-w-0">
+          <p className={cn('leading-relaxed text-foreground/80', compact ? 'text-[13px]' : 'text-[15px]')}>
+            {msg.label}
+          </p>
+          <p className="mt-0.5 text-[11px] opacity-70">{msg.error}</p>
+        </div>
+      </div>
+      {onRetry ? (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-2 flex items-center gap-1 text-[11px] font-medium text-destructive underline-offset-2 hover:underline"
+        >
+          <RefreshCw className="h-3 w-3" />
+          Retry
+        </button>
+      ) : null}
+    </div>
+  );
+
+  if (conversation) {
+    return (
+      <div className="flex flex-row-reverse gap-3 mt-1">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+          <User className="h-3.5 w-3.5" />
+        </div>
+        {inner}
+      </div>
+    );
+  }
+
+  return <div className="flex flex-col items-end mt-1">{inner}</div>;
+}
+
 export function CaseChatThread({
   variant,
   title,
@@ -168,6 +233,8 @@ export function CaseChatThread({
   composer,
   status,
   sendingText,
+  failedMessages = [],
+  onRetryFailed,
   hasOlderMessages,
   isLoadingOlder,
   onLoadOlder,
@@ -183,6 +250,7 @@ export function CaseChatThread({
   const isSending = Boolean(sendingText?.trim());
   const canSend = status === 'open' && draft.trim().length > 0 && !isSending;
   const live = statusLabel(status);
+  const charCount = draft.length;
 
   const [attachmentViewerOpen, setAttachmentViewerOpen] = useState(false);
   const [attachmentViewer, setAttachmentViewer] = useState<{
@@ -302,16 +370,13 @@ export function CaseChatThread({
           </h3>
           <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
             {live ? (
-              <span
-                className={
-                  status === 'open'
-                    ? 'text-emerald-600'
-                    : status === 'error'
-                      ? 'text-destructive'
-                      : ''
-                }
-              >
-                {live}
+              <span className={statusColor(status)}>
+                {status === 'reconnecting' ? (
+                  <span className="flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    {live}
+                  </span>
+                ) : live}
               </span>
             ) : null}
             <span>
@@ -511,6 +576,15 @@ export function CaseChatThread({
                 </div>
               );
             })}
+            {failedMessages.map((fm) => (
+              <FailedMessageBubble
+                key={fm.clientMessageId}
+                msg={fm}
+                conversation={conversation}
+                compact={compact}
+                onRetry={onRetryFailed ? () => onRetryFailed(fm.clientMessageId) : undefined}
+              />
+            ))}
             {isSending ? (
               conversation ? (
                 <div className="flex flex-row-reverse gap-3">
@@ -560,57 +634,69 @@ export function CaseChatThread({
         ) : null}
       </div>
 
-      <div className="flex shrink-0 gap-2 border-t p-3">
-        {composer === 'textarea' ? (
-          <Textarea
-            ref={textareaRef}
-            placeholder="Type a message... "
-            value={draft}
-            onChange={(e) => {
-              onDraftChange(e.target.value);
-              autoGrow();
-            }}
-            className="min-h-[40px] flex-1 overflow-y-auto"
-            rows={1}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (canSend) {
-                  onSend();
-                  resetTextarea();
+      <div className="flex shrink-0 flex-col gap-1 border-t p-3">
+        <div className="flex gap-2">
+          {composer === 'textarea' ? (
+            <Textarea
+              ref={textareaRef}
+              placeholder="Type a message…"
+              value={draft}
+              onChange={(e) => {
+                onDraftChange(e.target.value);
+                autoGrow();
+              }}
+              className="min-h-[40px] flex-1 overflow-y-auto"
+              rows={1}
+              maxLength={MAX_CHAT_TEXT_LENGTH}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (canSend) {
+                    onSend();
+                    resetTextarea();
+                  }
                 }
-              }
-            }}
-          />
-        ) : (
-          <Input
-            placeholder="Type a message..."
-            value={draft}
-            onChange={(e) => onDraftChange(e.target.value)}
-            className="flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                if (canSend) onSend();
-              }
-            }}
-          />
-        )}
-        {beforeSendActions}
-        <Button
-          type="button"
-          size="icon"
-          disabled={!canSend}
-          onClick={() => {
-            if (canSend) onSend();
-          }}
-        >
-          {status === 'connecting' || isSending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+              }}
+            />
           ) : (
-            <Send className="h-4 w-4" />
+            <Input
+              placeholder="Type a message…"
+              value={draft}
+              onChange={(e) => onDraftChange(e.target.value)}
+              className="flex-1"
+              maxLength={MAX_CHAT_TEXT_LENGTH}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (canSend) onSend();
+                }
+              }}
+            />
           )}
-        </Button>
+          {beforeSendActions}
+          <Button
+            type="button"
+            size="icon"
+            disabled={!canSend}
+            onClick={() => {
+              if (canSend) onSend();
+            }}
+          >
+            {status === 'connecting' || status === 'reconnecting' || isSending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        {charCount > MAX_CHAT_TEXT_LENGTH - 200 ? (
+          <p className={cn(
+            'self-end text-[11px] tabular-nums',
+            charCount >= MAX_CHAT_TEXT_LENGTH ? 'text-destructive' : 'text-muted-foreground'
+          )}>
+            {charCount}/{MAX_CHAT_TEXT_LENGTH}
+          </p>
+        ) : null}
       </div>
 
       {attachmentViewer ? (

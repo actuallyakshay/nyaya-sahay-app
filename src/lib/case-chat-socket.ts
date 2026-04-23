@@ -14,7 +14,9 @@ export const CHAT_ERROR = 'chat.error';
 
 export const CASE_CHAT_IO_PATH = '/api/socket.io';
 
-/** Shared options for every case-chat Socket.IO client in the app. */
+/** ACK timeout for chat.send — if the server doesn't respond within this window, treat as failed. */
+export const CHAT_SEND_ACK_TIMEOUT_MS = 8_000;
+
 export function createCaseChatSocket(): Socket | null {
   if (!env.apiOrigin) return null;
   const activeRole = getCookie('x-active-role');
@@ -23,7 +25,10 @@ export function createCaseChatSocket(): Socket | null {
     withCredentials: true,
     auth: { activeRole: activeRole || undefined },
     transports: ['websocket'],
-    /** Match HTTP client — free-tier hosts can be slow to accept the WS handshake. */
     timeout: env.apiTimeoutMs,
+    reconnection: true,
+    reconnectionDelay: 1_000,
+    reconnectionDelayMax: 8_000,
+    reconnectionAttempts: 10,
   });
 }

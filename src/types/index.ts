@@ -181,7 +181,13 @@ export interface CaseChatNotifyPayload {
 /** User vs admin API/socket variant for case thread messages. */
 export type CaseChatVariant = 'user' | 'admin';
 
-export type CaseChatConnectionStatus = 'idle' | 'connecting' | 'open' | 'error';
+export type CaseChatConnectionStatus = 'idle' | 'connecting' | 'reconnecting' | 'open' | 'error';
+
+export interface FailedChatMessage {
+  clientMessageId: string;
+  label: string;
+  error: string;
+}
 
 export type CaseChatMarkReadFn = (
   caseId: string,
@@ -220,6 +226,8 @@ export interface CaseChatThreadProps {
   status: CaseChatConnectionStatus;
   /** Outbound text still being confirmed by the server. */
   sendingText?: string | null;
+  failedMessages?: FailedChatMessage[];
+  onRetryFailed?: (clientMessageId: string) => void;
   hasOlderMessages?: boolean;
   isLoadingOlder?: boolean;
   onLoadOlder?: () => void;
