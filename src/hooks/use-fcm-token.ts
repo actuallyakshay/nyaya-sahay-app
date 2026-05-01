@@ -1,13 +1,13 @@
 import { updateUserFcmToken } from '@/api-client';
 import { env } from '@/config/env';
 import { toast } from '@/hooks/use-toast';
+import { playCaseMessageChime } from '@/lib/case-notify-sound';
 import {
   getLastSentFcmToken,
   rememberFcmTokenSent,
 } from '@/lib/fcm-token-registration-cache';
 import { getMessagingInstance } from '@/lib/firebase';
 import { getCookie } from '@/lib/helpers';
-import { playCaseMessageChime } from '@/lib/case-notify-sound';
 import { getToken, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -52,7 +52,6 @@ export async function syncFcmToken(): Promise<void> {
   if (!isLoggedIn() || !isBrowserSupported()) return;
 
   const messaging = await getMessagingInstance();
-  console.log('messaging', messaging);
   if (!messaging) return;
 
   // Ask for permission if not yet decided; bail if denied.

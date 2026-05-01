@@ -1,15 +1,16 @@
 import AdminProtectedRoute from '@/components/AdminProtectedRoute';
 import { CaseChatGlobalNotifier } from '@/components/case-chat/CaseChatGlobalNotifier';
+import { LawyerApprovedGate } from '@/components/LawyerApprovedGate';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { env } from '@/config/env';
 import { ROUTE_PATTERNS, ROUTES } from '@/constants';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { FcmTokenSync } from '@/hooks/use-fcm-token';
 import { queryClient } from '@/lib/query-client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { FcmTokenSync } from '@/hooks/use-fcm-token';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
@@ -44,11 +45,11 @@ import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminUsers from './pages/admin/AdminUsers';
 
 import AdminCaseRequests from './pages/admin/AdminCaseRequests';
-import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
 import AdminLawyerPendingDocumentsPage from './pages/admin/AdminLawyerPendingDocumentsPage';
+import AdminLawyerVerifications from './pages/admin/AdminLawyerVerifications';
 import AdminSessionRequests from './pages/admin/AdminSessionRequests';
+import CaseChatPage from './pages/CaseChat';
 import CaseNotificationsPage from './pages/CaseNotificationsPage';
-import CaseChatPage from './pages/ChatChat';
 import NotFound from './pages/NotFound';
 
 const App = () => (
@@ -83,7 +84,9 @@ const App = () => (
                 path={ROUTES.user.notifications}
                 element={
                   <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <CaseNotificationsPage />
+                    <LawyerApprovedGate>
+                      <CaseNotificationsPage />
+                    </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
               />
@@ -99,7 +102,9 @@ const App = () => (
                 path={ROUTE_PATTERNS.caseDetail}
                 element={
                   <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <CaseDetail />
+                    <LawyerApprovedGate>
+                      <CaseDetail />
+                    </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
               />
@@ -107,7 +112,9 @@ const App = () => (
                 path={ROUTE_PATTERNS.caseChat}
                 element={
                   <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <CaseChatPage />
+                    <LawyerApprovedGate>
+                      <CaseChatPage />
+                    </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
               />
@@ -150,7 +157,9 @@ const App = () => (
                 path={ROUTES.lawyer.dashboard}
                 element={
                   <ProtectedRoute allowedRoles={['lawyer']}>
-                    <LawyerDashboard />
+                    <LawyerApprovedGate>
+                      <LawyerDashboard />
+                    </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
               />
@@ -158,7 +167,9 @@ const App = () => (
                 path={ROUTES.lawyer.cases}
                 element={
                   <ProtectedRoute allowedRoles={['lawyer']}>
-                    <LawyerCases />
+                    <LawyerApprovedGate>
+                      <LawyerCases />
+                    </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
               />

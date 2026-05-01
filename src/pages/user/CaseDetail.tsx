@@ -34,14 +34,7 @@ import {
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import { QueryKey, useQuery } from '@tanstack/react-query';
-import {
-  Clock,
-  MessageCircle,
-  Scale,
-  StickyNote,
-  User,
-  Video,
-} from 'lucide-react';
+import { MessageCircle, Scale, StickyNote, User, Video } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -73,6 +66,7 @@ const CaseDetail = () => {
     if (!rawDescription) return false;
     return splitWords(rawDescription).length > DESCRIPTION_PREVIEW_MAX_WORDS;
   }, [rawDescription]);
+
   const descriptionPreviewText = useMemo(
     () =>
       rawDescription
@@ -172,20 +166,21 @@ const CaseDetail = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
+                    variant="default"
+                    size="sm"
+                    className="h-8 gap-1.5 px-3"
                     asChild
                   >
                     <Link to={id ? path.caseChat(id, caseData?.title) : '#'}>
                       <MessageCircle className="h-4 w-4" />
+                      <span>Case Chat</span>
                     </Link>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Case chat</TooltipContent>
               </Tooltip>
 
-              <Tooltip>
+              {/* <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
@@ -197,7 +192,7 @@ const CaseDetail = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Timeline</TooltipContent>
-              </Tooltip>
+              </Tooltip> */}
 
               {isLawyerAssigned && (
                 <Tooltip>

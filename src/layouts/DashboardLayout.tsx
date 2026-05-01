@@ -1,10 +1,11 @@
 import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
-import { LAWYER_NAV, ROUTES, USER_NAV } from '@/constants';
+import { LAWYER_NAV, ROUTES, USER_NAV, type NavItem } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
 import { useSidebarScrollRestore } from '@/hooks/useSidebarScrollRestore';
 import { getCookie, resetCookies, setCookie } from '@/lib/helpers';
+import { isLawyerApprovedForPractice } from '@/lib/lawyer-access';
 import { cn } from '@/lib/utils';
 import {
   ArrowRightLeft,
@@ -42,7 +43,19 @@ export const DashboardLayout = ({
     Boolean(user?.avatarUrl && user.avatarUrl.length > 0) && !avatarLoadFailed;
   const activeRole = getCookie('x-active-role');
 
-  const nav = activeRole === 'lawyer' ? LAWYER_NAV : USER_NAV;
+  const lawyerPendingNav: NavItem[] = [
+    ROUTES.lawyer.profile,
+    ROUTES.lawyer.documents,
+  ]
+    .map((to) => LAWYER_NAV.find((i) => i.to === to))
+    .filter((item): item is NavItem => item != null);
+
+  const nav =
+    activeRole === 'lawyer'
+      ? isLawyerApprovedForPractice(user)
+        ? LAWYER_NAV
+        : lawyerPendingNav
+      : USER_NAV;
   const roleName = activeRole === 'lawyer' ? 'Advocate' : 'User';
 
   const hasMultipleRoles = user?.roles?.length > 1;
@@ -58,6 +71,10 @@ export const DashboardLayout = ({
   const handleSwitchRole = () => {
     const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
     setCookie('x-active-role', newRole);
+    if (newRole === 'lawyer' && !isLawyerApprovedForPractice(user)) {
+      navigate(ROUTES.lawyer.profile);
+      return;
+    }
     navigate(
       newRole === 'lawyer' ? ROUTES.lawyer.dashboard : ROUTES.user.dashboard
     );

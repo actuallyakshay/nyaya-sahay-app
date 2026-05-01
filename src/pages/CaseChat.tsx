@@ -8,6 +8,7 @@ import { GenericTooltip } from '@/components/GenericTooltip';
 import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAttachments } from '@/hooks/use-attachments';
 import { useCaseChatSocket } from '@/hooks/use-case-chat-socket';
 import { useCaseMessages } from '@/hooks/use-case-messages';
 import { useToast } from '@/hooks/use-toast';
@@ -16,14 +17,22 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UserRole } from '@/types';
-import { ArrowLeft, Loader2, Upload } from 'lucide-react';
+import { ArrowLeft, File, Loader2, Plus, X } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
 export default function CaseChatPage() {
   const { id } = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+  const { user } = useAuth();
+
   const isAdmin = location.pathname.startsWith('/admin');
   const activeRole = getCookie('x-active-role');
   const viewerParticipant: UserRole = isAdmin
@@ -31,8 +40,6 @@ export default function CaseChatPage() {
     : activeRole === 'lawyer'
       ? 'lawyer'
       : 'user';
-  const { toast } = useToast();
-  const { user } = useAuth();
 
   const caseTitle =
     searchParams.get('title') ||
@@ -41,8 +48,10 @@ export default function CaseChatPage() {
   const userName = user?.fullName?.trim() || 'Client';
 
   const [message, setMessage] = useState('');
-  const [isUploadingChatFile, setIsUploadingChatFile] = useState(false);
-  const chatFileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { attachments, isFull, add, remove, clear } = useAttachments(id);
 
   const messagesVariant = isAdmin ? 'admin' : 'user';
   const {
@@ -70,36 +79,44 @@ export default function CaseChatPage() {
     tailFromViewer: tailMessage?.senderRole === viewerParticipant,
   });
 
-  const handleSend = () => {
+  const handleSend = async () => {
+    const text = message.trim();
+
+    if (attachments.length > 0 && id) {
+      setIsUploading(true);
+      try {
+        const uploaded = await Promise.all(
+          attachments.map((a) => uploadAsset(a.file).then((r) => r.data))
+        );
+        uploaded.forEach((asset, i) => {
+          sendChat({
+            assetUrl: asset.assetUrl,
+            assetName: asset.assetName || attachments[i].file.name,
+            ...(i === 0 && text ? { text } : {}),
+          });
+        });
+        clear();
+        setMessage('');
+      } catch (err) {
+        toast({
+          title: 'Upload failed',
+          description: getApiErrorMessage(err),
+          variant: 'destructive',
+        });
+      } finally {
+        setIsUploading(false);
+      }
+      return;
+    }
+
     sendChat(message);
     setMessage('');
   };
 
-  const handleChatAttachment = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
-    if (!file || !id) return;
-    setIsUploadingChatFile(true);
-    try {
-      const { data } = await uploadAsset(file);
-      const caption = message.trim();
-      sendChat({
-        assetUrl: data.assetUrl,
-        assetName: data.assetName || file.name,
-        ...(caption ? { text: caption } : {}),
-      });
-      if (caption) setMessage('');
-    } catch (err) {
-      toast({
-        title: 'Upload failed',
-        description: getApiErrorMessage(err),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUploadingChatFile(false);
-    }
+    if (file) add(file);
   };
 
   const Layout = isAdmin ? AdminLayout : DashboardLayout;
@@ -128,7 +145,6 @@ export default function CaseChatPage() {
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-
           <div className="min-w-0">
             <p className="mt-0.5 text-xs text-muted-foreground">{userName}</p>
             <GenericTooltip
@@ -151,8 +167,8 @@ export default function CaseChatPage() {
           viewerParticipant={viewerParticipant}
           draft={message}
           onDraftChange={setMessage}
-          onSend={handleSend}
-          composer={isAdmin ? 'input' : 'textarea'}
+          onSend={() => void handleSend()}
+          composer="textarea"
           status={chatStatus}
           sendingText={sendingText}
           failedMessages={failedMessages}
@@ -165,27 +181,44 @@ export default function CaseChatPage() {
           messageLayout="conversation"
           rootClassName="flex min-h-0 flex-1 flex-col rounded-none border-0 bg-transparent shadow-none"
           panelStyle={{ flex: 1, minHeight: 0 }}
+          hasComposerAttachment={attachments.length > 0}
+          isComposerBusy={isUploading}
+          composerAccessory={
+            attachments.length > 0 ? (
+              <div className="flex flex-wrap gap-2 border-border/50 px-1 pb-2 pt-0.5">
+                {attachments.map((a, i) => (
+                  <AttachmentPreview
+                    key={i}
+                    attachment={a}
+                    onRemove={() => remove(i)}
+                  />
+                ))}
+              </div>
+            ) : null
+          }
           beforeSendActions={
             <>
               <input
-                ref={chatFileInputRef}
+                ref={fileInputRef}
                 type="file"
                 accept={CASE_DOCUMENT_ACCEPT}
                 className="hidden"
-                onChange={handleChatAttachment}
+                onChange={handleFileSelected}
               />
               <Button
                 type="button"
                 size="icon"
                 variant="ghost"
-                disabled={isUploadingChatFile}
-                title="Send file in chat (uploads first, then sends)"
-                onClick={() => chatFileInputRef.current?.click()}
+                className="text-muted-foreground hover:text-foreground"
+                disabled={isUploading || isFull}
+                title={isFull ? 'Max 3 attachments' : 'Attach file'}
+                aria-label="Attach file"
+                onClick={() => fileInputRef.current?.click()}
               >
-                {isUploadingChatFile ? (
+                {isUploading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Upload className="h-4 w-4" />
+                  <Plus className="h-5 w-5 stroke-[2]" />
                 )}
               </Button>
             </>
@@ -193,5 +226,52 @@ export default function CaseChatPage() {
         />
       </div>
     </Layout>
+  );
+}
+
+function AttachmentPreview({
+  attachment,
+  onRemove,
+}: {
+  attachment: { file: File; previewUrl: string | null };
+  onRemove: () => void;
+}) {
+  if (attachment.previewUrl) {
+    return (
+      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border/80 bg-muted">
+        <img
+          src={attachment.previewUrl}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+        <button
+          type="button"
+          className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+          onClick={onRemove}
+          aria-label="Remove attachment"
+        >
+          <X className="h-3 w-3" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-w-0 max-w-[160px] items-center gap-1.5 rounded-lg border border-border/80 bg-muted/50 px-2 py-1.5">
+      <File className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <span className="min-w-0 flex-1 truncate text-xs font-medium text-foreground">
+        {attachment.file.name}
+      </span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="h-5 w-5 shrink-0 rounded-full"
+        onClick={onRemove}
+        aria-label="Remove attachment"
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
   );
 }

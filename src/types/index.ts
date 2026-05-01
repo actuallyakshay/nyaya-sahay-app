@@ -181,7 +181,12 @@ export interface CaseChatNotifyPayload {
 /** User vs admin API/socket variant for case thread messages. */
 export type CaseChatVariant = 'user' | 'admin';
 
-export type CaseChatConnectionStatus = 'idle' | 'connecting' | 'reconnecting' | 'open' | 'error';
+export type CaseChatConnectionStatus =
+  | 'idle'
+  | 'connecting'
+  | 'reconnecting'
+  | 'open'
+  | 'error';
 
 export interface FailedChatMessage {
   clientMessageId: string;
@@ -213,6 +218,11 @@ export interface CaseChatNotifierLivePeek {
   target: string;
 }
 
+export interface SendingAttachment {
+  previewUrl: string | null;
+  name: string;
+}
+
 export interface CaseChatThreadProps {
   variant: CaseChatVariant;
   title: string;
@@ -226,6 +236,8 @@ export interface CaseChatThreadProps {
   status: CaseChatConnectionStatus;
   /** Outbound text still being confirmed by the server. */
   sendingText?: string | null;
+  /** Attachments being uploaded — shown as blurred previews in the outbound bubble. */
+  sendingAttachments?: SendingAttachment[];
   failedMessages?: FailedChatMessage[];
   onRetryFailed?: (clientMessageId: string) => void;
   hasOlderMessages?: boolean;
@@ -233,6 +245,12 @@ export interface CaseChatThreadProps {
   onLoadOlder?: () => void;
   isLoadingMessages?: boolean;
   beforeSendActions?: ReactNode;
+  /** Shown inside the composer pill above the text field (e.g. staged attachment). */
+  composerAccessory?: ReactNode;
+  /** When true, Send works even if the draft is empty (e.g. image-only message). */
+  hasComposerAttachment?: boolean;
+  /** Disables send and Enter-to-send (e.g. while uploading a staged attachment). */
+  isComposerBusy?: boolean;
   panelStyle?: CSSProperties;
   /** When false, hide the built-in title/status header (page supplies its own chrome). */
   showThreadHeader?: boolean;
@@ -338,6 +356,7 @@ export interface AuthUser {
   roles: UserRole[];
   isProfileCompleted?: boolean;
   provider: 'email' | 'google';
+  lawyerProfile?: LawyerProfileApiShape | null;
 }
 
 // Cases list API response types
@@ -490,6 +509,8 @@ export interface LawyerProfileApiShape {
   state?: string | null;
   pincode?: string | null;
   lawyerPracticeAreas?: { practiceAreaId: string }[];
+  isProfileCompleted?: boolean;
+  isVerified?: boolean;
 }
 
 export interface CurrentUserApi {

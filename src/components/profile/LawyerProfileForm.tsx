@@ -133,6 +133,27 @@ export function LawyerProfileForm({ profile }: LawyerProfileFormProps) {
         </div>
       </div>
 
+      <div className="mt-5 rounded-lg border border-dashed border-muted-foreground/25 bg-muted/20 p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0">
+          <p className="text-sm font-medium">Professional documents</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Upload certificates, ID proofs, and other files for admin
+            verification from your documents page.
+          </p>
+        </div>
+        <Button
+          asChild
+          variant="secondary"
+          className="mt-3 shrink-0 sm:mt-0"
+          type="button"
+        >
+          <Link to={ROUTES.lawyer.documents}>
+            <FileText className="mr-2 h-4 w-4" />
+            Manage documents
+          </Link>
+        </Button>
+      </div>
+
       <div className="mt-3 border-t pt-5">
         <h3 className="mb-4 font-semibold">Professional Details</h3>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -221,27 +242,6 @@ export function LawyerProfileForm({ profile }: LawyerProfileFormProps) {
                   ))}
             </div>
           </div>
-        </div>
-
-        <div className="mt-5 rounded-lg border border-dashed border-muted-foreground/25 bg-muted/20 p-4 sm:flex sm:items-center sm:justify-between sm:gap-4">
-          <div className="min-w-0">
-            <p className="text-sm font-medium">Professional documents</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Upload certificates, ID proofs, and other files for admin
-              verification from your documents page.
-            </p>
-          </div>
-          <Button
-            asChild
-            variant="secondary"
-            className="mt-3 shrink-0 sm:mt-0"
-            type="button"
-          >
-            <Link to={ROUTES.lawyer.documents}>
-              <FileText className="mr-2 h-4 w-4" />
-              Manage documents
-            </Link>
-          </Button>
         </div>
       </div>
 

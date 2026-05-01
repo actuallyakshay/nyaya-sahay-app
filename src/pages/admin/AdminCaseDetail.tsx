@@ -164,7 +164,11 @@ const AdminCaseDetail = () => {
           {/* Header card */}
           <div className="overflow-hidden rounded-xl border bg-card">
             <div className="space-y-2 border-b bg-muted/30 px-5 py-3">
-              <GenericTooltip content={caseData?.title} side="bottom" className="min-w-0">
+              <GenericTooltip
+                content={caseData?.title}
+                side="bottom"
+                className="min-w-0"
+              >
                 <h1 className="truncate text-lg font-bold tracking-tight">
                   {caseData?.title}
                 </h1>
@@ -320,20 +324,25 @@ const AdminCaseDetail = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
+                        variant="default"
+                        size="sm"
+                        className="h-10 flex-none px-4 text-xs font-medium"
                         asChild
                       >
-                        <Link to={id ? path.adminCaseChat(id, caseData?.title) : '#'}>
+                        <Link
+                          to={
+                            id ? path.adminCaseChat(id, caseData?.title) : '#'
+                          }
+                        >
                           <MessageCircle className="h-4 w-4" />
+                          <span>Case Chat</span>
                         </Link>
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Case chat</TooltipContent>
+                    <TooltipContent>case chat</TooltipContent>
                   </Tooltip>
 
-                  <Tooltip>
+                  {/* <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
@@ -345,7 +354,7 @@ const AdminCaseDetail = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Timeline</TooltipContent>
-                  </Tooltip>
+                  </Tooltip> */}
 
                   <Tooltip>
                     <TooltipTrigger asChild>

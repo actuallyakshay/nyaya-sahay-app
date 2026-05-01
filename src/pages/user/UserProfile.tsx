@@ -1,14 +1,16 @@
 import PasswordResetModal from '@/components/PasswordResetModal';
 import { LawyerProfileForm } from '@/components/profile/LawyerProfileForm';
 import { UserProfileForm } from '@/components/profile/UserProfileForm';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfilePage } from '@/hooks/useProfilePage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getCookie } from '@/lib/helpers';
+import { isLawyerApprovedForPractice } from '@/lib/lawyer-access';
 import { mockPlans, mockSubscription } from '@/lib/mock-data';
-import { Calendar, CheckCircle2, CreditCard, Shield } from 'lucide-react';
+import { Calendar, CheckCircle2, CreditCard, Info, Shield } from 'lucide-react';
 import { useState } from 'react';
 
 const UserProfile = () => {
@@ -16,6 +18,8 @@ const UserProfile = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const isLawyer = getCookie('x-active-role') === 'lawyer';
   const profile = useProfilePage();
+  const lawyerApproved = isLawyer && isLawyerApprovedForPractice(user);
+  const lp = user?.lawyerProfile;
 
   const plan = mockPlans.find((p) => p.id === mockSubscription.planId);
 
@@ -23,6 +27,28 @@ const UserProfile = () => {
     <DashboardLayout>
       <div className="w-full space-y-6">
         <h1 className="text-2xl font-bold">Profile & Settings</h1>
+
+        {isLawyer && !lawyerApproved ? (
+          <Alert className="border-gold/30 bg-gold/5">
+            <Info className="h-4 w-4 text-gold" />
+            <AlertTitle>Account access</AlertTitle>
+            <AlertDescription>
+              {lp?.isProfileCompleted !== true ? (
+                <p>
+                  Complete your advocate profile below. After you submit your
+                  details and documents, an admin will review and verify your
+                  account before you can open cases or messages.
+                </p>
+              ) : (
+                <p>
+                  Your profile is submitted. An admin is reviewing your
+                  verification. You will get full access once your account is
+                  approved.
+                </p>
+              )}
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         {isLawyer ? (
           <LawyerProfileForm profile={profile} />
