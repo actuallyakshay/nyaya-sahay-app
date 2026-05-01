@@ -55,35 +55,26 @@ export const ROUTES = {
 /** Route patterns for `<Route path={...} />` (includes param tokens). */
 export const ROUTE_PATTERNS = {
   caseDetail: '/cases/:id',
+  caseDocuments: '/cases/:id/documents',
+  caseInternalNotes: '/cases/:id/internal-notes',
   caseChat: '/cases/:id/chat',
   adminUserDetail: `${PATH_PREFIX.admin}/users/:id`,
   adminLawyerDetail: `${PATH_PREFIX.admin}/lawyers/:id`,
   adminLawyerDocuments: `${PATH_PREFIX.admin}/lawyers/:id/documents`,
   adminCaseDetail: `${PATH_PREFIX.admin}/cases/:id`,
   adminCaseChat: `${PATH_PREFIX.admin}/cases/:id/chat`,
-  adminCaseInternalNotes: `${PATH_PREFIX.admin}/cases/:id/internal-notes`,
   adminCaseDocuments: `${PATH_PREFIX.admin}/cases/:id/documents`,
 } as const;
 
 export const path = {
   caseDetail: (id: string) => `/cases/${id}`,
-  caseChat: (id: string, title?: string) => {
-    const base = `/cases/${id}/chat`;
-    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
-  },
+  caseChat: (id: string) => `/cases/${id}/chat`,
+  caseDocuments: (id: string) => `/cases/${id}/documents`,
+  caseInternalNotes: (id: string) => `/cases/${id}/internal-notes`,
   adminCase: (id: string) => `${ROUTES.admin.cases}/${id}`,
-  adminCaseChat: (id: string, title?: string) => {
-    const base = `${ROUTES.admin.cases}/${id}/chat`;
-    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
-  },
-  adminCaseInternalNotes: (id: string, title?: string) => {
-    const base = `${ROUTES.admin.cases}/${id}/internal-notes`;
-    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
-  },
-  adminCaseDocuments: (id: string, title?: string) => {
-    const base = `${ROUTES.admin.cases}/${id}/documents`;
-    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
-  },
+  adminCaseChat: (id: string) => `${ROUTES.admin.cases}/${id}/chat`,
+  adminCaseDocuments: (id: string) =>
+    `${ROUTES.admin.cases}/${id}/documents`,
   adminUser: (id: string) => `${ROUTES.admin.users}/${id}`,
   adminLawyer: (id: string) => `${ROUTES.admin.lawyers}/${id}`,
   adminLawyerDocuments: (id: string) =>
@@ -110,8 +101,9 @@ export function isCaseChatPathname(pathname: string) {
 export function isFullScreenCaseSubpage(pathname: string) {
   return (
     isCaseChatPathname(pathname) ||
-    /^\/admin\/cases\/[^/]+\/documents\/?$/.test(pathname) ||
-    /^\/admin\/cases\/[^/]+\/internal-notes\/?$/.test(pathname)
+    /^\/cases\/[^/]+\/documents\/?$/.test(pathname) ||
+    /^\/cases\/[^/]+\/internal-notes\/?$/.test(pathname) ||
+    /^\/admin\/cases\/[^/]+\/documents\/?$/.test(pathname)
   );
 }
 

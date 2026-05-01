@@ -20,7 +20,9 @@ import Index from './pages/Index';
 import LoginPage from './pages/LoginPage';
 import PlansPage from './pages/PlansPage';
 
+import CaseInternalNotesPage from './pages/CaseInternalNotesPage';
 import CaseDetail from './pages/user/CaseDetail';
+import CaseDocuments from './pages/user/CaseDocuments';
 import LawyersDirectory from './pages/user/LawyersDirectory';
 import NewCase from './pages/user/NewCase';
 import UserCases from './pages/user/UserCases';
@@ -34,7 +36,6 @@ import LawyerDocuments from './pages/lawyer/LawyerDocuments';
 
 import AdminCaseDetail from './pages/admin/AdminCaseDetail';
 import AdminCaseDocuments from './pages/admin/AdminCaseDocuments';
-import AdminCaseInternalNotes from './pages/admin/AdminCaseInternalNotes';
 import AdminCases from './pages/admin/AdminCases';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLawyerDetail from './pages/admin/AdminLawyerDetail';
@@ -109,6 +110,20 @@ const App = () => (
                     </LawyerApprovedGate>
                   </ProtectedRoute>
                 }
+              />
+              <Route
+                path={ROUTE_PATTERNS.caseDocuments}
+                element={
+                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                    <LawyerApprovedGate>
+                      <CaseDocuments />
+                    </LawyerApprovedGate>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.caseInternalNotes}
+                element={<CaseInternalNotesPage />}
               />
               <Route
                 path={ROUTE_PATTERNS.caseChat}
@@ -306,14 +321,6 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <CaseChatPage />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminCaseInternalNotes}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminCaseInternalNotes />
                   </AdminProtectedRoute>
                 }
               />

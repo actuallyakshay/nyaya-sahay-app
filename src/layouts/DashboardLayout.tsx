@@ -4,7 +4,7 @@ import {
   LAWYER_NAV,
   ROUTES,
   USER_NAV,
-  isCaseChatPathname,
+  isFullScreenCaseSubpage,
   type NavItem,
 } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,7 +74,7 @@ export const DashboardLayout = ({
     navigate(ROUTES.login);
   };
 
-  const isCaseChat = isCaseChatPathname(location.pathname);
+  const isImmersiveCaseSubpage = isFullScreenCaseSubpage(location.pathname);
 
   const handleSwitchRole = () => {
     const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
@@ -92,7 +92,7 @@ export const DashboardLayout = ({
     <div
       className={cn(
         'flex flex-col lg:flex-row',
-        isCaseChat
+        isImmersiveCaseSubpage
           ? 'h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden'
           : 'min-h-screen lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:overflow-hidden'
       )}
@@ -325,12 +325,12 @@ export const DashboardLayout = ({
       <main
         className={cn(
           'flex-1 lg:min-h-0',
-          isCaseChat
+          isImmersiveCaseSubpage
             ? 'flex min-h-0 flex-col overflow-hidden'
             : 'overflow-y-auto'
         )}
       >
-        {isCaseChat ? (
+        {isImmersiveCaseSubpage ? (
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {children}
           </div>

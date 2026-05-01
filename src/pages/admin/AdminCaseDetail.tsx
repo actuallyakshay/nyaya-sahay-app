@@ -1,5 +1,4 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
-import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
 import { CloseCaseDialog } from '@/components/case-detail/CloseCaseDialog';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
@@ -8,13 +7,8 @@ import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
   TooltipContent,
@@ -25,22 +19,20 @@ import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { path } from '@/constants';
 import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
-import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import {
   DESCRIPTION_PREVIEW_MAX_WORDS,
   splitWords,
   truncateToWords,
 } from '@/lib/caseDescriptionPreview';
-import { CASE_DOCUMENT_ACCEPT } from '@/lib/helpers';
-import { queryClient } from '@/lib/query-client';
-import { QueryKey } from '@tanstack/react-query';
 import {
   AlertTriangle,
   CalendarDays,
   CheckCircle,
+  ChevronRight,
   Clock,
   ExternalLink,
+  FileText,
   Gavel,
   Hash,
   Loader2,
@@ -48,12 +40,11 @@ import {
   RotateCcw,
   StickyNote,
   Tag,
-  Upload,
   User,
   Video,
   XCircle,
 } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const priorityConfig = {
@@ -77,10 +68,7 @@ const AdminCaseDetail = () => {
   const navigate = useNavigate();
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
-  const [documentCount, setDocumentCount] = useState(0);
-  const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
-  const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
   const [sessionBookingOpen, setSessionBookingOpen] = useState(false);
   const rawDescription = caseData?.description?.trim() ?? '';
 
@@ -95,11 +83,6 @@ const AdminCaseDetail = () => {
         ? truncateToWords(rawDescription, DESCRIPTION_PREVIEW_MAX_WORDS)
         : '',
     [rawDescription]
-  );
-
-  const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
-    id,
-    'admin'
   );
 
   const {
@@ -134,16 +117,6 @@ const AdminCaseDetail = () => {
     }
   };
 
-  const handleDocumentUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    await uploadFromSource(file, 'Case page');
-    await queryClient.invalidateQueries({ queryKey });
-  };
-
   const priorityKey = (caseData?.priority ??
     'normal') as keyof typeof priorityConfig;
   const pConfig = priorityConfig[priorityKey] ?? priorityConfig.normal;
@@ -153,8 +126,12 @@ const AdminCaseDetail = () => {
   const lawyerDisplayName = caseData?.assignedLawyer?.user?.fullName;
   const userId = caseData?.user?.id;
   const timelineUpdatedAt = caseData?.updatedAt ?? caseData?.createdAt;
-
   const isLawyerAssigned = caseData?.assignedLawyerId;
+
+  const showCaseActions = ['lawyer_assigned', 'under_review'].includes(
+    caseData?.status
+  );
+  const showBookSession = isLawyerAssigned && !caseData?.caseSessionRequest;
 
   if (isLoading) {
     return (
@@ -168,262 +145,182 @@ const AdminCaseDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="shrink-0 space-y-4">
-          {/* Header card */}
-          <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="space-y-2 border-b bg-muted/30 px-5 py-3">
-              <GenericTooltip
-                content={caseData?.title}
-                side="bottom"
-                className="min-w-0"
-              >
-                <h1 className="truncate text-lg font-bold tracking-tight">
-                  {caseData?.title}
-                </h1>
-              </GenericTooltip>
-              <div className="flex flex-wrap items-center gap-3">
-                <StatusBadge status={caseData?.status} />
-                {caseData?.isEmergency && (
-                  <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
-                    Urgent
-                  </span>
-                )}
-                <Badge
-                  variant="outline"
-                  className={`gap-1 text-[11px] ${pConfig.color}`}
-                >
-                  {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
-                  {(caseData?.priority ?? 'normal').toUpperCase()}
-                </Badge>
-              </div>
-              <div className="flex items-center gap-1.5">
+      <TooltipProvider delayDuration={300}>
+        <div className="flex min-h-0 flex-1 flex-col gap-6">
+          {/* ── Page header card ── */}
+          <Card className="overflow-hidden shadow-sm">
+            <div className="bg-muted/40 px-6 py-5">
+              {/* Title + badges */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1 space-y-2.5">
+                  <GenericTooltip
+                    content={caseData?.title}
+                    side="bottom"
+                    className="min-w-0"
+                  >
+                    <h1 className="truncate text-xl font-bold tracking-tight text-foreground">
+                      {caseData?.title}
+                    </h1>
+                  </GenericTooltip>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge status={caseData?.status} />
+                    {caseData?.isEmergency && (
+                      <Badge
+                        variant="outline"
+                        className="border-destructive/30 bg-destructive/10 text-destructive"
+                      >
+                        Urgent
+                      </Badge>
+                    )}
+                    <Badge
+                      variant="outline"
+                      className={`gap-1 ${pConfig.color}`}
+                    >
+                      {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
+                      {(caseData?.priority ?? 'normal').toUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
                 {caseData?.status !== 'closed' &&
                   caseData?.status !== 'resolved' && (
-                    <>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={isCaseActionPending}
+                            onClick={() => void handleResetCase()}
+                          >
+                            {isResetting ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <RotateCcw className="h-4 w-4" />
+                            )}
+                            Reset
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Reset case to new</TooltipContent>
+                      </Tooltip>
+
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 text-xs"
-                        disabled={isCaseActionPending}
-                        onClick={() => void handleResetCase()}
-                      >
-                        {isResetting ? (
-                          <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <RotateCcw className="mr-1 h-3.5 w-3.5" />
-                        )}
-                        Reset
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="h-8 text-xs"
+                        className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         disabled={isCaseActionPending}
                         onClick={() => setCloseDialogOpen(true)}
                       >
-                        <XCircle className="mr-1 h-3.5 w-3.5" />
-                        Close
+                        <XCircle className="h-4 w-4" />
+                        Close Case
                       </Button>
+
                       {caseData?.status === 'new' && (
                         <Button
                           variant="default"
                           size="sm"
-                          className="h-8 text-xs"
                           disabled={isCaseActionPending}
                           onClick={() => void handleAcceptCase()}
                         >
                           {isUpdatingStatus ? (
-                            <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <CheckCircle className="mr-1 h-3.5 w-3.5" />
+                            <CheckCircle className="h-4 w-4" />
                           )}
                           Accept
                         </Button>
                       )}
-                    </>
-                  )}
-              </div>
-            </div>
-
-            <div className="space-y-4 px-5 py-4">
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Hash className="h-3.5 w-3.5 shrink-0" />
-                  <span className="font-mono text-foreground">
-                    {caseData?.caseCode}
-                  </span>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5 shrink-0" />
-                  <span className="text-foreground">
-                    {caseData?.practiceArea?.name}
-                  </span>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                  Created{' '}
-                  {new Date(caseData?.createdAt).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 shrink-0" />
-                  Updated{' '}
-                  {new Date(timelineUpdatedAt).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <User className="h-3.5 w-3.5 shrink-0" />
-                  <span className="font-medium text-foreground">
-                    {caseData?.user?.fullName ?? '—'}
-                  </span>
-                  {userId ? (
-                    <Link
-                      to={path.adminUser(userId)}
-                      className="text-primary hover:underline"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </Link>
-                  ) : null}
-                </span>
-                {lawyerDisplayName ? (
-                  <span className="flex items-center gap-1.5">
-                    <Gavel className="h-3.5 w-3.5 shrink-0" />
-                    <span className="font-medium text-foreground">
-                      Adv. {lawyerDisplayName}
-                    </span>
-                    {lawyerProfileId ? (
-                      <Link
-                        to={path.adminLawyer(lawyerProfileId)}
-                        className="text-primary hover:underline"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    ) : null}
-                  </span>
-                ) : null}
-              </div>
-              <div className="rounded-lg border bg-muted/30 px-4 py-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Description
-                </h3>
-                {rawDescription ? (
-                  descriptionIsLong ? (
-                    <div className="mt-2 text-sm leading-relaxed text-foreground/90">
-                      <span className="block whitespace-pre-wrap">
-                        {descriptionPreviewText}
-                      </span>
-                      <button
-                        type="button"
-                        className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground hover:text-gold"
-                        onClick={() => setDescriptionModalOpen(true)}
-                      >
-                        Show full description
-                      </button>
                     </div>
-                  ) : (
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                      {rawDescription}
-                    </p>
-                  )
-                ) : (
-                  <p className="mt-2 text-sm text-muted-foreground">—</p>
+                  )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Metadata strip */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-6 py-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Hash className="h-3.5 w-3.5 shrink-0" />
+                <span className="font-mono font-medium text-foreground">
+                  {caseData?.caseCode}
+                </span>
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-foreground">
+                  {caseData?.practiceArea?.name}
+                </span>
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                Created{' '}
+                {new Date(caseData?.createdAt).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                Updated{' '}
+                {new Date(timelineUpdatedAt).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5 shrink-0" />
+                <span className="font-medium text-foreground">
+                  {caseData?.user?.fullName ?? '—'}
+                </span>
+                {userId && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        to={path.adminUser(userId)}
+                        className="text-primary transition-colors hover:text-primary/70"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>View user profile</TooltipContent>
+                  </Tooltip>
                 )}
-              </div>
-            </div>
-            <div className="flex w-full flex-wrap items-center gap-3 px-4 py-3">
-              <div className="w-full min-w-0 flex-1 basis-full sm:basis-0">
-                <AdminCaseLawyerAssign
-                  caseId={id}
-                  caseStatus={caseData?.status}
-                />
-              </div>
-              <TooltipProvider delayDuration={300}>
-                <div className="ml-auto flex shrink-0 items-center gap-1">
-                  {['lawyer_assigned', 'under_review'].includes(
-                    caseData?.status
-                  ) && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="h-10 flex-none px-4 text-xs font-medium"
-                          asChild
-                        >
-                          <Link
-                            to={
-                              id ? path.adminCaseChat(id, caseData?.title) : '#'
-                            }
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                            <span>Case Chat</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>case chat</TooltipContent>
-                    </Tooltip>
-                  )}
-                  {['lawyer_assigned', 'under_review'].includes(
-                    caseData?.status
-                  ) && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-10 flex-none px-4 text-xs font-medium"
-                          asChild
-                        >
-                          <Link
-                            to={
-                              id
-                                ? path.adminCaseInternalNotes(
-                                    id,
-                                    caseData?.title
-                                  )
-                                : '#'
-                            }
-                          >
-                            <StickyNote className="h-4 w-4" />
-                            <span>Internal Notes</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>internal notes</TooltipContent>
-                    </Tooltip>
-                  )}
+              </span>
 
-                  {isLawyerAssigned && !caseData?.caseSessionRequest && (
+              {lawyerDisplayName && (
+                <span className="flex items-center gap-1.5">
+                  <Gavel className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium text-foreground">
+                    Adv. {lawyerDisplayName}
+                  </span>
+                  {lawyerProfileId && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="h-10 flex-none px-4 text-xs font-medium"
-                          onClick={() => setSessionBookingOpen(true)}
+                        <Link
+                          to={path.adminLawyer(lawyerProfileId)}
+                          className="text-primary transition-colors hover:text-primary/70"
                         >
-                          <Video className="h-4 w-4" />
-                          Book Session
-                        </Button>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
                       </TooltipTrigger>
-                      <TooltipContent>Book Session</TooltipContent>
+                      <TooltipContent>View lawyer profile</TooltipContent>
                     </Tooltip>
                   )}
-                </div>
-              </TooltipProvider>
+                </span>
+              )}
             </div>
-          </div>
-        </div>
+          </Card>
 
-        {caseData?.caseSessionRequest && (
-          <div className="w-full min-w-0 shrink-0">
+          {/* ── Session / Meeting URI — full width ── */}
+          {caseData?.caseSessionRequest && (
             <CaseMeetingUri
               sessionRequest={caseData?.caseSessionRequest}
               caseId={id}
@@ -431,88 +328,155 @@ const AdminCaseDetail = () => {
               allowAdminReviewSessionRequest
               allowAdminDeleteSessionRequest
             />
-          </div>
-        )}
+          )}
 
-        <div className="w-full min-w-0 shrink-0">
-          <Card className="grid grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
-            <CardHeader className="shrink-0 border-b bg-muted/20 pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">Documents</CardTitle>
-                  <CardDescription>
-                    Recent files attached to this case.
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (isUploadingDocument) return;
-                      documentUploadInputRef.current?.click();
-                    }}
-                    disabled={
-                      isUploadingDocument ||
-                      caseData?.status === 'closed' ||
-                      caseData?.status === 'rejected'
-                    }
-                  >
-                    {isUploadingDocument ? (
-                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          {/* ── Main grid ── */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Left column */}
+            <div className="flex flex-col gap-6 lg:col-span-2">
+              {/* Description */}
+              <Card className="shadow-sm">
+                <CardHeader className="border-b bg-muted/20 pb-4">
+                  <CardTitle className="text-base font-semibold">
+                    Description
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 py-5">
+                  {rawDescription ? (
+                    descriptionIsLong ? (
+                      <div>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                          {descriptionPreviewText}
+                        </p>
+                        <button
+                          type="button"
+                          className="mt-4 text-xs font-medium text-primary transition-colors hover:text-primary/70"
+                          onClick={() => setDescriptionModalOpen(true)}
+                        >
+                          Read full description →
+                        </button>
+                      </div>
                     ) : (
-                      <Upload className="mr-1.5 h-3.5 w-3.5" />
-                    )}
-                    Upload
-                  </Button>
-                  {documentCount > 3 && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0"
-                      onClick={() => {
-                        navigate(
-                          path.adminCaseDocuments(id || '', caseData?.title)
-                        );
-                      }}
-                      title="View all documents"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                        {rawDescription}
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground">
+                      No description provided.
+                    </p>
                   )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="min-h-0 overflow-hidden px-6 pb-5 pt-4">
-              <CaseDocumentsContent
-                isAdmin
-                caseClientName={caseData?.user?.fullName}
-                caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
-                caseStatus={caseData?.status}
-                loading={isUploadingDocument}
-                previewMode={true}
-                previewLimit={3}
-                showUploadInHeader={true}
-                onUploadClick={(qk) => {
-                  setQueryKey(qk);
-                }}
-                onViewAllClick={() => {
-                  navigate(path.adminCaseDocuments(id || '', caseData?.title));
-                }}
-                onDocumentCountChange={setDocumentCount}
-              />
-            </CardContent>
-          </Card>
-        </div>
+                </CardContent>
+              </Card>
+            </div>
 
-        <input
-          ref={documentUploadInputRef}
-          type="file"
-          accept={CASE_DOCUMENT_ACCEPT}
-          className="hidden"
-          onChange={handleDocumentUpload}
-        />
-      </div>
+            {/* Right sidebar — single unified card */}
+            <div className="flex flex-col gap-5">
+              <Card className="overflow-hidden shadow-sm">
+                {/* Assign Lawyer section */}
+                <div className="px-5 pb-4 pt-5">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Assigned Lawyer
+                  </p>
+                  <AdminCaseLawyerAssign
+                    caseId={id}
+                    caseStatus={caseData?.status}
+                  />
+                </div>
+
+                {/* Case action links — always shown, conditional items hidden when irrelevant */}
+                <Separator />
+                <div className="px-5 pb-1 pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Case Actions
+                  </p>
+                </div>
+
+                {/* Documents — always visible */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(path.adminCaseDocuments(id || ''))
+                  }
+                  className="group flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600">
+                    <FileText className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="text-sm font-medium">Documents</p>
+                    <p className="text-xs text-muted-foreground">
+                      View &amp; manage case files
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                </button>
+
+                {showCaseActions && (
+                  <Link
+                    to={id ? path.adminCaseChat(id) : '#'}
+                    className="group flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600">
+                      <MessageCircle className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">Case Chat</p>
+                      <p className="text-xs text-muted-foreground">
+                        Message lawyer &amp; client
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                )}
+
+                {showCaseActions && (
+                  <Link
+                    to={
+                      id
+                        ? path.caseInternalNotes(id)
+                        : '#'
+                    }
+                    className="group flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+                      <StickyNote className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">Internal Notes</p>
+                      <p className="text-xs text-muted-foreground">
+                        Admin &amp; lawyer - internal case notes
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                )}
+
+                {showBookSession && (
+                  <button
+                    type="button"
+                    onClick={() => setSessionBookingOpen(true)}
+                    className="group flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
+                      <Video className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="text-sm font-medium">Book Session</p>
+                      <p className="text-xs text-muted-foreground">
+                        Schedule a video consultation
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                )}
+
+                <div className="pb-2" />
+              </Card>
+            </div>
+          </div>
+        </div>
+      </TooltipProvider>
 
       <SessionBookingModal
         bookingOpen={sessionBookingOpen}

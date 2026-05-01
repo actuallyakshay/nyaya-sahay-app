@@ -1,4 +1,3 @@
-import { path } from '@/constants';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
@@ -10,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { path } from '@/constants';
 import { CASE_STATUS_FILTERS } from '@/lib/mock-data';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -112,10 +112,21 @@ export const LawyerCasesTable = ({
                   key={c.id}
                   className="border-b last:border-0 hover:bg-muted/30"
                 >
-                  <td className="px-4 py-3 font-mono text-xs">{c.caseCode}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    <Link
+                      to={
+                        isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)
+                      }
+                      className="hover:text-gold hover:underline"
+                    >
+                      {c.caseCode}
+                    </Link>
+                  </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link
-                      to={isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)}
+                      to={
+                        isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)
+                      }
                       className="hover:text-gold hover:underline"
                     >
                       {c.title}

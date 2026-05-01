@@ -25,7 +25,9 @@ export default function CaseNotificationsPage() {
   const openCase = (row: CaseChatUnreadItem) => {
     invalidateCaseMessagesForCase(queryClient, row.caseId);
     invalidateCaseChatUnread(queryClient);
-    const target = isAdmin ? path.adminCaseChat(row.caseId, row.title) : path.caseChat(row.caseId, row.title);
+    const target = isAdmin
+      ? path.adminCaseChat(row.caseId)
+      : path.caseChat(row.caseId);
     navigate(target);
   };
 

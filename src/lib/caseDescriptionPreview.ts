@@ -1,4 +1,4 @@
-export const DESCRIPTION_PREVIEW_MAX_WORDS = 300;
+export const DESCRIPTION_PREVIEW_MAX_WORDS = 180;
 
 export function splitWords(text: string): string[] {
   return text.trim().split(/\s+/).filter(Boolean);

@@ -496,6 +496,13 @@ export const getAdminCaseInternalNotes = (caseId, params) => {
   });
 };
 
+export const deleteAdminCaseNote = (noteId) => {
+  return apiClient({
+    method: routes.DELETE_ADMIN_CASE_NOTE.METHOD,
+    url: routes.DELETE_ADMIN_CASE_NOTE.URL.replace(':noteId', noteId),
+  });
+};
+
 export const uploadCaseDocument = (caseId, body) => {
   return apiClient({
     method: routes.UPLOAD_CASE_DOCUMENT.METHOD,

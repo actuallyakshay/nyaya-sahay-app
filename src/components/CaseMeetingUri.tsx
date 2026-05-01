@@ -198,9 +198,9 @@ export const CaseMeetingUri = ({
                 </Button>
                 <Button
                   type="button"
-                  variant="destructive"
+                  variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto"
+                  className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:w-auto"
                   disabled={adminReviewButtonsDisabled}
                   onClick={handleReject}
                 >

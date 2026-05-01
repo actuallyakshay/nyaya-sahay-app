@@ -255,6 +255,10 @@ const routes = {
     URL: '/api/admin/cases/:caseId/notes',
     METHOD: 'GET',
   },
+  DELETE_ADMIN_CASE_NOTE: {
+    URL: '/api/admin/cases/notes/:noteId',
+    METHOD: 'DELETE',
+  },
   UPLOAD_CASE_DOCUMENT: {
     URL: '/api/cases/:caseId/documents/upload',
     METHOD: 'POST',

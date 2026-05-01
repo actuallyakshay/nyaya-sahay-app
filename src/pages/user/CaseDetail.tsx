@@ -1,54 +1,62 @@
 import { getCaseDetails } from '@/api-client';
-import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
-import { CaseInternalNotesContent } from '@/components/case-detail/CaseInternalNotesContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { path } from '@/constants';
-import { useCaseDocumentUpload } from '@/hooks/useCaseDocumentUpload';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import {
   DESCRIPTION_PREVIEW_MAX_WORDS,
   splitWords,
   truncateToWords,
 } from '@/lib/caseDescriptionPreview';
-import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
-import { queryClient } from '@/lib/query-client';
-import { QueryKey, useQuery } from '@tanstack/react-query';
-import { MessageCircle, Scale, StickyNote, User, Video } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { getCookie } from '@/lib/helpers';
+import { useQuery } from '@tanstack/react-query';
+import {
+  AlertTriangle,
+  CalendarDays,
+  ChevronRight,
+  Clock,
+  FileText,
+  Gavel,
+  Hash,
+  MessageCircle,
+  StickyNote,
+  Tag,
+  User,
+  Video,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
+const priorityConfig = {
+  urgent: {
+    color: 'bg-destructive/10 text-destructive border-destructive/20',
+    icon: AlertTriangle,
+  },
+  high: {
+    color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+    icon: AlertTriangle,
+  },
+  normal: {
+    color: 'bg-muted text-muted-foreground border-border',
+    icon: null,
+  },
+  low: { color: 'bg-muted text-muted-foreground border-border', icon: null },
+};
 
 const CaseDetail = () => {
   const { id } = useParams();
   const activeRole = getCookie('x-active-role');
   const isLawyer = activeRole === 'lawyer' ? true : false;
-  const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
-  const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
-  const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
-    id,
-    isLawyer ? 'lawyer' : 'user'
-  );
 
   const { data: caseData, isLoading } = useQuery({
     queryKey: ['case-details', id],
@@ -73,22 +81,23 @@ const CaseDetail = () => {
     [rawDescription]
   );
 
-  const handleDocumentUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    await uploadFromSource(file, 'Case page');
-    await queryClient.invalidateQueries({ queryKey });
-  };
-
   const isLawyerAssigned = caseData?.assignedLawyerId;
+  const timelineUpdatedAt = caseData?.updatedAt ?? caseData?.createdAt;
+
+  const priorityKey = (caseData?.priority ??
+    'normal') as keyof typeof priorityConfig;
+  const pConfig = priorityConfig[priorityKey] ?? priorityConfig.normal;
+
+  const showCaseActions = ['lawyer_assigned', 'under_review'].includes(
+    caseData?.status ?? ''
+  );
+  const showBookSession =
+    isLawyerAssigned && !caseData?.caseSessionRequest && !isLawyer;
 
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6">
           <CaseDetailSkeleton isLawyer={isLawyer} />
         </div>
       </DashboardLayout>
@@ -97,177 +106,235 @@ const CaseDetail = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-        {/* Header */}
-        <div className="shrink-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-sm text-muted-foreground">
-              {caseData?.caseCode}
-            </span>
-            <StatusBadge status={caseData?.status} />
-            {caseData?.isEmergency && (
-              <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                Urgent
-              </span>
-            )}
-          </div>
-          <GenericTooltip content={caseData?.title}>
-            <h1 className="mt-1 line-clamp-2 text-xl font-bold sm:text-2xl lg:line-clamp-1">
-              {caseData?.title}
-            </h1>
-          </GenericTooltip>
-          {rawDescription ? (
-            descriptionIsLong ? (
-              <button
-                type="button"
-                className="group mt-0.5 w-full rounded-md text-left text-sm leading-relaxed text-muted-foreground transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                onClick={() => setDescriptionModalOpen(true)}
-              >
-                <span className="block whitespace-pre-wrap">
-                  {descriptionPreviewText}
-                </span>
-                <span className="mt-3 block border-t border-border/60 pt-3 text-xs text-muted-foreground group-hover:text-foreground">
-                  Show full description
-                </span>
-              </button>
-            ) : (
-              <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-                {rawDescription}
-              </p>
-            )
-          ) : (
-            <p className="mt-0.5 text-sm text-muted-foreground">—</p>
-          )}
-        </div>
+      <TooltipProvider delayDuration={300}>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6">
+          {/* ── Page header card ── */}
+          <Card className="overflow-hidden shadow-sm">
+            <div className="bg-muted/40 px-6 py-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1 space-y-2.5">
+                  <GenericTooltip
+                    content={caseData?.title}
+                    side="bottom"
+                    className="min-w-0"
+                  >
+                    <h1 className="truncate text-xl font-bold tracking-tight text-foreground">
+                      {caseData?.title}
+                    </h1>
+                  </GenericTooltip>
 
-        {/* Action bar */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {isLawyerAssigned && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1 text-xs font-medium text-gold transition-colors hover:bg-gold/20">
-              <Scale className="h-3 w-3" />
-              Adv. {caseData?.assignedLawyer?.user?.fullName}
-            </span>
-          )}
-          {isLawyer && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-              <User className="h-3 w-3" />
-              Client: {caseData?.user?.fullName}
-            </span>
-          )}
-          <Badge variant="secondary" className="font-normal">
-            {caseData?.practiceArea?.name}
-          </Badge>
-          <div className="flex-1" />
-
-          <TooltipProvider delayDuration={300}>
-            <div className="flex items-center gap-1">
-              {['lawyer_assigned', 'under_review'].includes(
-                caseData?.status
-              ) && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="h-8 gap-1.5 px-3"
-                      asChild
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge status={caseData?.status} />
+                    {caseData?.isEmergency && (
+                      <Badge
+                        variant="outline"
+                        className="border-destructive/30 bg-destructive/10 text-destructive"
+                      >
+                        Urgent
+                      </Badge>
+                    )}
+                    <Badge
+                      variant="outline"
+                      className={`gap-1 ${pConfig.color}`}
                     >
-                      <Link to={id ? path.caseChat(id, caseData?.title) : '#'}>
-                        <MessageCircle className="h-4 w-4" />
-                        <span>Case Chat</span>
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Case chat</TooltipContent>
-                </Tooltip>
+                      {pConfig.icon && <pConfig.icon className="h-3 w-3" />}
+                      {(caseData?.priority ?? 'normal').toUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-6 py-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Hash className="h-3.5 w-3.5 shrink-0" />
+                <span className="font-mono font-medium text-foreground">
+                  {caseData?.caseCode}
+                </span>
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5 shrink-0" />
+                <span className="text-foreground">
+                  {caseData?.practiceArea?.name}
+                </span>
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                Created{' '}
+                {caseData?.createdAt &&
+                  new Date(caseData.createdAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+              </span>
+
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 shrink-0" />
+                Updated{' '}
+                {timelineUpdatedAt &&
+                  new Date(timelineUpdatedAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+              </span>
+
+              {isLawyer && (
+                <span className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium text-foreground">
+                    {caseData?.user?.fullName ?? '—'}
+                  </span>
+                </span>
               )}
 
-              {isLawyerAssigned && !caseData?.caseSessionRequest && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="h-8 gap-1.5 px-3"
-                      onClick={() => setBookingOpen(true)}
-                    >
-                      <Video className="h-4 w-4" />
-                      <span>Book Session</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Book Session</TooltipContent>
-                </Tooltip>
+              {caseData?.assignedLawyer?.user?.fullName && (
+                <span className="flex items-center gap-1.5">
+                  <Gavel className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium text-foreground">
+                    Adv. {caseData.assignedLawyer.user.fullName}
+                  </span>
+                </span>
               )}
             </div>
-          </TooltipProvider>
-        </div>
+          </Card>
 
-        {caseData?.caseSessionRequest && (
-          <div className="w-full min-w-0 shrink-0">
+          {caseData?.caseSessionRequest && (
             <CaseMeetingUri
               sessionRequest={caseData?.caseSessionRequest}
               caseId={id}
+              caseCode={caseData?.caseCode}
               allowWithdrawSessionRequest={!isLawyer}
             />
+          )}
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="flex flex-col gap-6 lg:col-span-2">
+              <Card className="shadow-sm">
+                <CardHeader className="border-b bg-muted/20 pb-4">
+                  <CardTitle className="text-base font-semibold">
+                    Description
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-6 py-5">
+                  {rawDescription ? (
+                    descriptionIsLong ? (
+                      <div>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                          {descriptionPreviewText}
+                        </p>
+                        <button
+                          type="button"
+                          className="mt-4 text-xs font-medium text-primary transition-colors hover:text-primary/70"
+                          onClick={() => setDescriptionModalOpen(true)}
+                        >
+                          Read full description →
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                        {rawDescription}
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground">
+                      No description provided.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <Card className="overflow-hidden shadow-sm">
+                <div className="px-5 pb-1 pt-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Case Actions
+                  </p>
+                </div>
+
+                <Link
+                  to={id ? path.caseDocuments(id) : '#'}
+                  className="group flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600">
+                    <FileText className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="text-sm font-medium">Documents</p>
+                    <p className="text-xs text-muted-foreground">
+                      View &amp; upload case files
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+
+                {showCaseActions && (
+                  <Link
+                    to={id ? path.caseChat(id) : '#'}
+                    className="group flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600">
+                      <MessageCircle className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">Case Chat</p>
+                      <p className="text-xs text-muted-foreground">
+                        Message about this case
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                )}
+
+                {showCaseActions && isLawyer && (
+                  <Link
+                    to={id ? path.caseInternalNotes(id) : '#'}
+                    className="group flex items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+                      <StickyNote className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">Internal Notes</p>
+                      <p className="text-xs text-muted-foreground">
+                        Lawyer &amp; admin only
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                )}
+
+                {showBookSession && (
+                  <button
+                    type="button"
+                    onClick={() => setBookingOpen(true)}
+                    className="group flex w-full items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600">
+                      <Video className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="text-sm font-medium">Book Session</p>
+                      <p className="text-xs text-muted-foreground">
+                        Schedule a video consultation
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                )}
+
+                <div className="pb-2" />
+              </Card>
+            </div>
           </div>
-        )}
-
-        {/* Documents + internal notes — flex-1 fills remaining viewport height */}
-        <div
-          className={
-            isLawyer
-              ? 'flex min-h-[420px] flex-1 flex-col gap-4 lg:flex-row lg:items-stretch'
-              : 'flex min-h-[420px] flex-1 flex-col gap-4'
-          }
-        >
-          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <CardHeader className="shrink-0 pb-3">
-              <CardTitle className="text-lg">Documents</CardTitle>
-              <CardDescription>
-                All files attached to this case.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
-              <CaseDocumentsContent
-                caseClientName={caseData?.user?.fullName}
-                caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
-                caseStatus={caseData?.status}
-                loading={isUploadingDocument}
-                onUploadClick={(qk) => {
-                  if (isUploadingDocument) return;
-                  documentUploadInputRef.current?.click();
-                  setQueryKey(qk);
-                }}
-              />
-            </CardContent>
-          </Card>
-
-          {isLawyer ? (
-            <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <CardHeader className="shrink-0 pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <StickyNote className="h-4 w-4 shrink-0" />
-                  Internal Notes
-                </CardTitle>
-                <CardDescription>
-                  Private notes visible only to lawyers and admins.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
-                <CaseInternalNotesContent />
-              </CardContent>
-            </Card>
-          ) : null}
         </div>
-
-        <input
-          ref={documentUploadInputRef}
-          type="file"
-          accept={CASE_DOCUMENT_ACCEPT}
-          className="hidden"
-          onChange={handleDocumentUpload}
-        />
-      </div>
+      </TooltipProvider>
 
       <CaseDescriptionModal
         open={descriptionModalOpen}
@@ -282,13 +349,6 @@ const CaseDetail = () => {
         caseId={id}
         lawyerName={caseData?.assignedLawyer?.user?.fullName}
       />
-
-      {/* <TimelineDrawer
-        open={timelineDrawerOpen}
-        onOpenChange={setTimelineDrawerOpen}
-        status={caseData?.status}
-        updatedAt={caseData?.updatedAt}
-      /> */}
     </DashboardLayout>
   );
 };
