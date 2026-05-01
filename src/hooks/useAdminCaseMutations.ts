@@ -14,22 +14,34 @@ function invalidateAdminCaseQueries(caseId?: string) {
 
 export function useAdminCaseMutations(
   caseId: string | undefined,
-  options?: { caseLabel?: string }
+  options?: { caseLabel?: string; additionalInvalidationKeys?: unknown[][] }
 ) {
   const { toast } = useToast();
   const label = options?.caseLabel;
+  const additionalInvalidationKeys = options?.additionalInvalidationKeys ?? [];
 
   const caseRef = label ? `Case ${label}` : 'Case';
 
   const updateCaseStatusMutation = useMutation({
-    mutationFn: async (status: CaseStatus) => {
-      if (!caseId) {
+    mutationFn: async ({
+      status,
+      caseId: targetCaseId,
+    }: {
+      status: CaseStatus;
+      caseId?: string;
+    }) => {
+      const resolvedCaseId = targetCaseId ?? caseId;
+      if (!resolvedCaseId) {
         throw new Error('Missing case id');
       }
-      await updateAdminCaseStatus(caseId, status);
+      await updateAdminCaseStatus(resolvedCaseId, status);
+      return { status, caseId: resolvedCaseId };
     },
-    onSuccess: (_, status) => {
-      invalidateAdminCaseQueries(caseId);
+    onSuccess: ({ status, caseId: updatedCaseId }) => {
+      invalidateAdminCaseQueries(updatedCaseId);
+      additionalInvalidationKeys.forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey });
+      });
       if (status === 'resolved') {
         toast({
           title: 'Case finalized',
@@ -83,7 +95,10 @@ export function useAdminCaseMutations(
     updateCaseStatusMutation.isPending || resetCaseMutation.isPending;
 
   return {
-    updateCaseStatus: updateCaseStatusMutation.mutateAsync,
+    updateCaseStatus: (status: CaseStatus) =>
+      updateCaseStatusMutation.mutateAsync({ status }),
+    updateCaseStatusForCase: (targetCaseId: string, status: CaseStatus) =>
+      updateCaseStatusMutation.mutateAsync({ caseId: targetCaseId, status }),
     resetCase: resetCaseMutation.mutateAsync,
     isUpdatingStatus: updateCaseStatusMutation.isPending,
     isResetting: resetCaseMutation.isPending,

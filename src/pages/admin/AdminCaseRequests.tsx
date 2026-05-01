@@ -1,4 +1,4 @@
-import { getAdminCaseRequests, updateAdminCaseStatus } from '@/api-client';
+import { getAdminCaseRequests } from '@/api-client';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
@@ -6,11 +6,10 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
-import { useToast } from '@/hooks/use-toast';
+import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { splitWords, truncateToWords } from '@/lib/caseDescriptionPreview';
 import { PAGE_SIZE } from '@/lib/mock-data';
-import { queryClient } from '@/lib/query-client';
 import { CaseStatus, CasesResponse, LEGAL_CATEGORIES } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { CheckCircle, Eye, Loader2, XCircle } from 'lucide-react';
@@ -29,7 +28,6 @@ const buildQueryParams = (page: number) => {
 };
 
 const AdminCaseRequests = () => {
-  const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState<{
     caseId: string | null;
@@ -37,6 +35,9 @@ const AdminCaseRequests = () => {
   }>({
     caseId: null,
     action: null,
+  });
+  const { updateCaseStatusForCase } = useAdminCaseMutations(undefined, {
+    additionalInvalidationKeys: [['case-requests', page]],
   });
   const [descriptionModal, setDescriptionModal] = useState<{
     open: boolean;
@@ -70,26 +71,7 @@ const AdminCaseRequests = () => {
       action,
     });
     try {
-      await updateAdminCaseStatus(caseId, status);
-      toast({
-        title: 'Case Status Updated',
-        description: `Case ${caseId} has been updated to ${status}.`,
-      });
-
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ['case-requests', page],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ['admin-cases'],
-        }),
-      ]);
-    } catch (error) {
-      toast({
-        title: 'Error Updating Case Status',
-        description: error.message,
-        variant: 'destructive',
-      });
+      await updateCaseStatusForCase(caseId, status);
     } finally {
       setLoading({ caseId: null, action: null });
     }

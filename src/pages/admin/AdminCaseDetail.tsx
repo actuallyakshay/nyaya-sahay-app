@@ -39,6 +39,7 @@ import { QueryKey } from '@tanstack/react-query';
 import {
   AlertTriangle,
   CalendarDays,
+  CheckCircle,
   Clock,
   ExternalLink,
   Gavel,
@@ -80,10 +81,12 @@ const AdminCaseDetail = () => {
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
   const [sessionBookingOpen, setSessionBookingOpen] = useState(false);
   const rawDescription = caseData?.description?.trim() ?? '';
+
   const descriptionIsLong = useMemo(() => {
     if (!rawDescription) return false;
     return splitWords(rawDescription).length > DESCRIPTION_PREVIEW_MAX_WORDS;
   }, [rawDescription]);
+
   const descriptionPreviewText = useMemo(
     () =>
       rawDescription
@@ -103,7 +106,10 @@ const AdminCaseDetail = () => {
     isCaseActionPending,
     isUpdatingStatus,
     isResetting,
-  } = useAdminCaseMutations(id, { caseLabel: caseData?.caseCode });
+  } = useAdminCaseMutations(id, {
+    caseLabel: caseData?.caseCode,
+    additionalInvalidationKeys: [['case-requests']],
+  });
 
   const handleCloseCase = async (_reason: string) => {
     try {
@@ -116,6 +122,14 @@ const AdminCaseDetail = () => {
 
   const handleResetCase = async () => {
     await resetCase();
+  };
+
+  const handleAcceptCase = async () => {
+    try {
+      await updateCaseStatus('under_review');
+    } catch {
+      // Error toast from useAdminCaseMutations
+    }
   };
 
   const handleDocumentUpload = async (
@@ -209,6 +223,22 @@ const AdminCaseDetail = () => {
                         <XCircle className="mr-1 h-3.5 w-3.5" />
                         Close
                       </Button>
+                      {caseData?.status === 'new' && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="h-8 text-xs"
+                          disabled={isCaseActionPending}
+                          onClick={() => void handleAcceptCase()}
+                        >
+                          {isUpdatingStatus ? (
+                            <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle className="mr-1 h-3.5 w-3.5" />
+                          )}
+                          Accept
+                        </Button>
+                      )}
                     </>
                   )}
               </div>

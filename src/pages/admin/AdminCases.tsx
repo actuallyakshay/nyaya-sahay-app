@@ -93,7 +93,7 @@ const AdminCases = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CASE_STATUS_FILTERS.map((s) => (
+              {CASE_STATUS_FILTERS.filter((s) => s.value !== 'new').map((s) => (
                 <SelectItem key={s.value} value={s.value}>
                   {s.label}
                 </SelectItem>
