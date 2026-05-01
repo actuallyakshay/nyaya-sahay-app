@@ -200,7 +200,11 @@ const CaseDetail = () => {
 
         {caseData?.caseSessionRequest && (
           <div className="w-full min-w-0 shrink-0">
-            <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+            <CaseMeetingUri
+              sessionRequest={caseData?.caseSessionRequest}
+              caseId={id}
+              allowWithdrawSessionRequest={!isLawyer}
+            />
           </div>
         )}
 
