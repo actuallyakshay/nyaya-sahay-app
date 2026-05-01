@@ -2,6 +2,7 @@ import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign'
 import { AdminCaseInternalNotesContent } from '@/components/case-detail/AdminCaseInternalNotesContent';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
+import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -144,6 +145,8 @@ const AdminCaseDetail = () => {
   const lawyerDisplayName = caseData?.assignedLawyer?.user?.fullName;
   const userId = caseData?.user?.id;
   const timelineUpdatedAt = caseData?.updatedAt ?? caseData?.createdAt;
+
+  const isLawyerAssigned = caseData?.assignedLawyerId;
 
   if (isLoading) {
     return (
@@ -340,19 +343,27 @@ const AdminCaseDetail = () => {
                     <TooltipContent>case chat</TooltipContent>
                   </Tooltip>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Video className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Book Session</TooltipContent>
-                  </Tooltip>
+                  {isLawyerAssigned && !caseData?.caseSessionRequest && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Video className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Book Session</TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
               </TooltipProvider>
             </div>
           </div>
         </div>
+
+        {caseData?.caseSessionRequest && (
+          <div className="w-full min-w-0 shrink-0">
+            <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+          </div>
+        )}
 
         <div className="flex shrink-0 flex-col gap-4 lg:flex-row lg:items-stretch">
           <Card className="grid h-[420px] flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
