@@ -1,4 +1,4 @@
-import { getAdminLawyerVerifications, updateAdminLawyer } from '@/api-client';
+import { getAdminLawyerVerifications, verifyAdminLawyer } from '@/api-client';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
 import { PracticeAreaBadge } from '@/components/StatusBadge';
@@ -67,7 +67,7 @@ const AdminLawyers = () => {
   ) => {
     setPendingVerification({ lawyerId });
     try {
-      await updateAdminLawyer(lawyerId, { isVerified });
+      await verifyAdminLawyer(lawyerId, { verified: isVerified });
       toast({
         title: isVerified ? 'Lawyer verified' : 'Verification removed',
         description: isVerified

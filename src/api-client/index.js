@@ -528,6 +528,14 @@ export const updateAdminLawyer = (id, data) => {
   });
 };
 
+export const verifyAdminLawyer = (lawyerId, data) => {
+  return apiClient({
+    method: routes.ADMIN_VERIFY_LAWYER.METHOD,
+    url: routes.ADMIN_VERIFY_LAWYER.URL.replace(':lawyerId', lawyerId),
+    data,
+  });
+};
+
 export const completeUserOnboarding = (data) => {
   return apiClient({
     method: routes.USER_PROFILE.METHOD,

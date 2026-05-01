@@ -267,6 +267,10 @@ const routes = {
     URL: '/api/admin/lawyers/:id',
     METHOD: 'PATCH',
   },
+  ADMIN_VERIFY_LAWYER: {
+    URL: '/api/admin/lawyers/:lawyerId/verify',
+    METHOD: 'PATCH',
+  },
   USER_PROFILE: {
     URL: '/api/users',
     METHOD: 'PATCH',

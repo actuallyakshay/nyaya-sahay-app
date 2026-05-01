@@ -1,14 +1,14 @@
 import { getAdminLawyerCases, getAdminLawyerDetails } from '@/api-client';
+import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
 import { Button } from '@/components/ui/button';
 import WithShimmer from '@/components/WithShimmer';
-import { LawyerCasesTable } from '@/components/lawyers/lawyerCasesTable';
-import { useDebounce } from '@/hooks/useDebounce';
 import { path } from '@/constants';
+import { useDebounce } from '@/hooks/useDebounce';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { Award, FileText, Mail, Phone } from 'lucide-react';
+import { Award, FileText, Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { buildLawyerCasesQueryParams } from '../lawyer/LawyerCases';
@@ -72,6 +72,18 @@ const AdminLawyerDetail = () => {
     ? calculateYearsOfExperience(lawyerData.careerStartDate)
     : null;
 
+  const addressParts = [
+    lawyerData?.addressLine1,
+    lawyerData?.addressLine2,
+    lawyerData?.city,
+    lawyerData?.state,
+    lawyerData?.pincode,
+  ]
+    .map((part) => part?.trim())
+    .filter(Boolean) as string[];
+  const formattedAddress =
+    addressParts.length > 0 ? addressParts.join(', ') : null;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -130,6 +142,16 @@ const AdminLawyerDetail = () => {
               {!isLoading && lawyerData?.bio?.trim() && (
                 <p className="mt-2 text-sm text-foreground">{lawyerData.bio}</p>
               )}
+              <div className="mt-2">
+                {isLoading ? (
+                  <WithShimmer loading className="h-4 w-64" />
+                ) : (
+                  <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span>{formattedAddress ?? 'Address not provided.'}</span>
+                  </p>
+                )}
+              </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {isLoading ? (
                   <>
@@ -192,7 +214,9 @@ const AdminLawyerDetail = () => {
           <div className="rounded-xl border bg-card p-5 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Professional documents</h2>
+                <h2 className="text-lg font-semibold">
+                  Professional documents
+                </h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">
                   Review and approve uploads on a full page when there are many
                   files.

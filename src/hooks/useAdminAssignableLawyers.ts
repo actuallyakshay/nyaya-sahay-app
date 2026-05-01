@@ -9,11 +9,12 @@ import { useState } from 'react';
 const ASSIGN_LAWYERS_LIMIT = Math.max(PAGE_SIZE, 15);
 
 export function buildAssignableLawyersParams(page: number, search: string) {
-  const params: Record<string, string | number> = {
+  const params: Record<string, string | number | boolean> = {
     page,
     limit: ASSIGN_LAWYERS_LIMIT,
     orderBy: 'createdAt',
     order: 'DESC',
+    approved: true,
   };
   if (search.trim()) {
     params.search = search.trim();
