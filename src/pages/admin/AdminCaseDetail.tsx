@@ -346,47 +346,59 @@ const AdminCaseDetail = () => {
               </div>
               <TooltipProvider delayDuration={300}>
                 <div className="ml-auto flex shrink-0 items-center gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="h-10 flex-none px-4 text-xs font-medium"
-                        asChild
-                      >
-                        <Link
-                          to={
-                            id ? path.adminCaseChat(id, caseData?.title) : '#'
-                          }
+                  {['lawyer_assigned', 'under_review'].includes(
+                    caseData?.status
+                  ) && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="h-10 flex-none px-4 text-xs font-medium"
+                          asChild
                         >
-                          <MessageCircle className="h-4 w-4" />
-                          <span>Case Chat</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>case chat</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-10 flex-none px-4 text-xs font-medium"
-                        asChild
-                      >
-                        <Link
-                          to={
-                            id ? path.adminCaseInternalNotes(id, caseData?.title) : '#'
-                          }
+                          <Link
+                            to={
+                              id ? path.adminCaseChat(id, caseData?.title) : '#'
+                            }
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            <span>Case Chat</span>
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>case chat</TooltipContent>
+                    </Tooltip>
+                  )}
+                  {['lawyer_assigned', 'under_review'].includes(
+                    caseData?.status
+                  ) && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-10 flex-none px-4 text-xs font-medium"
+                          asChild
                         >
-                          <StickyNote className="h-4 w-4" />
-                          <span>Internal Notes</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>internal notes</TooltipContent>
-                  </Tooltip>
+                          <Link
+                            to={
+                              id
+                                ? path.adminCaseInternalNotes(
+                                    id,
+                                    caseData?.title
+                                  )
+                                : '#'
+                            }
+                          >
+                            <StickyNote className="h-4 w-4" />
+                            <span>Internal Notes</span>
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>internal notes</TooltipContent>
+                    </Tooltip>
+                  )}
 
                   {isLawyerAssigned && !caseData?.caseSessionRequest && (
                     <Tooltip>
@@ -440,7 +452,11 @@ const AdminCaseDetail = () => {
                       if (isUploadingDocument) return;
                       documentUploadInputRef.current?.click();
                     }}
-                    disabled={isUploadingDocument || caseData?.status === 'closed' || caseData?.status === 'rejected'}
+                    disabled={
+                      isUploadingDocument ||
+                      caseData?.status === 'closed' ||
+                      caseData?.status === 'rejected'
+                    }
                   >
                     {isUploadingDocument ? (
                       <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -455,7 +471,9 @@ const AdminCaseDetail = () => {
                       size="icon"
                       className="h-8 w-8 shrink-0"
                       onClick={() => {
-                        navigate(path.adminCaseDocuments(id || '', caseData?.title));
+                        navigate(
+                          path.adminCaseDocuments(id || '', caseData?.title)
+                        );
                       }}
                       title="View all documents"
                     >

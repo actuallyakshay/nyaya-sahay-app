@@ -77,20 +77,7 @@ const AdminSettings = () => {
                 />
               </WithShimmer>
             </div>
-            <div className="space-y-2">
-              <Label>Support Address</Label>
-              <WithShimmer
-                loading={isSettingsLoading}
-                className="h-10 w-full rounded-md"
-              >
-                <Textarea
-                  rows={3}
-                  value={supportAddress}
-                  onChange={(e) => setSupportAddress(e.target.value)}
-                  placeholder="123 Main St, Anytown, USA"
-                />
-              </WithShimmer>
-            </div>
+
             <div className="space-y-2">
               <Label>Support Phone</Label>
               <WithShimmer
@@ -111,6 +98,20 @@ const AdminSettings = () => {
                     }
                   />
                 </div>
+              </WithShimmer>
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Support Address</Label>
+              <WithShimmer
+                loading={isSettingsLoading}
+                className="h-24 w-full rounded-md"
+              >
+                <Textarea
+                  rows={3}
+                  value={supportAddress}
+                  onChange={(e) => setSupportAddress(e.target.value)}
+                  placeholder="123 Main St, Anytown, USA"
+                />
               </WithShimmer>
             </div>
           </div>

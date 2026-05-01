@@ -151,7 +151,18 @@ const AdminLawyers = () => {
               </tr>
             </thead>
             <tbody>
+              {lawyers.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="py-4 text-center text-muted-foreground"
+                  >
+                    No lawyers found
+                  </td>
+                </tr>
+              )}
               {!isFetching &&
+                lawyers.length > 0 &&
                 lawyers.map((l) => {
                   const rowBusy =
                     pendingVerification !== null &&
@@ -180,7 +191,11 @@ const AdminLawyers = () => {
                       </td>
                       <td className="max-w-[160px] px-4 py-3">
                         <div className="min-w-0">
-                          <GenericTooltip content={l.user?.fullName} side="bottom" className="min-w-0">
+                          <GenericTooltip
+                            content={l.user?.fullName}
+                            side="bottom"
+                            className="min-w-0"
+                          >
                             <Link
                               to={path.adminLawyer(l.id)}
                               className="block truncate font-medium hover:text-gold hover:underline"
@@ -220,36 +235,36 @@ const AdminLawyers = () => {
 
                       <td className="whitespace-nowrap px-4 py-3">
                         <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingLawyer(l);
-                            setModalOpen(true);
-                          }}
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant={l.isVerified ? 'outline' : 'secondary'}
-                          size="sm"
-                          disabled={rowBusy}
-                          onClick={() =>
-                            handleUpdateLawyerVerification(
-                              l.id,
-                              !l.isVerified,
-                              l.user?.fullName ?? 'Lawyer'
-                            )
-                          }
-                        >
-                          {rowBusy ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : l.isVerified ? (
-                            'Unverify'
-                          ) : (
-                            'Verify'
-                          )}
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingLawyer(l);
+                              setModalOpen(true);
+                            }}
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant={l.isVerified ? 'outline' : 'secondary'}
+                            size="sm"
+                            disabled={rowBusy}
+                            onClick={() =>
+                              handleUpdateLawyerVerification(
+                                l.id,
+                                !l.isVerified,
+                                l.user?.fullName ?? 'Lawyer'
+                              )
+                            }
+                          >
+                            {rowBusy ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : l.isVerified ? (
+                              'Unverify'
+                            ) : (
+                              'Verify'
+                            )}
+                          </Button>
                         </div>
                       </td>
                     </tr>

@@ -161,22 +161,26 @@ const CaseDetail = () => {
 
           <TooltipProvider delayDuration={300}>
             <div className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="h-8 gap-1.5 px-3"
-                    asChild
-                  >
-                    <Link to={id ? path.caseChat(id, caseData?.title) : '#'}>
-                      <MessageCircle className="h-4 w-4" />
-                      <span>Case Chat</span>
-                    </Link>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Case chat</TooltipContent>
-              </Tooltip>
+              {['lawyer_assigned', 'under_review'].includes(
+                caseData?.status
+              ) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-8 gap-1.5 px-3"
+                      asChild
+                    >
+                      <Link to={id ? path.caseChat(id, caseData?.title) : '#'}>
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Case Chat</span>
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Case chat</TooltipContent>
+                </Tooltip>
+              )}
 
               {isLawyerAssigned && !caseData?.caseSessionRequest && (
                 <Tooltip>

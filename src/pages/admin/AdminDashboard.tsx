@@ -115,6 +115,16 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
+                {newCases.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="py-4 text-center text-muted-foreground"
+                    >
+                      No cases found
+                    </td>
+                  </tr>
+                )}
                 {newCases?.map((c) => (
                   <tr
                     key={c.caseCode}
