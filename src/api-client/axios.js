@@ -22,7 +22,9 @@ const skipAccessTokenPaths = new Set([
 // --- Axios instance ---
 
 const apiClient = axios.create({
-  baseURL: env.apiBaseUrl,
+  // Only set baseURL when an explicit origin is configured (local dev).
+  // In production the Vercel rewrite proxy handles /api/* so relative paths work.
+  ...(env.apiBaseUrl ? { baseURL: env.apiBaseUrl } : {}),
   timeout: env.apiTimeoutMs,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
@@ -57,7 +59,10 @@ const redirectToLogin = async (requestUrl = '') => {
   const isAdminRequest = requestUrl.startsWith('/api/admin/');
 
   try {
-    await fetch(`${env.apiBaseUrl}${routes.LOGOUT.URL}`, {
+    const logoutUrl = env.apiBaseUrl
+      ? `${env.apiBaseUrl}${routes.LOGOUT.URL}`
+      : routes.LOGOUT.URL;
+    await fetch(logoutUrl, {
       method: routes.LOGOUT.METHOD,
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
