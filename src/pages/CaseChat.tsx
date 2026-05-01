@@ -174,6 +174,14 @@ export default function CaseChatPage() {
           failedMessages={failedMessages}
           onRetryFailed={retryFailed}
           hasOlderMessages={Boolean(hasNextPage)}
+          sendingAttachments={
+            isUploading
+              ? attachments.map((a) => ({
+                  previewUrl: a.previewUrl,
+                  name: a.file.name,
+                }))
+              : []
+          }
           isLoadingOlder={isFetchingNextPage}
           onLoadOlder={() => void fetchNextPage()}
           isLoadingMessages={isMessagesPending}

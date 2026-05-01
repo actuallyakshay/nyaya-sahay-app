@@ -606,6 +606,7 @@ export function CaseChatThread({
                         m={m}
                         onOpen={() => openChatAttachment(m)}
                       />
+
                       <div
                         className={cn(
                           'border-current/10 mt-1.5 flex items-center justify-between gap-2 border-t pt-1 text-[9px] leading-none opacity-75',
