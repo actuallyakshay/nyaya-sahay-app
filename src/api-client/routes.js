@@ -151,6 +151,14 @@ const routes = {
     URL: '/api/admin/cases/session-requests/:sessionRequestId/update-status',
     METHOD: 'PATCH',
   },
+  ADMIN_SESSION_REQUEST_DELETE: {
+    URL: '/api/admin/cases/session-requests/:sessionRequestId',
+    METHOD: 'DELETE',
+  },
+  ADMIN_CASE_SESSION_REQUEST: {
+    URL: '/api/admin/cases/session-requests',
+    METHOD: 'POST',
+  },
   ADMIN_LAWYER_VERIFICATIONS: {
     URL: '/api/admin/lawyers',
     METHOD: 'GET',
@@ -254,6 +262,10 @@ const routes = {
   CASE_SESSION_REQUEST: {
     URL: '/api/cases/:caseId/session-requests',
     METHOD: 'POST',
+  },
+  CASE_SESSION_REQUEST_DELETE: {
+    URL: '/api/cases/session-requests/:sessionRequestId',
+    METHOD: 'DELETE',
   },
   ADD_LAWYER: {
     URL: '/api/admin/lawyers',

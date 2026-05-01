@@ -1,6 +1,7 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { AdminCaseInternalNotesContent } from '@/components/case-detail/AdminCaseInternalNotesContent';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
+import { CloseCaseDialog } from '@/components/case-detail/CloseCaseDialog';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { GenericTooltip } from '@/components/GenericTooltip';
@@ -16,19 +17,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { SessionBookingModal } from '@/components/user/SessionBookingModal';
 import { path } from '@/constants';
 import { useAdminCaseDetails } from '@/hooks/useAdminCaseDetails';
 import { useAdminCaseMutations } from '@/hooks/useAdminCaseMutations';
@@ -81,11 +75,10 @@ const AdminCaseDetail = () => {
   const { id } = useParams();
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
-  const [closeReason, setCloseReason] = useState('');
   const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
-
+  const [sessionBookingOpen, setSessionBookingOpen] = useState(false);
   const rawDescription = caseData?.description?.trim() ?? '';
   const descriptionIsLong = useMemo(() => {
     if (!rawDescription) return false;
@@ -112,11 +105,10 @@ const AdminCaseDetail = () => {
     isResetting,
   } = useAdminCaseMutations(id, { caseLabel: caseData?.caseCode });
 
-  const handleCloseCase = async () => {
+  const handleCloseCase = async (_reason: string) => {
     try {
       await updateCaseStatus('closed');
       setCloseDialogOpen(false);
-      setCloseReason('');
     } catch {
       // Error toast from useAdminCaseMutations
     }
@@ -346,8 +338,14 @@ const AdminCaseDetail = () => {
                   {isLawyerAssigned && !caseData?.caseSessionRequest && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="h-10 flex-none px-4 text-xs font-medium"
+                          onClick={() => setSessionBookingOpen(true)}
+                        >
                           <Video className="h-4 w-4" />
+                          Book Session
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Book Session</TooltipContent>
@@ -361,7 +359,13 @@ const AdminCaseDetail = () => {
 
         {caseData?.caseSessionRequest && (
           <div className="w-full min-w-0 shrink-0">
-            <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+            <CaseMeetingUri
+              sessionRequest={caseData?.caseSessionRequest}
+              caseId={id}
+              caseCode={caseData?.caseCode}
+              allowAdminReviewSessionRequest
+              allowAdminDeleteSessionRequest
+            />
           </div>
         )}
 
@@ -414,6 +418,14 @@ const AdminCaseDetail = () => {
         />
       </div>
 
+      <SessionBookingModal
+        bookingOpen={sessionBookingOpen}
+        setBookingOpen={setSessionBookingOpen}
+        caseId={id}
+        raisedBy="admin"
+        lawyerName={caseData?.assignedLawyer?.user?.fullName}
+      />
+
       <CaseDescriptionModal
         open={descriptionModalOpen}
         onOpenChange={setDescriptionModalOpen}
@@ -421,42 +433,13 @@ const AdminCaseDetail = () => {
         description={rawDescription}
       />
 
-      <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Close Case</DialogTitle>
-            <DialogDescription>
-              This will permanently close case {caseData?.caseCode}. Please
-              provide a reason.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <Textarea
-              placeholder="Reason for closing..."
-              value={closeReason}
-              onChange={(e) => setCloseReason(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setCloseDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => void handleCloseCase()}
-                disabled={!closeReason.trim() || isUpdatingStatus}
-              >
-                {isUpdatingStatus ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                Close Case
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CloseCaseDialog
+        open={closeDialogOpen}
+        onOpenChange={setCloseDialogOpen}
+        caseCode={caseData?.caseCode}
+        isConfirmPending={isUpdatingStatus}
+        onConfirmClose={handleCloseCase}
+      />
     </AdminLayout>
   );
 };

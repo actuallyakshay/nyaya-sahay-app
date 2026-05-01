@@ -178,6 +178,14 @@ export const updateCaseSessionRequestStatus = (sessionRequestId, status) => {
   });
 };
 
+export const createAdminCaseSessionRequest = (body) => {
+  return apiClient({
+    method: routes.ADMIN_CASE_SESSION_REQUEST.METHOD,
+    url: routes.ADMIN_CASE_SESSION_REQUEST.URL,
+    data: body,
+  });
+};
+
 export const updateLawyerRoleStatus = (userId, roleCode, status) => {
   return apiClient({
     method: routes.UPDATE_LAWYER_ROLE_STATUS.METHOD,
@@ -501,6 +509,26 @@ export const createCaseSessionRequest = (caseId, body) => {
     method: routes.CASE_SESSION_REQUEST.METHOD,
     url: routes.CASE_SESSION_REQUEST.URL.replace(':caseId', caseId),
     data: body,
+  });
+};
+
+export const deleteCaseSessionRequest = (sessionRequestId) => {
+  return apiClient({
+    method: routes.CASE_SESSION_REQUEST_DELETE.METHOD,
+    url: routes.CASE_SESSION_REQUEST_DELETE.URL.replace(
+      ':sessionRequestId',
+      sessionRequestId
+    ),
+  });
+};
+
+export const deleteAdminCaseSessionRequest = (sessionRequestId) => {
+  return apiClient({
+    method: routes.ADMIN_SESSION_REQUEST_DELETE.METHOD,
+    url: routes.ADMIN_SESSION_REQUEST_DELETE.URL.replace(
+      ':sessionRequestId',
+      sessionRequestId
+    ),
   });
 };
 

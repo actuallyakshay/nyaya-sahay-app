@@ -422,7 +422,7 @@ export interface UploadedDoc {
 export type CaseSessionCallType = 'video' | 'audio';
 
 /** Align with backend CaseSessionRequestRaisedBy enum. */
-export type CaseSessionRequestRaisedBy = 'user' | 'lawyer';
+export type CaseSessionRequestRaisedBy = 'user' | 'lawyer' | 'admin';
 
 export interface CreateCaseSessionRequestBody {
   caseId: string;
