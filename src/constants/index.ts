@@ -13,5 +13,6 @@ export {
   dashboardForRole,
   isCaseChatPathname,
   isCaseNotificationsHubPathname,
+  isFullScreenCaseSubpage,
   path,
 } from './routes';

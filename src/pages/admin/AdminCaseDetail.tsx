@@ -1,5 +1,4 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
-import { AdminCaseInternalNotesContent } from '@/components/case-detail/AdminCaseInternalNotesContent';
 import { CaseDocumentsContent } from '@/components/case-detail/CaseDocumentsContent';
 import { CloseCaseDialog } from '@/components/case-detail/CloseCaseDialog';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
@@ -49,12 +48,13 @@ import {
   RotateCcw,
   StickyNote,
   Tag,
+  Upload,
   User,
   Video,
   XCircle,
 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const priorityConfig = {
   urgent: {
@@ -74,8 +74,10 @@ const priorityConfig = {
 
 const AdminCaseDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
+  const [documentCount, setDocumentCount] = useState(0);
   const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
@@ -365,6 +367,27 @@ const AdminCaseDetail = () => {
                     <TooltipContent>case chat</TooltipContent>
                   </Tooltip>
 
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-10 flex-none px-4 text-xs font-medium"
+                        asChild
+                      >
+                        <Link
+                          to={
+                            id ? path.adminCaseInternalNotes(id, caseData?.title) : '#'
+                          }
+                        >
+                          <StickyNote className="h-4 w-4" />
+                          <span>Internal Notes</span>
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>internal notes</TooltipContent>
+                  </Tooltip>
+
                   {isLawyerAssigned && !caseData?.caseSessionRequest && (
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -399,13 +422,48 @@ const AdminCaseDetail = () => {
           </div>
         )}
 
-        <div className="flex shrink-0 flex-col gap-4 lg:flex-row lg:items-stretch">
-          <Card className="grid h-[420px] flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
+        <div className="w-full min-w-0 shrink-0">
+          <Card className="grid grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
             <CardHeader className="shrink-0 border-b bg-muted/20 pb-3">
-              <CardTitle className="text-lg">Documents</CardTitle>
-              <CardDescription>
-                All files attached to this case.
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">Documents</CardTitle>
+                  <CardDescription>
+                    Recent files attached to this case.
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (isUploadingDocument) return;
+                      documentUploadInputRef.current?.click();
+                    }}
+                    disabled={isUploadingDocument || caseData?.status === 'closed' || caseData?.status === 'rejected'}
+                  >
+                    {isUploadingDocument ? (
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="mr-1.5 h-3.5 w-3.5" />
+                    )}
+                    Upload
+                  </Button>
+                  {documentCount > 3 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => {
+                        navigate(path.adminCaseDocuments(id || '', caseData?.title));
+                      }}
+                      title="View all documents"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="min-h-0 overflow-hidden px-6 pb-5 pt-4">
               <CaseDocumentsContent
@@ -414,27 +472,17 @@ const AdminCaseDetail = () => {
                 caseLawyerName={caseData?.assignedLawyer?.user?.fullName}
                 caseStatus={caseData?.status}
                 loading={isUploadingDocument}
+                previewMode={true}
+                previewLimit={3}
+                showUploadInHeader={true}
                 onUploadClick={(qk) => {
-                  if (isUploadingDocument) return;
-                  documentUploadInputRef.current?.click();
                   setQueryKey(qk);
                 }}
+                onViewAllClick={() => {
+                  navigate(path.adminCaseDocuments(id || '', caseData?.title));
+                }}
+                onDocumentCountChange={setDocumentCount}
               />
-            </CardContent>
-          </Card>
-
-          <Card className="grid h-[420px] flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
-            <CardHeader className="shrink-0 border-b bg-muted/20 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <StickyNote className="h-4 w-4 shrink-0" />
-                Internal Notes
-              </CardTitle>
-              <CardDescription>
-                Private notes visible only to lawyers and admins.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="min-h-0 overflow-hidden px-6 pb-5 pt-4">
-              <AdminCaseInternalNotesContent caseStatus={caseData?.status} />
             </CardContent>
           </Card>
         </div>

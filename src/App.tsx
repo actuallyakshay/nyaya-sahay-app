@@ -33,6 +33,8 @@ import LawyerDashboard from './pages/lawyer/LawyerDashboard';
 import LawyerDocuments from './pages/lawyer/LawyerDocuments';
 
 import AdminCaseDetail from './pages/admin/AdminCaseDetail';
+import AdminCaseDocuments from './pages/admin/AdminCaseDocuments';
+import AdminCaseInternalNotes from './pages/admin/AdminCaseInternalNotes';
 import AdminCases from './pages/admin/AdminCases';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLawyerDetail from './pages/admin/AdminLawyerDetail';
@@ -304,6 +306,22 @@ const App = () => (
                 element={
                   <AdminProtectedRoute>
                     <CaseChatPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.adminCaseInternalNotes}
+                element={
+                  <AdminProtectedRoute>
+                    <AdminCaseInternalNotes />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTE_PATTERNS.adminCaseDocuments}
+                element={
+                  <AdminProtectedRoute>
+                    <AdminCaseDocuments />
                   </AdminProtectedRoute>
                 }
               />
