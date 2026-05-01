@@ -1,6 +1,6 @@
 import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
-import { ADMIN_NAV, ROUTES, isCaseChatPathname } from '@/constants';
+import { ADMIN_NAV, ROUTES, isCaseChatPathname, isFullScreenCaseSubpage } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
 import { useSidebarScrollRestore } from '@/hooks/useSidebarScrollRestore';
@@ -31,6 +31,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navRef = useSidebarScrollRestore('admin');
 
   const isCaseChat = isCaseChatPathname(location.pathname);
+  const isFullScreen = isFullScreenCaseSubpage(location.pathname);
 
   const handleLogout = async () => {
     await logout();
@@ -61,7 +62,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     <div
       className={cn(
         'flex flex-col lg:flex-row',
-        isCaseChat
+        isFullScreen
           ? 'h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden'
           : 'min-h-screen lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:overflow-hidden'
       )}
@@ -253,12 +254,12 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <main
         className={cn(
           'flex-1 lg:min-h-0',
-          isCaseChat
+          isFullScreen
             ? 'flex min-h-0 flex-col overflow-hidden'
             : 'overflow-y-auto'
         )}
       >
-        {isCaseChat ? (
+        {isFullScreen ? (
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {children}
           </div>

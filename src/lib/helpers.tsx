@@ -100,10 +100,10 @@ export const getFirstLetterCapitalized = (word: string) => {
   return word.charAt(0).toUpperCase() + word.slice(1);
 };
 
-export const buildGenericQueryParams = (page: number) => {
+export const buildGenericQueryParams = (page: number, limit?: number) => {
   const params: Record<string, string | number> = {
     page,
-    limit: PAGE_SIZE,
+    limit: limit ?? PAGE_SIZE,
     orderBy: 'createdAt',
     order: 'DESC',
   };

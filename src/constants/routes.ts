@@ -61,6 +61,8 @@ export const ROUTE_PATTERNS = {
   adminLawyerDocuments: `${PATH_PREFIX.admin}/lawyers/:id/documents`,
   adminCaseDetail: `${PATH_PREFIX.admin}/cases/:id`,
   adminCaseChat: `${PATH_PREFIX.admin}/cases/:id/chat`,
+  adminCaseInternalNotes: `${PATH_PREFIX.admin}/cases/:id/internal-notes`,
+  adminCaseDocuments: `${PATH_PREFIX.admin}/cases/:id/documents`,
 } as const;
 
 export const path = {
@@ -72,6 +74,14 @@ export const path = {
   adminCase: (id: string) => `${ROUTES.admin.cases}/${id}`,
   adminCaseChat: (id: string, title?: string) => {
     const base = `${ROUTES.admin.cases}/${id}/chat`;
+    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
+  },
+  adminCaseInternalNotes: (id: string, title?: string) => {
+    const base = `${ROUTES.admin.cases}/${id}/internal-notes`;
+    return title ? `${base}?title=${encodeURIComponent(title)}` : base;
+  },
+  adminCaseDocuments: (id: string, title?: string) => {
+    const base = `${ROUTES.admin.cases}/${id}/documents`;
     return title ? `${base}?title=${encodeURIComponent(title)}` : base;
   },
   adminUser: (id: string) => `${ROUTES.admin.users}/${id}`,
@@ -93,6 +103,15 @@ export function isCaseChatPathname(pathname: string) {
   return (
     /^\/cases\/[^/]+\/chat\/?$/.test(pathname) ||
     /^\/admin\/cases\/[^/]+\/chat\/?$/.test(pathname)
+  );
+}
+
+/** Full-screen case sub-pages — no breadcrumb, no padding (chat, documents, internal-notes). */
+export function isFullScreenCaseSubpage(pathname: string) {
+  return (
+    isCaseChatPathname(pathname) ||
+    /^\/admin\/cases\/[^/]+\/documents\/?$/.test(pathname) ||
+    /^\/admin\/cases\/[^/]+\/internal-notes\/?$/.test(pathname)
   );
 }
 
