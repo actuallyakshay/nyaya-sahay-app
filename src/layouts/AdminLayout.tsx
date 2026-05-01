@@ -259,14 +259,9 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       >
         {isCaseChat ? (
-          <>
-            <div className="hidden">
-              <Breadcrumbs />
-            </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {children}
-            </div>
-          </>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            {children}
+          </div>
         ) : (
           <div className="p-4 md:p-6 lg:p-8">
             <div className="mb-2">

@@ -5,7 +5,7 @@ import type {
   UserRole,
 } from '@/types';
 
-export const MAX_CHAT_TEXT_LENGTH = 4000;
+export const MAX_CHAT_TEXT_LENGTH = 10000;
 export const COMPOSER_TEXTAREA_MAX_HEIGHT_PX = 160;
 
 export function statusLabel(status: CaseChatConnectionStatus): string {

@@ -331,14 +331,9 @@ export const DashboardLayout = ({
         )}
       >
         {isCaseChat ? (
-          <>
-            <div className="hidden shrink-0 border-b bg-background px-4 py-2 md:block md:px-6 lg:px-8">
-              <Breadcrumbs />
-            </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {children}
-            </div>
-          </>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            {children}
+          </div>
         ) : (
           <div className="p-4 md:p-6 lg:p-8">
             <div className="mb-2">
