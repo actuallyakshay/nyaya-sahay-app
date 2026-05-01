@@ -5,7 +5,6 @@ import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
-import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -82,7 +81,6 @@ const AdminCaseDetail = () => {
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [closeReason, setCloseReason] = useState('');
-  const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const { data: caseData, isLoading } = useAdminCaseDetails(id);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
@@ -342,20 +340,6 @@ const AdminCaseDetail = () => {
                     <TooltipContent>case chat</TooltipContent>
                   </Tooltip>
 
-                  {/* <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setTimelineDrawerOpen(true)}
-                      >
-                        <Clock className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Timeline</TooltipContent>
-                  </Tooltip> */}
-
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -370,15 +354,15 @@ const AdminCaseDetail = () => {
           </div>
         </div>
 
-        <div className="flex min-h-[420px] flex-1 flex-col gap-4 lg:flex-row lg:items-stretch">
-          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <CardHeader className="shrink-0 pb-3">
+        <div className="flex shrink-0 flex-col gap-4 lg:flex-row lg:items-stretch">
+          <Card className="grid h-[420px] flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
+            <CardHeader className="shrink-0 border-b bg-muted/20 pb-3">
               <CardTitle className="text-lg">Documents</CardTitle>
               <CardDescription>
                 All files attached to this case.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+            <CardContent className="min-h-0 overflow-hidden px-6 pb-5 pt-4">
               <CaseDocumentsContent
                 isAdmin
                 caseClientName={caseData?.user?.fullName}
@@ -394,8 +378,8 @@ const AdminCaseDetail = () => {
             </CardContent>
           </Card>
 
-          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <CardHeader className="shrink-0 pb-3">
+          <Card className="grid h-[420px] flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden border-border/70 bg-card/95 shadow-sm">
+            <CardHeader className="shrink-0 border-b bg-muted/20 pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <StickyNote className="h-4 w-4 shrink-0" />
                 Internal Notes
@@ -404,7 +388,7 @@ const AdminCaseDetail = () => {
                 Private notes visible only to lawyers and admins.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden px-6 pb-6 pt-0">
+            <CardContent className="min-h-0 overflow-hidden px-6 pb-5 pt-4">
               <AdminCaseInternalNotesContent caseStatus={caseData?.status} />
             </CardContent>
           </Card>
@@ -462,13 +446,6 @@ const AdminCaseDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      <TimelineDrawer
-        open={timelineDrawerOpen}
-        onOpenChange={setTimelineDrawerOpen}
-        status={caseData?.status}
-        updatedAt={timelineUpdatedAt}
-      />
     </AdminLayout>
   );
 };

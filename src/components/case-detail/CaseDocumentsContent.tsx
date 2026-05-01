@@ -56,8 +56,8 @@ export function CaseDocumentsContent({
   const isCaseClosed = caseStatus === 'closed' || caseStatus === 'rejected';
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto py-1">
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-1">
         {documents.length === 0 ? (
           <p className="py-8 text-center text-sm text-muted-foreground">
             No documents uploaded yet.
