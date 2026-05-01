@@ -3,11 +3,11 @@ import {
   markCaseChatRead,
   uploadAsset,
 } from '@/api-client';
+import whatsappBg from '@/assets/whatsapp-bg.jpg';
 import { CaseChatThread } from '@/components/case-chat/CaseChatThread';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { Button } from '@/components/ui/button';
 import { path } from '@/constants';
-import { useAuth } from '@/contexts/AuthContext';
 import { useAttachments } from '@/hooks/use-attachments';
 import { useCaseChatSocket } from '@/hooks/use-case-chat-socket';
 import { useCaseMessages } from '@/hooks/use-case-messages';
@@ -18,7 +18,7 @@ import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UserRole } from '@/types';
 import { ArrowLeft, File, Loader2, Plus, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useRef, useState, type CSSProperties } from 'react';
 import {
   Link,
   useLocation,
@@ -26,12 +26,20 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+/** Single source for case-chat wallpaper (composer stays transparent so this shows through). */
+const CASE_CHAT_SURFACE = '#e8e6df';
+const caseChatPatternStyle = (src: string): CSSProperties => ({
+  backgroundImage: `url(${src})`,
+  backgroundRepeat: 'repeat',
+  backgroundSize: '450px auto',
+  opacity: 0.38,
+});
+
 export default function CaseChatPage() {
   const { id } = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const isAdmin = location.pathname.startsWith('/admin');
   const activeRole = getCookie('x-active-role');
@@ -45,7 +53,8 @@ export default function CaseChatPage() {
     searchParams.get('title') ||
     (location.state as { title?: string } | null)?.title ||
     'Case Chat';
-  const userName = user?.fullName?.trim() || 'Client';
+  const shortCaseTitle =
+    caseTitle.length > 10 ? `${caseTitle.slice(0, 10)}…` : caseTitle;
 
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -121,117 +130,119 @@ export default function CaseChatPage() {
 
   const Layout = isAdmin ? AdminLayout : DashboardLayout;
 
-  if (!id) {
-    return (
-      <Layout>
-        <div className="py-16 text-center text-muted-foreground">
-          Invalid case.
-        </div>
-      </Layout>
-    );
-  }
-
   const backLink = isAdmin ? path.adminCase(id) : path.caseDetail(id);
 
   return (
     <Layout>
-      <div
-        className="flex min-h-0 flex-col"
-        style={{ height: 'calc(100vh - 80px)' }}
-      >
-        <div className="mb-3 flex shrink-0 items-center gap-3 border-b pb-3">
-          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="flex shrink-0 items-center gap-2 border-b border-border bg-card px-3 py-2 md:gap-3 md:px-6 md:py-3 lg:px-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted hover:text-foreground"
+            asChild
+          >
             <Link to={backLink} aria-label="Back to case">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div className="min-w-0">
-            <p className="mt-0.5 text-xs text-muted-foreground">{userName}</p>
-            <GenericTooltip
-              content={caseTitle}
-              side="bottom"
-              className="min-w-0 flex-1"
-            >
-              <p className="truncate text-sm font-semibold text-foreground">
-                {caseTitle}
-              </p>
-            </GenericTooltip>
-          </div>
+          <GenericTooltip
+            content={caseTitle}
+            side="bottom"
+            className="min-w-0 flex-1"
+          >
+            <p className="text-sm font-semibold leading-none text-foreground">
+              {shortCaseTitle}
+            </p>
+          </GenericTooltip>
         </div>
 
-        <CaseChatThread
-          key={id}
-          variant={messagesVariant}
-          title="Case communication"
-          messages={messages}
-          viewerParticipant={viewerParticipant}
-          draft={message}
-          onDraftChange={setMessage}
-          onSend={() => void handleSend()}
-          composer="textarea"
-          status={chatStatus}
-          sendingText={sendingText}
-          failedMessages={failedMessages}
-          onRetryFailed={retryFailed}
-          hasOlderMessages={Boolean(hasNextPage)}
-          sendingAttachments={
-            isUploading
-              ? attachments.map((a) => ({
-                  previewUrl: a.previewUrl,
-                  name: a.file.name,
-                }))
-              : []
-          }
-          isLoadingOlder={isFetchingNextPage}
-          onLoadOlder={() => void fetchNextPage()}
-          isLoadingMessages={isMessagesPending}
-          showThreadHeader={false}
-          messageLayout="conversation"
-          rootClassName="flex min-h-0 flex-1 flex-col rounded-none border-0 bg-transparent shadow-none"
-          panelStyle={{ flex: 1, minHeight: 0 }}
-          hasComposerAttachment={attachments.length > 0}
-          isComposerBusy={isUploading}
-          composerAccessory={
-            attachments.length > 0 ? (
-              <div className="flex flex-wrap gap-2 border-border/50 px-1 pb-2 pt-0.5">
-                {attachments.map((a, i) => (
-                  <AttachmentPreview
-                    key={i}
-                    attachment={a}
-                    onRemove={() => remove(i)}
+        <div
+          className="relative flex min-h-0 flex-1 flex-col"
+          style={{ backgroundColor: CASE_CHAT_SURFACE }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={caseChatPatternStyle(whatsappBg)}
+          />
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            <CaseChatThread
+              key={id}
+              variant={messagesVariant}
+              title="Case communication"
+              messages={messages}
+              viewerParticipant={viewerParticipant}
+              draft={message}
+              onDraftChange={setMessage}
+              onSend={() => void handleSend()}
+              composer="textarea"
+              status={chatStatus}
+              sendingText={sendingText}
+              failedMessages={failedMessages}
+              onRetryFailed={retryFailed}
+              hasOlderMessages={Boolean(hasNextPage)}
+              sendingAttachments={
+                isUploading
+                  ? attachments.map((a) => ({
+                      previewUrl: a.previewUrl,
+                      name: a.file.name,
+                    }))
+                  : []
+              }
+              isLoadingOlder={isFetchingNextPage}
+              onLoadOlder={() => void fetchNextPage()}
+              isLoadingMessages={isMessagesPending}
+              showThreadHeader={false}
+              messageLayout="conversation"
+              composerOverPattern
+              rootClassName="flex min-h-0 flex-1 flex-col rounded-none border-0 bg-transparent shadow-none"
+              panelStyle={{ flex: 1, minHeight: 0 }}
+              hasComposerAttachment={attachments.length > 0}
+              isComposerBusy={isUploading}
+              composerAccessory={
+                attachments.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 border-border/50 px-1 pb-2 pt-0.5">
+                    {attachments.map((a, i) => (
+                      <AttachmentPreview
+                        key={i}
+                        attachment={a}
+                        onRemove={() => remove(i)}
+                      />
+                    ))}
+                  </div>
+                ) : null
+              }
+              beforeSendActions={
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={CASE_DOCUMENT_ACCEPT}
+                    className="hidden"
+                    onChange={handleFileSelected}
                   />
-                ))}
-              </div>
-            ) : null
-          }
-          beforeSendActions={
-            <>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={CASE_DOCUMENT_ACCEPT}
-                className="hidden"
-                onChange={handleFileSelected}
-              />
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="text-muted-foreground hover:text-foreground"
-                disabled={isUploading || isFull}
-                title={isFull ? 'Max 3 attachments' : 'Attach file'}
-                aria-label="Attach file"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {isUploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Plus className="h-5 w-5 stroke-[2]" />
-                )}
-              </Button>
-            </>
-          }
-        />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-foreground"
+                    disabled={isUploading || isFull}
+                    title={isFull ? 'Max 3 attachments' : 'Attach file'}
+                    aria-label="Attach file"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-5 w-5 stroke-[2]" />
+                    )}
+                  </Button>
+                </>
+              }
+            />
+          </div>
+        </div>
       </div>
     </Layout>
   );

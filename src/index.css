@@ -141,4 +141,13 @@
   .bg-warning {
     background-color: hsl(var(--warning));
   }
+
+  /** Hide scrollbars while keeping overflow scrollable (Firefox, WebKit, legacy Edge). */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

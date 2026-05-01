@@ -1,6 +1,12 @@
 import { BrandLogo } from '@/components/BrandLogo';
 import Breadcrumbs from '@/components/Breakcrumbs';
-import { LAWYER_NAV, ROUTES, USER_NAV, type NavItem } from '@/constants';
+import {
+  LAWYER_NAV,
+  ROUTES,
+  USER_NAV,
+  isCaseChatPathname,
+  type NavItem,
+} from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaseChatUnreadSummary } from '@/hooks/use-case-chat-unread';
 import { useSidebarScrollRestore } from '@/hooks/useSidebarScrollRestore';
@@ -68,6 +74,8 @@ export const DashboardLayout = ({
     navigate(ROUTES.login);
   };
 
+  const isCaseChat = isCaseChatPathname(location.pathname);
+
   const handleSwitchRole = () => {
     const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
     setCookie('x-active-role', newRole);
@@ -81,7 +89,14 @@ export const DashboardLayout = ({
   };
 
   return (
-    <div className="flex min-h-screen flex-col lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:flex-row lg:overflow-hidden">
+    <div
+      className={cn(
+        'flex flex-col lg:flex-row',
+        isCaseChat
+          ? 'h-[100dvh] max-h-[100dvh] min-h-0 overflow-hidden'
+          : 'min-h-screen lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:overflow-hidden'
+      )}
+    >
       {/* Mobile header */}
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 lg:hidden">
         <button onClick={() => setSidebarOpen(true)} className="shrink-0 p-1">
@@ -307,13 +322,31 @@ export const DashboardLayout = ({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto lg:min-h-0">
-        <div className="p-4 md:p-6 lg:p-8">
-          <div className="mb-2">
-            <Breadcrumbs />
+      <main
+        className={cn(
+          'flex-1 lg:min-h-0',
+          isCaseChat
+            ? 'flex min-h-0 flex-col overflow-hidden'
+            : 'overflow-y-auto'
+        )}
+      >
+        {isCaseChat ? (
+          <>
+            <div className="hidden shrink-0 border-b bg-background px-4 py-2 md:block md:px-6 lg:px-8">
+              <Breadcrumbs />
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {children}
+            </div>
+          </>
+        ) : (
+          <div className="p-4 md:p-6 lg:p-8">
+            <div className="mb-2">
+              <Breadcrumbs />
+            </div>
+            {children}
           </div>
-          {children}
-        </div>
+        )}
       </main>
     </div>
   );

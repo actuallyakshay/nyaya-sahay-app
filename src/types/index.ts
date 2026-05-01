@@ -258,6 +258,8 @@ export interface CaseChatThreadProps {
   messageLayout?: 'stack' | 'conversation';
   /** Merged onto the outer panel (e.g. `flex-1 min-h-0 border-0 shadow-none rounded-none`). */
   rootClassName?: string;
+  /** Transparent footer so a pattern/image behind the thread shows around the composer pill. */
+  composerOverPattern?: boolean;
 }
 
 export interface SubscriptionPlan {
