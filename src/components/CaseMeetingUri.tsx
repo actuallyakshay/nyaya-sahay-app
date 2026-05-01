@@ -60,13 +60,6 @@ export const CaseMeetingUri = ({ sessionRequest }: CaseMeetingUriProps) => {
   const callTypeLabel =
     getFirstLetterCapitalized(sessionRequest?.callType ?? '') || null;
 
-  const raisedByLabel =
-    sessionRequest?.raisedBy === 'user'
-      ? 'User'
-      : sessionRequest?.raisedBy
-        ? getFirstLetterCapitalized(sessionRequest.raisedBy)
-        : null;
-
   const statusConfig = (() => {
     if (isRejected)
       return {
@@ -148,7 +141,7 @@ export const CaseMeetingUri = ({ sessionRequest }: CaseMeetingUriProps) => {
         </div>
 
         {/* Right: CTA */}
-        {meetingLink ? (
+        {meetingLink && isAccepted ? (
           <a
             href={meetingLink}
             target="_blank"
