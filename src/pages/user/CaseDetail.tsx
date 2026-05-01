@@ -6,7 +6,6 @@ import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { CaseDetailSkeleton } from '@/components/skeletons/CaseDetailSkeleton';
 import { StatusBadge } from '@/components/StatusBadge';
-import { TimelineDrawer } from '@/components/TimelineDrawer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,7 +43,6 @@ const CaseDetail = () => {
   const isLawyer = activeRole === 'lawyer' ? true : false;
   const documentUploadInputRef = useRef<HTMLInputElement>(null);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const [timelineDrawerOpen, setTimelineDrawerOpen] = useState(false);
   const [descriptionModalOpen, setDescriptionModalOpen] = useState(false);
   const [queryKey, setQueryKey] = useState<QueryKey | null>(null);
   const { isUploadingDocument, uploadFromSource } = useCaseDocumentUpload(
@@ -90,7 +88,7 @@ const CaseDetail = () => {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex min-h-0 flex-1 flex-col gap-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
           <CaseDetailSkeleton isLawyer={isLawyer} />
         </div>
       </DashboardLayout>
@@ -99,7 +97,7 @@ const CaseDetail = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
         {/* Header */}
         <div className="shrink-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -180,30 +178,17 @@ const CaseDetail = () => {
                 <TooltipContent>Case chat</TooltipContent>
               </Tooltip>
 
-              {/* <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setTimelineDrawerOpen(true)}
-                  >
-                    <Clock className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Timeline</TooltipContent>
-              </Tooltip> */}
-
-              {isLawyerAssigned && (
+              {isLawyerAssigned && !caseData?.caseSessionRequest && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                      variant="default"
+                      size="sm"
+                      className="h-8 gap-1.5 px-3"
                       onClick={() => setBookingOpen(true)}
                     >
                       <Video className="h-4 w-4" />
+                      <span>Book Session</span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Book Session</TooltipContent>
@@ -213,9 +198,11 @@ const CaseDetail = () => {
           </TooltipProvider>
         </div>
 
-        <div className="shrink-0">
-          <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
-        </div>
+        {caseData?.caseSessionRequest && (
+          <div className="w-full min-w-0 shrink-0">
+            <CaseMeetingUri sessionRequest={caseData?.caseSessionRequest} />
+          </div>
+        )}
 
         {/* Documents + internal notes — flex-1 fills remaining viewport height */}
         <div
@@ -288,12 +275,12 @@ const CaseDetail = () => {
         lawyerName={caseData?.assignedLawyer?.user?.fullName}
       />
 
-      <TimelineDrawer
+      {/* <TimelineDrawer
         open={timelineDrawerOpen}
         onOpenChange={setTimelineDrawerOpen}
         status={caseData?.status}
         updatedAt={caseData?.updatedAt}
-      />
+      /> */}
     </DashboardLayout>
   );
 };
