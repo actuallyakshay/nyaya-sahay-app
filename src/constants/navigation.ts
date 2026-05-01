@@ -68,7 +68,7 @@ export const ADMIN_NAV: NavItem[] = [
     icon: CalendarCheck,
   },
   {
-    label: 'Lawyer pending documents',
+    label: 'Pending documents',
     to: ROUTES.admin.lawyerPendingDocuments,
     icon: FileStack,
   },

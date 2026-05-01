@@ -7,7 +7,7 @@ import { buildGenericQueryParams } from '@/lib/helpers';
 import { CaseStatus } from '@/types';
 import { keepPreviousData, QueryKey, useQuery } from '@tanstack/react-query';
 import { Loader2, Upload } from 'lucide-react';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export interface CaseDocumentsContentProps {
@@ -68,7 +68,7 @@ export function CaseDocumentsContent({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (onDocumentCountChange) {
       onDocumentCountChange(total);
     }

@@ -30,7 +30,7 @@ const ROUTE_LABELS: Record<string, string> = {
   subscriptions: 'Subscriptions',
   'case-requests': 'Case Requests',
   'session-requests': 'Session Requests',
-  'lawyer-pending-documents': 'Lawyer pending documents',
+  'lawyer-pending-documents': 'Pending documents',
   'lawyer-verifications': 'Verifications',
   notifications: 'Messages',
 };

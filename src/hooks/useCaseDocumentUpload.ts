@@ -28,7 +28,7 @@ export function useCaseDocumentUpload(
 
   const uploadFromSource = async (
     file: File,
-    source: 'Chat' | 'Documents drawer' | 'Case page'
+    source: 'Chat' | 'Documents drawer' | 'Case page' | 'Documents page'
   ) => {
     try {
       await uploadSingleDocument(file);

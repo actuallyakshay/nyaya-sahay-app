@@ -1,20 +1,10 @@
+import { caseDocumentRoleStyles } from '@/lib/case-document-role';
+import { caseDocumentDisplayName } from '@/lib/case-document-utils';
 import { getFileIcon } from '@/lib/helpers';
 import type { CaseDocument } from '@/types';
 import { Eye } from 'lucide-react';
 import { useState } from 'react';
 import { FileViewer } from './FileViewer';
-
-export const roleColorMap: Record<string, { bg: string; label: string }> = {
-  user: { bg: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Client' },
-  lawyer: {
-    bg: 'bg-amber-50 text-amber-700 border-amber-200',
-    label: 'Lawyer',
-  },
-  admin: {
-    bg: 'bg-purple-50 text-purple-700 border-purple-200',
-    label: 'Admin',
-  },
-};
 
 interface DocumentListProps {
   documents: CaseDocument[];
@@ -39,14 +29,14 @@ export const DocumentList = ({
     <>
       <div className="space-y-2">
         {documents.map((d) => {
+          const displayName = caseDocumentDisplayName(d);
           const isClient = d.author === 'user';
           const isLawyer = d.author === 'lawyer';
-          const isAdmin = d.author === 'admin';
           const roleInfo = isClient
-            ? roleColorMap.user
+            ? caseDocumentRoleStyles.user
             : isLawyer
-              ? roleColorMap.lawyer
-              : roleColorMap.admin;
+              ? caseDocumentRoleStyles.lawyer
+              : caseDocumentRoleStyles.admin;
 
           return (
             <div
@@ -55,10 +45,8 @@ export const DocumentList = ({
               onClick={() => openDoc(d)}
             >
               <div className="flex items-center gap-2.5">
-                {getFileIcon(d.assetName || d.assetType)}
-                <span className="flex-1 truncate text-sm">
-                  {d.assetName || d.assetType}
-                </span>
+                {getFileIcon(displayName)}
+                <span className="flex-1 truncate text-sm">{displayName}</span>
                 <Eye className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <div className="ml-6 mt-1.5 flex items-center gap-2">
@@ -84,7 +72,7 @@ export const DocumentList = ({
         <FileViewer
           open={viewerOpen}
           onOpenChange={setViewerOpen}
-          fileName={selectedDoc.assetName || selectedDoc.assetType}
+          fileName={caseDocumentDisplayName(selectedDoc)}
           fileUrl={selectedDoc.assetUrl}
         />
       )}
