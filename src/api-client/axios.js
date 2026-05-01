@@ -1,6 +1,7 @@
 import { env } from '@/config/env';
 import { ROUTES } from '@/constants/routes';
 import { clearFcmTokenRegistrationCache } from '@/lib/fcm-token-registration-cache';
+import { clearAccessToken, setAccessToken } from '@/lib/auth-token';
 import { getCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import axios from 'axios';
@@ -64,6 +65,7 @@ const redirectToLogin = async (requestUrl = '') => {
   } catch {
     /* ignore — still clear client-visible session hints */
   }
+  clearAccessToken();
   resetCookies();
   localStorage.removeItem('auth_user');
   clearFcmTokenRegistrationCache();
@@ -107,7 +109,12 @@ apiClient.interceptors.request.use(
 // --- Response interceptor ---
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (typeof response.data?.accessToken === 'string') {
+      setAccessToken(response.data.accessToken);
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     if (!originalRequest?.url) {

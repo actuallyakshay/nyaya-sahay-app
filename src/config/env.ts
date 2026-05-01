@@ -8,11 +8,18 @@ function apiOriginFromBase(apiBaseUrl: string): string {
 
 const apiTimeoutMs = 180000;
 
-
 export const env = {
   googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID as string,
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL as string,
-  /** Origin of the API (Socket.IO uses path /api/socket.io on this host). */
+  apiBaseUrl: (import.meta.env.VITE_API_BASE_URL as string) ?? '',
+  /**
+   * Direct GCP origin for Socket.IO (WebSocket — cannot go through the Vercel
+   * rewrite proxy). Set VITE_SOCKET_ORIGIN explicitly in production to the GCP
+   * run.app URL; falls back to deriving it from VITE_API_BASE_URL for local dev.
+   */
+  socketOrigin:
+    (import.meta.env.VITE_SOCKET_ORIGIN as string) ||
+    apiOriginFromBase((import.meta.env.VITE_API_BASE_URL as string) ?? ''),
+  /** @deprecated use socketOrigin for Socket.IO, apiBaseUrl for HTTP */
   apiOrigin: apiOriginFromBase((import.meta.env.VITE_API_BASE_URL as string) ?? ''),
   apiTimeoutMs,
   /** Web FCM: set `VITE_FIREBASE_*` + `VITE_FIREBASE_VAPID_KEY` in `.env`. */

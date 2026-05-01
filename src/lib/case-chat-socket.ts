@@ -1,4 +1,5 @@
 import { env } from '@/config/env';
+import { getAccessToken } from '@/lib/auth-token';
 import { getCookie } from '@/lib/helpers';
 import { io, type Socket } from 'socket.io-client';
 
@@ -18,12 +19,16 @@ export const CASE_CHAT_IO_PATH = '/api/socket.io';
 export const CHAT_SEND_ACK_TIMEOUT_MS = 8_000;
 
 export function createCaseChatSocket(): Socket | null {
-  if (!env.apiOrigin) return null;
+  if (!env.socketOrigin) return null;
   const activeRole = getCookie('x-active-role');
-  return io(env.apiOrigin, {
+  const token = getAccessToken();
+  return io(env.socketOrigin, {
     path: CASE_CHAT_IO_PATH,
     withCredentials: true,
-    auth: { activeRole: activeRole || undefined },
+    auth: {
+      activeRole: activeRole || undefined,
+      ...(token ? { token } : {}),
+    },
     transports: ['websocket'],
     timeout: env.apiTimeoutMs,
     reconnection: true,
