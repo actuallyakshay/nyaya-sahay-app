@@ -3,7 +3,7 @@ import {
   logout as logoutApi,
 } from '@/api-client';
 import { clearFcmTokenRegistrationCache } from '@/lib/fcm-token-registration-cache';
-import { clearAccessToken } from '@/lib/auth-token';
+import { clearTokens } from '@/lib/auth-token';
 import { getCookie, removeCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import type { AuthUser, UserRole } from '@/types';
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch {
       // Proceed with local cleanup even if API call fails
     }
-    clearAccessToken();
+    clearTokens();
     clearFcmTokenRegistrationCache();
     setUser(null);
     clearStoredUser();

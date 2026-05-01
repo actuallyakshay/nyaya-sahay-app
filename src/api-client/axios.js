@@ -1,7 +1,7 @@
 import { env } from '@/config/env';
 import { ROUTES } from '@/constants/routes';
 import { clearFcmTokenRegistrationCache } from '@/lib/fcm-token-registration-cache';
-import { clearAccessToken, setAccessToken } from '@/lib/auth-token';
+import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@/lib/auth-token';
 import { getCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
 import axios from 'axios';
@@ -9,9 +9,8 @@ import routes from './routes';
 
 const ACTIVE_ROLE_COOKIE = 'x-active-role';
 
-/** Paths where we do not attach Bearer (login/register/refresh). */
-const skipAccessTokenPaths = new Set([
-  routes.REFRESH_TOKEN.URL,
+/** Paths that don't need an Authorization header (login / register). */
+const skipAuthPaths = new Set([
   routes.GOOGLE_AUTH_LOGIN.URL,
   routes.LOGIN.URL,
   routes.ADMIN_LOGIN.URL,
@@ -50,9 +49,7 @@ const enqueueFailedRequest = () => {
 
 // --- Helpers ---
 
-const isRefreshRequest = (config) => {
-  return config.url === routes.REFRESH_TOKEN.URL;
-};
+const isRefreshRequest = (config) => config.url === routes.REFRESH_TOKEN.URL;
 
 const redirectToLogin = async (requestUrl = '') => {
   queryClient.clear();
@@ -65,12 +62,16 @@ const redirectToLogin = async (requestUrl = '') => {
     await fetch(logoutUrl, {
       method: routes.LOGOUT.METHOD,
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
+      },
     });
   } catch {
     /* ignore — still clear client-visible session hints */
   }
-  clearAccessToken();
+
+  clearTokens();
   resetCookies();
   localStorage.removeItem('auth_user');
   clearFcmTokenRegistrationCache();
@@ -92,13 +93,23 @@ apiClient.interceptors.request.use(
   (config) => {
     const url = config.url ?? '';
 
-    if (url === routes.REFRESH_TOKEN.URL) {
-      // Refresh token is HttpOnly; sent as Cookie. Body is {}.
+    if (isRefreshRequest(config)) {
+      // Inject refresh token from localStorage into the request body.
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        config.data = { ...(config.data ?? {}), refreshToken };
+      }
       return config;
     }
 
-    if (skipAccessTokenPaths.has(url)) {
+    if (skipAuthPaths.has(url)) {
       return config;
+    }
+
+    // Attach access token as Authorization header.
+    const accessToken = getAccessToken();
+    if (accessToken) {
+      config.headers.set('Authorization', `Bearer ${accessToken}`);
     }
 
     const activeRole = getCookie(ACTIVE_ROLE_COOKIE);
@@ -115,8 +126,10 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
-    if (typeof response.data?.accessToken === 'string') {
-      setAccessToken(response.data.accessToken);
+    // Persist tokens whenever the backend returns them (login / refresh).
+    const { accessToken, refreshToken } = response.data ?? {};
+    if (typeof accessToken === 'string' && typeof refreshToken === 'string') {
+      setTokens(accessToken, refreshToken);
     }
     return response;
   },
@@ -129,7 +142,7 @@ apiClient.interceptors.response.use(
     const isUnauthorized = error.response?.status === 401;
     const isAlreadyRetried = originalRequest._retry;
     const isRefreshCall = isRefreshRequest(originalRequest);
-    const isAuthEndpoint = skipAccessTokenPaths.has(originalRequest.url);
+    const isAuthEndpoint = skipAuthPaths.has(originalRequest.url);
 
     // Auth endpoints (login/register) — just reject, don't redirect
     if (isAuthEndpoint) {
@@ -153,7 +166,6 @@ apiClient.interceptors.response.use(
 
     try {
       await attemptTokenRefresh();
-      // Clear flag before waking the queue so retries do not see isRefreshing === true.
       isRefreshing = false;
       processQueue(null);
       return apiClient(originalRequest);

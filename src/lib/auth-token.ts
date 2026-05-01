@@ -1,18 +1,40 @@
-/**
- * In-memory access token for Socket.IO auth.
- *
- * Kept here (not in localStorage/sessionStorage) so XSS cannot read it and
- * iOS ITP cannot interfere. Cleared on page refresh intentionally — the axios
- * interceptor re-populates it from the first refresh-token round-trip.
- */
-let _accessToken: string | null = null;
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
 
-export const setAccessToken = (token: string): void => {
-  _accessToken = token;
+const safeGet = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 };
 
-export const getAccessToken = (): string | null => _accessToken;
+const safeSet = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // localStorage unavailable (e.g. private browsing with storage blocked)
+  }
+};
 
-export const clearAccessToken = (): void => {
-  _accessToken = null;
+const safeRemove = (key: string): void => {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // ignore
+  }
+};
+
+export const setTokens = (accessToken: string, refreshToken: string): void => {
+  safeSet(ACCESS_TOKEN_KEY, accessToken);
+  safeSet(REFRESH_TOKEN_KEY, refreshToken);
+};
+
+export const getAccessToken = (): string | null => safeGet(ACCESS_TOKEN_KEY);
+
+export const getRefreshToken = (): string | null => safeGet(REFRESH_TOKEN_KEY);
+
+export const clearTokens = (): void => {
+  safeRemove(ACCESS_TOKEN_KEY);
+  safeRemove(REFRESH_TOKEN_KEY);
 };
