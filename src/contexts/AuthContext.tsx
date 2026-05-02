@@ -2,7 +2,6 @@ import {
   googleAuthLogin as googleAuthLoginApi,
   logout as logoutApi,
 } from '@/api-client';
-import { clearFcmTokenRegistrationCache } from '@/hooks/use-fcm-token';
 import { clearTokens } from '@/lib/auth-token';
 import { getCookie, removeCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
@@ -70,7 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Proceed with local cleanup even if API call fails
     }
     clearTokens();
-    clearFcmTokenRegistrationCache();
     setUser(null);
     clearStoredUser();
     queryClient.clear();

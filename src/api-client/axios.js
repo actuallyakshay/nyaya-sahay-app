@@ -1,6 +1,5 @@
 import { env } from '@/config/env';
 import { ROUTES } from '@/constants/routes';
-import { clearFcmTokenRegistrationCache } from '@/hooks/use-fcm-token';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@/lib/auth-token';
 import { getCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';
@@ -74,7 +73,6 @@ const redirectToLogin = async (requestUrl = '') => {
   clearTokens();
   resetCookies();
   localStorage.removeItem('auth_user');
-  clearFcmTokenRegistrationCache();
 
   window.location.href = isAdminRequest ? ROUTES.admin.login : ROUTES.login;
 };

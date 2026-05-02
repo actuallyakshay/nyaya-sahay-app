@@ -3,32 +3,6 @@ import { getCookie } from '@/lib/helpers';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const FCM_SENT_KEY = 'fcm_token_sent';
-
-function lastSentToken(): string | null {
-  try {
-    return localStorage.getItem(FCM_SENT_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function rememberSent(token: string) {
-  try {
-    localStorage.setItem(FCM_SENT_KEY, token);
-  } catch {
-    /* ignore */
-  }
-}
-
-export function clearFcmTokenRegistrationCache() {
-  try {
-    localStorage.removeItem(FCM_SENT_KEY);
-  } catch {
-    /* ignore */
-  }
-}
-
 function isLoggedIn() {
   return !!getCookie('x-active-role');
 }
@@ -66,12 +40,10 @@ function waitForInjectedNativeToken(timeoutMs = 25000): Promise<string | null> {
 }
 
 async function pushTokenToBackend(token: string) {
-  if (lastSentToken() === token) return;
   try {
     await updateUserFcmToken({ fcmToken: token });
-    rememberSent(token);
   } catch {
-    /* retry on next navigation */
+    /* retry on next navigation or nativeTokenReady */
   }
 }
 
