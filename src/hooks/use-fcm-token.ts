@@ -1,10 +1,5 @@
 import { updateUserFcmToken } from '@/api-client';
-import { env } from '@/config/env';
-import { toast } from '@/hooks/use-toast';
-import { playCaseMessageChime } from '@/lib/case-notify-sound';
-import { getMessagingInstance } from '@/lib/firebase';
 import { getCookie } from '@/lib/helpers';
-import { getToken, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -85,85 +80,10 @@ async function syncAndroidInjectedToken() {
   if (token) await pushTokenToBackend(token);
 }
 
-async function syncWebPushToken() {
-  if (
-    typeof window === 'undefined' ||
-    !('Notification' in window) ||
-    !('serviceWorker' in navigator)
-  ) {
-    return;
-  }
-
-  const messaging = await getMessagingInstance();
-  if (!messaging) return;
-
-  if (Notification.permission === 'default') await Notification.requestPermission();
-  if (Notification.permission !== 'granted') return;
-
-  let reg: ServiceWorkerRegistration | null = null;
-  try {
-    reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-      scope: '/',
-    });
-    await navigator.serviceWorker.ready;
-  } catch {
-    return;
-  }
-  if (!reg) return;
-
-  let token: string;
-  try {
-    token = await getToken(messaging, {
-      vapidKey: env.firebaseVapidKey,
-      serviceWorkerRegistration: reg,
-    });
-  } catch {
-    return;
-  }
-  if (!token) return;
-  await pushTokenToBackend(token);
-}
-
+/** Registers native FCM token from the Android Expo shell only (no web push). */
 export async function syncFcmToken() {
-  if (!isLoggedIn()) return;
-  if (isAndroidNativeShell()) {
-    await syncAndroidInjectedToken();
-    return;
-  }
-  await syncWebPushToken();
-}
-
-function subscribeForeground(
-  messaging: NonNullable<Awaited<ReturnType<typeof getMessagingInstance>>>
-) {
-  return onMessage(messaging, async (payload) => {
-    const title =
-      payload.notification?.title ?? payload.data?.title ?? 'Notification';
-    const body = payload.notification?.body ?? payload.data?.body ?? '';
-    const icon =
-      (payload.notification as { icon?: string } | undefined)?.icon ??
-      payload.data?.icon;
-
-    toast({ title, description: body || undefined });
-    void playCaseMessageChime();
-
-    if (Notification.permission !== 'granted') return;
-    try {
-      const swReg = await navigator.serviceWorker.ready;
-      const data = Object.fromEntries(
-        Object.entries(payload.data ?? {}).filter(([, v]) => v != null && v !== '')
-      ) as Record<string, string>;
-
-      await swReg.showNotification(title, {
-        body: body || undefined,
-        icon: icon || undefined,
-        tag: data.tag ?? data.caseId ?? `fcm-${Date.now()}`,
-        ...(Object.keys(data).length ? { data } : {}),
-      });
-    } catch {
-      /* toast already shown */
-    }
-  });
+  if (!isLoggedIn() || !isAndroidNativeShell()) return;
+  await syncAndroidInjectedToken();
 }
 
 export function useFcmToken() {
@@ -177,25 +97,8 @@ export function useFcmToken() {
   }, []);
 
   useEffect(() => {
-    if (!isLoggedIn()) return;
+    if (!isLoggedIn() || !isAndroidNativeShell()) return;
     void syncFcmToken();
-  }, [pathname]);
-
-  useEffect(() => {
-    if (!isLoggedIn() || isAndroidNativeShell()) return;
-
-    let cancelled = false;
-    let unsubscribe: (() => void) | undefined;
-
-    void getMessagingInstance().then((messaging) => {
-      if (cancelled || !messaging) return;
-      unsubscribe = subscribeForeground(messaging);
-    });
-
-    return () => {
-      cancelled = true;
-      unsubscribe?.();
-    };
   }, [pathname]);
 }
 
