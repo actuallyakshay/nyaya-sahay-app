@@ -8,6 +8,13 @@ import routes from './routes';
 
 const ACTIVE_ROLE_COOKIE = 'x-active-role';
 
+function isAndroidNativeShell() {
+  if (typeof window === 'undefined') return false;
+  return (
+    window.__samvidhanNativeApp === true && window.__samvidhanNativePlatform === 'android'
+  );
+}
+
 /** Paths that don't need an Authorization header (login / register). */
 const skipAuthPaths = new Set([
   routes.GOOGLE_AUTH_LOGIN.URL,
@@ -55,9 +62,13 @@ const redirectToLogin = async (requestUrl = '') => {
   const isAdminRequest = requestUrl.startsWith('/api/admin/');
 
   try {
-    const logoutUrl = env.apiBaseUrl
+    let logoutUrl = env.apiBaseUrl
       ? `${env.apiBaseUrl}${routes.LOGOUT.URL}`
       : routes.LOGOUT.URL;
+    if (isAndroidNativeShell()) {
+      logoutUrl += logoutUrl.includes('?') ? '&' : '?';
+      logoutUrl += 'clearFcm=1';
+    }
     await fetch(logoutUrl, {
       method: routes.LOGOUT.METHOD,
       credentials: 'include',
@@ -113,6 +124,10 @@ apiClient.interceptors.request.use(
     const activeRole = getCookie(ACTIVE_ROLE_COOKIE);
     if (activeRole) {
       config.headers.set('x-active-role', activeRole);
+    }
+
+    if (url === routes.LOGOUT.URL && isAndroidNativeShell()) {
+      config.url = `${routes.LOGOUT.URL}?clearFcm=1`;
     }
 
     return config;
