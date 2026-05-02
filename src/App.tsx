@@ -8,6 +8,7 @@ import { env } from '@/config/env';
 import { ROUTE_PATTERNS, ROUTES } from '@/constants';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FcmTokenSync } from '@/hooks/use-fcm-token';
+import { isReactNativeWebView } from '@/lib/is-react-native-webview';
 import { queryClient } from '@/lib/query-client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -55,16 +56,16 @@ import CaseChatPage from './pages/CaseChat';
 import CaseNotificationsPage from './pages/CaseNotificationsPage';
 import NotFound from './pages/NotFound';
 
-const App = () => (
-  <GoogleOAuthProvider clientId={env.googleClientId}>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
-            <FcmTokenSync />
-            <CaseChatGlobalNotifier />
-            <Routes>
+/** In the RN WebView shell we use native Custom Tabs for Google — skip GIS script (blocked in WebView). */
+const AppInner = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <FcmTokenSync />
+          <CaseChatGlobalNotifier />
+          <Routes>
               {/* Public */}
               <Route path={ROUTES.home} element={<Index />} />
               <Route path={ROUTES.plans} element={<PlansPage />} />
@@ -360,11 +361,19 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  </GoogleOAuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
+
+const App = () =>
+  isReactNativeWebView() ? (
+    <AppInner />
+  ) : (
+    <GoogleOAuthProvider clientId={env.googleClientId}>
+      <AppInner />
+    </GoogleOAuthProvider>
+  );
 
 export default App;
