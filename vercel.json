@@ -2,11 +2,17 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "https://service-samvidhan-1079164039353.asia-south1.run.app/api/:path*"
+      "src": "/api/(.*)",
+      "dest": "https://service-samvidhan-1079164039353.asia-south1.run.app/api/$1"
     },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
