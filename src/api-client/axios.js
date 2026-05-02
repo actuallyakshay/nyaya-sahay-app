@@ -1,6 +1,6 @@
 import { env } from '@/config/env';
 import { ROUTES } from '@/constants/routes';
-import { clearFcmTokenRegistrationCache } from '@/lib/fcm-token-registration-cache';
+import { clearFcmTokenRegistrationCache } from '@/hooks/use-fcm-token';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@/lib/auth-token';
 import { getCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';

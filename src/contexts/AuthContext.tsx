@@ -2,7 +2,7 @@ import {
   googleAuthLogin as googleAuthLoginApi,
   logout as logoutApi,
 } from '@/api-client';
-import { clearFcmTokenRegistrationCache } from '@/lib/fcm-token-registration-cache';
+import { clearFcmTokenRegistrationCache } from '@/hooks/use-fcm-token';
 import { clearTokens } from '@/lib/auth-token';
 import { getCookie, removeCookie, resetCookies } from '@/lib/helpers';
 import { queryClient } from '@/lib/query-client';

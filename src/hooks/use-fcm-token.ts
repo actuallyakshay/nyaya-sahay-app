@@ -2,114 +2,114 @@ import { updateUserFcmToken } from '@/api-client';
 import { env } from '@/config/env';
 import { toast } from '@/hooks/use-toast';
 import { playCaseMessageChime } from '@/lib/case-notify-sound';
-import {
-  getLastSentFcmToken,
-  rememberFcmTokenSent,
-} from '@/lib/fcm-token-registration-cache';
 import { getMessagingInstance } from '@/lib/firebase';
-import {
-  requestNativeAndroidFcmToken,
-  shouldUseAndroidNativePushBridge,
-} from '@/lib/native-push-bridge';
 import { getCookie } from '@/lib/helpers';
 import { getToken, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-// ─── guards ──────────────────────────────────────────────────────────────────
+const FCM_SENT_KEY = 'fcm_token_sent';
+
+function lastSentToken(): string | null {
+  try {
+    return localStorage.getItem(FCM_SENT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function rememberSent(token: string) {
+  try {
+    localStorage.setItem(FCM_SENT_KEY, token);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearFcmTokenRegistrationCache() {
+  try {
+    localStorage.removeItem(FCM_SENT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 function isLoggedIn() {
   return !!getCookie('x-active-role');
 }
 
-function isBrowserSupported() {
-  return (
-    typeof window !== 'undefined' &&
-    'Notification' in window &&
-    'serviceWorker' in navigator
-  );
+function isAndroidNativeShell() {
+  if (typeof window === 'undefined') return false;
+  const w = window as Window & {
+    __samvidhanNativeApp?: boolean;
+    __samvidhanNativePlatform?: string;
+  };
+  return w.__samvidhanNativeApp === true && w.__samvidhanNativePlatform === 'android';
 }
 
-// ─── service worker ───────────────────────────────────────────────────────────
+function waitForInjectedNativeToken(timeoutMs = 25000): Promise<string | null> {
+  if (typeof window === 'undefined' || !isAndroidNativeShell()) {
+    return Promise.resolve(null);
+  }
+  const w = window as Window & { nativeFCMToken?: string };
+  if (typeof w.nativeFCMToken === 'string' && w.nativeFCMToken.length > 0) {
+    return Promise.resolve(w.nativeFCMToken);
+  }
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => {
+      window.removeEventListener('nativeTokenReady', onReady);
+      resolve(null);
+    }, timeoutMs);
+    const onReady = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('nativeTokenReady', onReady);
+      const t = w.nativeFCMToken;
+      resolve(typeof t === 'string' && t.length > 0 ? t : null);
+    };
+    window.addEventListener('nativeTokenReady', onReady);
+  });
+}
 
-async function getServiceWorkerReg(): Promise<ServiceWorkerRegistration | null> {
+async function pushTokenToBackend(token: string) {
+  if (lastSentToken() === token) return;
   try {
-    const reg = await navigator.serviceWorker.register(
-      '/firebase-messaging-sw.js',
-      { scope: '/' }
-    );
-    await navigator.serviceWorker.ready;
-    return reg;
-  } catch (err) {
-    console.warn('[FCM] service worker registration failed', err);
-    return null;
+    await updateUserFcmToken({ fcmToken: token });
+    rememberSent(token);
+  } catch {
+    /* retry on next navigation */
   }
 }
 
-// ─── token sync ───────────────────────────────────────────────────────────────
+async function syncAndroidInjectedToken() {
+  const token = await waitForInjectedNativeToken();
+  if (token) await pushTokenToBackend(token);
+}
 
-/**
- * Gets the FCM token and sends it to the backend.
- * Deduped — skips the API call if the token hasn't changed since last sync.
- * Safe to call multiple times.
- */
-export async function syncFcmToken(): Promise<void> {
-  if (!isLoggedIn()) {
-    console.warn('[FCM] skipped: not logged in (x-active-role cookie missing)');
-    return;
-  }
-
-  if (shouldUseAndroidNativePushBridge()) {
-    let nativeToken: string | null = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) await new Promise((r) => setTimeout(r, 1000));
-      nativeToken = await requestNativeAndroidFcmToken();
-      if (nativeToken) break;
-    }
-    if (nativeToken) {
-      if (getLastSentFcmToken() === nativeToken) {
-        console.log('[FCM] skipped: native token unchanged since last sync');
-        return;
-      }
-      try {
-        await updateUserFcmToken({ fcmToken: nativeToken });
-        rememberFcmTokenSent(nativeToken);
-        console.log('[FCM] native Android token synced to backend');
-      } catch (err) {
-        console.warn('[FCM] native token API failed (will retry on next route change)', err);
-      }
-      return;
-    }
-    console.warn(
-      '[FCM] native Android path failed after retries. Check: (1) dev build `npx expo run:android`, not Expo Go, (2) notification permission, (3) `google-services.json` matches package `com.samvidhan.app` + same Firebase project as API, (4) this web bundle is deployed if you load Vercel URL.'
-    );
-    return;
-  }
-
-  if (!isBrowserSupported()) {
-    console.warn('[FCM] skipped: browser does not support notifications/serviceWorker');
+async function syncWebPushToken() {
+  if (
+    typeof window === 'undefined' ||
+    !('Notification' in window) ||
+    !('serviceWorker' in navigator)
+  ) {
     return;
   }
 
   const messaging = await getMessagingInstance();
-  if (!messaging) {
-    console.warn('[FCM] skipped: getMessagingInstance returned null (Firebase env vars missing or FCM not supported)');
-    return;
-  }
+  if (!messaging) return;
 
-  // Ask for permission if not yet decided; bail if denied.
-  if (Notification.permission === 'default')
-    await Notification.requestPermission();
-  if (Notification.permission !== 'granted') {
-    console.warn('[FCM] skipped: notification permission not granted:', Notification.permission);
-    return;
-  }
+  if (Notification.permission === 'default') await Notification.requestPermission();
+  if (Notification.permission !== 'granted') return;
 
-  const reg = await getServiceWorkerReg();
-  if (!reg) {
-    console.warn('[FCM] skipped: service worker registration failed');
+  let reg: ServiceWorkerRegistration | null = null;
+  try {
+    reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    });
+    await navigator.serviceWorker.ready;
+  } catch {
     return;
   }
+  if (!reg) return;
 
   let token: string;
   try {
@@ -117,40 +117,25 @@ export async function syncFcmToken(): Promise<void> {
       vapidKey: env.firebaseVapidKey,
       serviceWorkerRegistration: reg,
     });
-  } catch (err) {
-    console.warn('[FCM] skipped: getToken failed (VAPID key missing or invalid?)', err);
+  } catch {
     return;
   }
-
-  if (!token) {
-    console.warn('[FCM] skipped: getToken returned empty token');
-    return;
-  }
-  if (getLastSentFcmToken() === token) {
-    console.log('[FCM] skipped: token unchanged since last sync');
-    return;
-  }
-
-  try {
-    await updateUserFcmToken({ fcmToken: token });
-    rememberFcmTokenSent(token);
-    console.log('[FCM] token synced to backend');
-  } catch (err) {
-    console.warn('[FCM] API call failed (will retry on next route change)', err);
-  }
+  if (!token) return;
+  await pushTokenToBackend(token);
 }
 
-// ─── foreground handler ───────────────────────────────────────────────────────
+export async function syncFcmToken() {
+  if (!isLoggedIn()) return;
+  if (isAndroidNativeShell()) {
+    await syncAndroidInjectedToken();
+    return;
+  }
+  await syncWebPushToken();
+}
 
-/**
- * Shows an in-app toast + OS notification when a push arrives while the tab is active.
- * When the tab is in the background, the service worker handles it instead.
- */
-async function handleForegroundMessage(
-  messaging: Awaited<ReturnType<typeof getMessagingInstance>>
+function subscribeForeground(
+  messaging: NonNullable<Awaited<ReturnType<typeof getMessagingInstance>>>
 ) {
-  if (!messaging) return () => {};
-
   return onMessage(messaging, async (payload) => {
     const title =
       payload.notification?.title ?? payload.data?.title ?? 'Notification';
@@ -159,18 +144,14 @@ async function handleForegroundMessage(
       (payload.notification as { icon?: string } | undefined)?.icon ??
       payload.data?.icon;
 
-    // In-app toast + chime (always shown when foreground).
     toast({ title, description: body || undefined });
     void playCaseMessageChime();
 
-    // Also show OS notification so Android WebView / Chrome surface it properly.
     if (Notification.permission !== 'granted') return;
     try {
       const swReg = await navigator.serviceWorker.ready;
       const data = Object.fromEntries(
-        Object.entries(payload.data ?? {}).filter(
-          ([, v]) => v != null && v !== ''
-        )
+        Object.entries(payload.data ?? {}).filter(([, v]) => v != null && v !== '')
       ) as Record<string, string>;
 
       await swReg.showNotification(title, {
@@ -180,50 +161,44 @@ async function handleForegroundMessage(
         ...(Object.keys(data).length ? { data } : {}),
       });
     } catch {
-      // Best-effort — toast already shown above.
+      /* toast already shown */
     }
   });
 }
 
-// ─── hook ─────────────────────────────────────────────────────────────────────
-
 export function useFcmToken() {
   const { pathname } = useLocation();
 
-  // Re-sync token on every route change (covers page refresh + SPA navigation).
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isAndroidNativeShell()) return;
+    const onReady = () => void syncFcmToken();
+    window.addEventListener('nativeTokenReady', onReady);
+    return () => window.removeEventListener('nativeTokenReady', onReady);
+  }, []);
+
   useEffect(() => {
     if (!isLoggedIn()) return;
     void syncFcmToken();
   }, [pathname]);
 
-  // Subscribe to foreground messages for the lifetime of the session.
   useEffect(() => {
-    if (!isLoggedIn()) return;
+    if (!isLoggedIn() || isAndroidNativeShell()) return;
 
-    let unsubscribe: (() => void) | undefined;
     let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
 
-    getMessagingInstance().then((messaging) => {
-      if (cancelled) return;
-      handleForegroundMessage(messaging).then((unsub) => {
-        if (cancelled) {
-          unsub();
-          return;
-        }
-        unsubscribe = unsub;
-      });
+    void getMessagingInstance().then((messaging) => {
+      if (cancelled || !messaging) return;
+      unsubscribe = subscribeForeground(messaging);
     });
 
     return () => {
       cancelled = true;
       unsubscribe?.();
     };
-  }, []); // intentionally once — the subscription outlives route changes
+  }, [pathname]);
 }
 
-// ─── component ────────────────────────────────────────────────────────────────
-
-/** Drop this inside <BrowserRouter> once to wire up FCM for the whole app. */
 export function FcmTokenSync() {
   useFcmToken();
   return null;
