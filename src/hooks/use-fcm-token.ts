@@ -7,6 +7,10 @@ import {
   rememberFcmTokenSent,
 } from '@/lib/fcm-token-registration-cache';
 import { getMessagingInstance } from '@/lib/firebase';
+import {
+  requestNativeAndroidFcmToken,
+  shouldUseAndroidNativePushBridge,
+} from '@/lib/native-push-bridge';
 import { getCookie } from '@/lib/helpers';
 import { getToken, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
@@ -54,6 +58,34 @@ export async function syncFcmToken(): Promise<void> {
     console.warn('[FCM] skipped: not logged in (x-active-role cookie missing)');
     return;
   }
+
+  if (shouldUseAndroidNativePushBridge()) {
+    let nativeToken: string | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 1000));
+      nativeToken = await requestNativeAndroidFcmToken();
+      if (nativeToken) break;
+    }
+    if (nativeToken) {
+      if (getLastSentFcmToken() === nativeToken) {
+        console.log('[FCM] skipped: native token unchanged since last sync');
+        return;
+      }
+      try {
+        await updateUserFcmToken({ fcmToken: nativeToken });
+        rememberFcmTokenSent(nativeToken);
+        console.log('[FCM] native Android token synced to backend');
+      } catch (err) {
+        console.warn('[FCM] native token API failed (will retry on next route change)', err);
+      }
+      return;
+    }
+    console.warn(
+      '[FCM] native Android path failed after retries. Check: (1) dev build `npx expo run:android`, not Expo Go, (2) notification permission, (3) `google-services.json` matches package `com.samvidhan.app` + same Firebase project as API, (4) this web bundle is deployed if you load Vercel URL.'
+    );
+    return;
+  }
+
   if (!isBrowserSupported()) {
     console.warn('[FCM] skipped: browser does not support notifications/serviceWorker');
     return;
