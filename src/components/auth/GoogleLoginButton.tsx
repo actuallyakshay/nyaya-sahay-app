@@ -4,11 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { syncFcmToken } from '@/hooks/use-fcm-token';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
+import { isReactNativeWebView } from '@/lib/is-react-native-webview';
 import { cn } from '@/lib/utils';
 import type { UserRole } from '@/types';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface GoogleLoginButtonProps {
@@ -48,46 +49,69 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const nativeShell = isReactNativeWebView();
+
+  const finishWithIdToken = useCallback(
+    async (idToken: string) => {
+      if (!idToken) {
+        toast({
+          title: 'Google sign-in failed',
+          description: 'No credential received.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const data = await googleLogin(idToken, role);
+        if (!data.status) throw new Error(data.message);
+        if (data?.isAdmin) {
+          setCookie('x-active-role', 'admin');
+          void syncFcmToken();
+          return navigate(ROUTES.admin.dashboard);
+        } else {
+          setCookie('x-active-role', role as string);
+          void syncFcmToken();
+        }
+        toast({
+          title: 'Welcome!',
+          description: `Signed in with Google as ${role}.`,
+        });
+        onSuccess();
+      } catch (e) {
+        toast({
+          title: 'Login failed',
+          description:
+            e instanceof Error ? e.message : 'Please check your credentials.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [googleLogin, navigate, onSuccess, role, toast]
+  );
+
+  useEffect(() => {
+    if (!nativeShell) return;
+    const onNativeGoogle = (ev: Event) => {
+      const detail = (ev as CustomEvent<{ idToken?: string }>).detail;
+      if (detail?.idToken) void finishWithIdToken(detail.idToken);
+    };
+    window.addEventListener('samvidhan-native-google', onNativeGoogle as EventListener);
+    return () =>
+      window.removeEventListener('samvidhan-native-google', onNativeGoogle as EventListener);
+  }, [finishWithIdToken, nativeShell]);
+
+  const requestNativeGoogleSignIn = () => {
+    const bridge = (window as Window & { ReactNativeWebView?: { postMessage(msg: string): void } })
+      .ReactNativeWebView;
+    bridge?.postMessage(JSON.stringify({ type: 'REQUEST_GOOGLE_SIGN_IN', role }));
+  };
 
   const handleCredentialResponse = async (response: CredentialResponse) => {
-    const idToken = response.credential;
-
-    if (!idToken) {
-      toast({
-        title: 'Google sign-in failed',
-        description: 'No credential received.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const data = await googleLogin(idToken, role);
-      if (!data.status) throw new Error(data.message);
-      if (data?.isAdmin) {
-        setCookie('x-active-role', 'admin');
-        void syncFcmToken();
-        return navigate(ROUTES.admin.dashboard);
-      } else {
-        setCookie('x-active-role', role as string);
-        void syncFcmToken();
-      }
-      toast({
-        title: 'Welcome!',
-        description: `Signed in with Google as ${role}.`,
-      });
-      onSuccess();
-    } catch (e) {
-      toast({
-        title: 'Login failed',
-        description:
-          e instanceof Error ? e.message : 'Please check your credentials.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await finishWithIdToken(response.credential ?? '');
   };
 
   const handleError = () => {
@@ -111,6 +135,18 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
             <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
             Signing in with Google…
           </Button>
+        ) : nativeShell ? (
+          <button
+            type="button"
+            className={cn(
+              googleSignInChrome,
+              'w-full cursor-pointer border-border outline-none focus-visible:ring-2 focus-visible:ring-gold/55 focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+            )}
+            onClick={requestNativeGoogleSignIn}
+          >
+            <GoogleGMark className="h-5 w-5 shrink-0" />
+            Sign in with Google
+          </button>
         ) : (
           <div className="group relative w-full rounded-full transition-shadow focus-within:outline-none focus-within:ring-2 focus-within:ring-gold/55 focus-within:ring-offset-2 focus-within:ring-offset-background">
             {/* Visible chrome — Google’s iframe hover is sky-blue; we hide it and match your palette. */}
