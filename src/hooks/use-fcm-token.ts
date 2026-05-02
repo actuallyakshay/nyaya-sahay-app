@@ -36,7 +36,8 @@ async function getServiceWorkerReg(): Promise<ServiceWorkerRegistration | null> 
     );
     await navigator.serviceWorker.ready;
     return reg;
-  } catch {
+  } catch (err) {
+    console.warn('[FCM] service worker registration failed', err);
     return null;
   }
 }
@@ -49,18 +50,34 @@ async function getServiceWorkerReg(): Promise<ServiceWorkerRegistration | null> 
  * Safe to call multiple times.
  */
 export async function syncFcmToken(): Promise<void> {
-  if (!isLoggedIn() || !isBrowserSupported()) return;
+  if (!isLoggedIn()) {
+    console.warn('[FCM] skipped: not logged in (x-active-role cookie missing)');
+    return;
+  }
+  if (!isBrowserSupported()) {
+    console.warn('[FCM] skipped: browser does not support notifications/serviceWorker');
+    return;
+  }
 
   const messaging = await getMessagingInstance();
-  if (!messaging) return;
+  if (!messaging) {
+    console.warn('[FCM] skipped: getMessagingInstance returned null (Firebase env vars missing or FCM not supported)');
+    return;
+  }
 
   // Ask for permission if not yet decided; bail if denied.
   if (Notification.permission === 'default')
     await Notification.requestPermission();
-  if (Notification.permission !== 'granted') return;
+  if (Notification.permission !== 'granted') {
+    console.warn('[FCM] skipped: notification permission not granted:', Notification.permission);
+    return;
+  }
 
   const reg = await getServiceWorkerReg();
-  if (!reg) return;
+  if (!reg) {
+    console.warn('[FCM] skipped: service worker registration failed');
+    return;
+  }
 
   let token: string;
   try {
@@ -68,17 +85,26 @@ export async function syncFcmToken(): Promise<void> {
       vapidKey: env.firebaseVapidKey,
       serviceWorkerRegistration: reg,
     });
-  } catch {
+  } catch (err) {
+    console.warn('[FCM] skipped: getToken failed (VAPID key missing or invalid?)', err);
     return;
   }
 
-  if (!token || getLastSentFcmToken() === token) return;
+  if (!token) {
+    console.warn('[FCM] skipped: getToken returned empty token');
+    return;
+  }
+  if (getLastSentFcmToken() === token) {
+    console.log('[FCM] skipped: token unchanged since last sync');
+    return;
+  }
 
   try {
     await updateUserFcmToken({ fcmToken: token });
     rememberFcmTokenSent(token);
-  } catch {
-    // Non-fatal — will retry on next route change.
+    console.log('[FCM] token synced to backend');
+  } catch (err) {
+    console.warn('[FCM] API call failed (will retry on next route change)', err);
   }
 }
 
