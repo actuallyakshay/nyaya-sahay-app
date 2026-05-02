@@ -265,7 +265,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         ) : (
           <div className="p-4 md:p-6 lg:p-8">
-            <div className="mb-2">
+            <div className="mb-2 hidden lg:block">
               <Breadcrumbs />
             </div>
             {children}

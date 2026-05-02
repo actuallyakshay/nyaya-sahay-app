@@ -149,7 +149,9 @@ export const DashboardLayout = ({
               collapsed ? 'lg:justify-center lg:px-0' : 'justify-between'
             )}
           >
-            <div className={cn('min-w-0 flex-1 pr-2', collapsed && 'lg:hidden')}>
+            <div
+              className={cn('min-w-0 flex-1 pr-2', collapsed && 'lg:hidden')}
+            >
               <BrandLogo
                 as="link"
                 to={nav[0].to}
@@ -219,7 +221,10 @@ export const DashboardLayout = ({
 
           <nav
             ref={navRef}
-            className={cn('min-h-0 flex-1 space-y-0.5 overflow-y-auto', collapsed ? 'px-1.5' : 'px-3')}
+            className={cn(
+              'min-h-0 flex-1 space-y-0.5 overflow-y-auto',
+              collapsed ? 'px-1.5' : 'px-3'
+            )}
           >
             {nav.map((item) => {
               const active =
@@ -336,7 +341,7 @@ export const DashboardLayout = ({
           </div>
         ) : (
           <div className="p-4 md:p-6 lg:p-8">
-            <div className="mb-2">
+            <div className="mb-2 hidden lg:block">
               <Breadcrumbs />
             </div>
             {children}
