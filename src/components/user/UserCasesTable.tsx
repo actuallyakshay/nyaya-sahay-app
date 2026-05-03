@@ -30,8 +30,8 @@ export const UserCasesTable = ({
   isAdmin = false,
 }) => {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Cases ({total})</h1>
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Cases ({total})</h2>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative max-w-sm flex-1">

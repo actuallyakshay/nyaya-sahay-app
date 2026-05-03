@@ -155,20 +155,24 @@ export function AdminCaseInternalNotesContent({
       {/* Info / status strip */}
       <div
         className={cn(
-          'flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs',
+          'flex shrink-0 flex-col gap-2 rounded-lg border px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:gap-2 sm:py-2',
           isCaseClosed
             ? 'border-destructive/20 bg-destructive/5 text-destructive/80'
             : 'border-amber-200/80 bg-amber-50/80 text-amber-700 dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-400'
         )}
       >
-        <Lock className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1">
-          {isCaseClosed
-            ? 'Case closed — notes are locked and cannot be added.'
-            : 'Private — visible only to admins and lawyers.'}
-        </span>
+        <div className="flex min-w-0 flex-1 items-start gap-2 sm:items-center">
+          <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 sm:mt-0" />
+          <span className="min-w-0 flex-1 leading-snug">
+            {isCaseClosed
+              ? 'Case closed — notes are locked and cannot be added.'
+              : 'Private — visible only to admins and lawyers.'}
+          </span>
+        </div>
         {caseCode && (
-          <CaseCodeText className="font-medium opacity-80">{caseCode}</CaseCodeText>
+          <CaseCodeText className="min-w-0 shrink whitespace-normal break-words pl-[calc(0.875rem+0.5rem)] font-medium opacity-80 sm:inline-block sm:max-w-[14rem] sm:shrink-0 sm:pl-0 sm:text-right sm:truncate sm:break-normal">
+            {caseCode}
+          </CaseCodeText>
         )}
       </div>
 

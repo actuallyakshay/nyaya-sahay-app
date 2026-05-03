@@ -129,18 +129,17 @@ const AdminUsers = () => {
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
                     <td className="px-4 py-3 font-medium">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
-                        {u.avatarUrl && (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-sm font-bold text-gold">
+                        {u.avatarUrl ? (
                           <img
                             src={u.avatarUrl}
-                            alt={u.fullName}
-                            className="h-9 w-9 rounded-full object-cover"
+                            alt={u.fullName ?? 'User'}
+                            className="h-full w-full object-cover"
                           />
-                        )}
-                        {!u.avatarUrl && (
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
-                            {u.fullName.charAt(0).toUpperCase()}
-                          </div>
+                        ) : (
+                          <span aria-hidden>
+                            {u.fullName?.charAt(0).toUpperCase() ?? '?'}
+                          </span>
                         )}
                       </div>
                     </td>

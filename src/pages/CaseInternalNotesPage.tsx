@@ -47,7 +47,7 @@ function CaseInternalNotesInner() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex min-h-0 flex-1 flex-col gap-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pt-4 md:px-6 md:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] md:pt-6">
           <CaseDetailSkeleton isLawyer={!isAdmin} />
         </div>
       </Layout>
@@ -57,7 +57,7 @@ function CaseInternalNotesInner() {
   return (
     <Layout>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex shrink-0 items-center gap-2 border-b border-border bg-card px-3 py-2 md:gap-3 md:px-6 md:py-3">
+        <div className="flex shrink-0 items-center gap-2 border-b border-border bg-card py-2 pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] md:gap-3 md:px-6 md:py-3">
           <Button
             variant="ghost"
             size="icon"
@@ -79,7 +79,7 @@ function CaseInternalNotesInner() {
           </GenericTooltip>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col p-4 md:p-6">
+        <div className="flex min-h-0 flex-1 flex-col pt-4 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:px-6 md:pt-6 md:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
           <AdminCaseInternalNotesContent
             notesVariant={isAdmin ? 'admin' : 'lawyer'}
             caseStatus={
