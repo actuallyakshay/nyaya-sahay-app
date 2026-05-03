@@ -127,12 +127,12 @@ const Homepage = () => {
       <section className="relative overflow-hidden bg-navy">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(43_55%_52%_/_0.12),_transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(220_40%_30%_/_0.5),_transparent_60%)]" />
-        <div className="container relative py-20 md:py-28 lg:py-36">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="container relative py-12 md:py-14 lg:py-16">
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
             <motion.div
               initial="hidden"
               animate="visible"
-              className="space-y-6"
+              className="space-y-4"
             >
               <motion.div variants={fadeUp} custom={0}>
                 <BrandLogo
@@ -171,7 +171,7 @@ const Homepage = () => {
               <motion.div
                 variants={fadeUp}
                 custom={4}
-                className="flex flex-col gap-3 pt-2 sm:flex-row"
+                className="flex flex-col gap-3 sm:flex-row"
               >
                 <Button
                   size="lg"
@@ -197,14 +197,14 @@ const Homepage = () => {
             <motion.div
               initial="hidden"
               animate="visible"
-              className="hidden grid-cols-2 gap-4 lg:grid"
+              className="hidden grid-cols-2 gap-3 lg:grid"
             >
               {stats.map((s, i) => (
                 <motion.div
                   key={s.label}
                   variants={fadeUp}
                   custom={i + 3}
-                  className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 text-center backdrop-blur"
+                  className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-5 text-center backdrop-blur"
                 >
                   <p className="text-3xl font-bold text-gold">{s.value}</p>
                   <p className="mt-1 text-sm text-primary-foreground/60">
@@ -216,7 +216,7 @@ const Homepage = () => {
           </div>
 
           {/* Mobile stats row */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:hidden">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:hidden">
             {stats.map((s) => (
               <div
                 key={s.label}
@@ -233,9 +233,9 @@ const Homepage = () => {
       </section>
 
       {/* Features */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
               Why Families Trust Samvidhan Legal Advisory
             </h2>
@@ -269,9 +269,9 @@ const Homepage = () => {
       </section>
 
       {/* How It Works */}
-      <section className="bg-muted/50 py-16 md:py-24">
+      <section className="bg-muted/50 py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto mb-14 max-w-2xl text-center">
+          <div className="mx-auto mb-10 max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
               How It Works
             </h2>
@@ -311,9 +311,9 @@ const Homepage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
               What Our Users Say
             </h2>
@@ -359,9 +359,9 @@ const Homepage = () => {
       </section>
 
       {/* Plans preview */}
-      <section className="bg-muted/50 py-16 md:py-24">
+      <section className="bg-muted/50 py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
               Simple, Transparent Pricing
             </h2>
@@ -417,9 +417,9 @@ const Homepage = () => {
       </section>
 
       {/* FAQ Teaser */}
-      <section className="py-16 md:py-20">
+      <section className="py-12 md:py-16">
         <div className="container">
-          <div className="mx-auto max-w-3xl rounded-2xl border bg-card p-8 text-center shadow-sm md:p-12">
+          <div className="mx-auto max-w-3xl rounded-2xl border bg-card p-6 text-center shadow-sm md:p-10">
             <h2 className="text-xl font-bold sm:text-2xl">Have Questions?</h2>
             <p className="mt-2 text-muted-foreground">
               Check out our frequently asked questions or reach out to our
@@ -435,7 +435,7 @@ const Homepage = () => {
       </section>
 
       {/* CTA */}
-      <section className="bg-navy py-16 md:py-20">
+      <section className="bg-navy py-12 md:py-16">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -453,7 +453,7 @@ const Homepage = () => {
             <motion.p
               variants={fadeUp}
               custom={1}
-              className="mx-auto mt-4 max-w-lg text-base text-primary-foreground/70 sm:text-lg"
+              className="mx-auto mt-3 max-w-lg text-base text-primary-foreground/70 sm:text-lg"
             >
               Join thousands of Indians who trust Samvidhan Legal Advisory for
               reliable, affordable legal assistance.
@@ -461,7 +461,7 @@ const Homepage = () => {
             <motion.div
               variants={fadeUp}
               custom={2}
-              className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+              className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
             >
               <Button
                 size="lg"

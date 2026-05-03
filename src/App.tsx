@@ -66,301 +66,301 @@ const AppInner = () => (
           <FcmTokenSync />
           <CaseChatGlobalNotifier />
           <Routes>
-              {/* Public */}
-              <Route path={ROUTES.home} element={<Index />} />
-              <Route path={ROUTES.plans} element={<PlansPage />} />
-              <Route path={ROUTES.about} element={<AboutPage />} />
-              <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
-              <Route path={ROUTES.faq} element={<FAQPage />} />
-              {/* <Route path={ROUTES.contact} element={<ContactPage />} /> */}
-              <Route path={ROUTES.login} element={<LoginPage />} />
+            {/* Public */}
+            <Route path={ROUTES.home} element={<Index />} />
+            <Route path={ROUTES.plans} element={<PlansPage />} />
+            <Route path={ROUTES.about} element={<AboutPage />} />
+            <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
+            <Route path={ROUTES.faq} element={<FAQPage />} />
+            {/* <Route path={ROUTES.contact} element={<ContactPage />} /> */}
+            <Route path={ROUTES.login} element={<LoginPage />} />
 
-              {/* User */}
-              <Route
-                path={ROUTES.user.dashboard}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <UserDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.user.notifications}
-                element={
-                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <LawyerApprovedGate>
-                      <CaseNotificationsPage />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.user.cases}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <UserCases />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.caseDetail}
-                element={
-                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <LawyerApprovedGate>
-                      <CaseDetail />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.caseDocuments}
-                element={
-                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <LawyerApprovedGate>
-                      <CaseDocuments />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.caseInternalNotes}
-                element={<CaseInternalNotesPage />}
-              />
-              <Route
-                path={ROUTE_PATTERNS.caseChat}
-                element={
-                  <ProtectedRoute allowedRoles={['user', 'lawyer']}>
-                    <LawyerApprovedGate>
-                      <CaseChatPage />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.user.newCase}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <NewCase />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.user.subscription}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <UserSubscription />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.user.profile}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <UserProfile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.user.lawyers}
-                element={
-                  <ProtectedRoute allowedRoles={['user']}>
-                    <LawyersDirectory />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Lawyer */}
-              <Route
-                path={ROUTES.lawyer.dashboard}
-                element={
-                  <ProtectedRoute allowedRoles={['lawyer']}>
-                    <LawyerApprovedGate>
-                      <LawyerDashboard />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.lawyer.cases}
-                element={
-                  <ProtectedRoute allowedRoles={['lawyer']}>
-                    <LawyerApprovedGate>
-                      <LawyerCases />
-                    </LawyerApprovedGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.lawyer.documents}
-                element={
-                  <ProtectedRoute allowedRoles={['lawyer']}>
-                    <LawyerDocuments />
-                  </ProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.lawyer.profile}
-                element={
-                  <ProtectedRoute allowedRoles={['lawyer']}>
-                    <UserProfile />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Admin */}
-              <Route
-                path={ROUTES.admin.dashboard}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminDashboard />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.notifications}
-                element={
-                  <AdminProtectedRoute>
+            {/* User */}
+            <Route
+              path={ROUTES.user.dashboard}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <UserDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.user.notifications}
+              element={
+                <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                  <LawyerApprovedGate>
                     <CaseNotificationsPage />
-                  </AdminProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.admin.caseRequests}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminCaseRequests />
-                  </AdminProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.admin.sessionRequests}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminSessionRequests />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.lawyerPendingDocuments}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLawyerPendingDocumentsPage />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.users}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminUsers />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminUserDetail}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminUserDetail />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.lawyers}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLawyers />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminLawyerDocuments}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLawyerDocumentsPage />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminLawyerDetail}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLawyerDetail />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.cases}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminCases />
-                  </AdminProtectedRoute>
-                }
-              />
-
-              <Route
-                path={ROUTES.admin.lawyerVerifications}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminLawyerVerifications />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminCaseDetail}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminCaseDetail />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminCaseChat}
-                element={
-                  <AdminProtectedRoute>
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.user.cases}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <UserCases />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.caseDetail}
+              element={
+                <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                  <LawyerApprovedGate>
+                    <CaseDetail />
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.caseDocuments}
+              element={
+                <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                  <LawyerApprovedGate>
+                    <CaseDocuments />
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.caseInternalNotes}
+              element={<CaseInternalNotesPage />}
+            />
+            <Route
+              path={ROUTE_PATTERNS.caseChat}
+              element={
+                <ProtectedRoute allowedRoles={['user', 'lawyer']}>
+                  <LawyerApprovedGate>
                     <CaseChatPage />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTE_PATTERNS.adminCaseDocuments}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminCaseDocuments />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.subscriptions}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminSubscriptions />
-                  </AdminProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.admin.payments}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminPayments />
-                  </AdminProtectedRoute>
-                }
-              />
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.user.newCase}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <NewCase />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.user.subscription}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <UserSubscription />
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path={ROUTES.admin.settings}
-                element={
-                  <AdminProtectedRoute>
-                    <AdminSettings />
-                  </AdminProtectedRoute>
-                }
-              />
+            <Route
+              path={ROUTES.user.profile}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.user.lawyers}
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <LawyersDirectory />
+                </ProtectedRoute>
+              }
+            />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            {/* Lawyer */}
+            <Route
+              path={ROUTES.lawyer.dashboard}
+              element={
+                <ProtectedRoute allowedRoles={['lawyer']}>
+                  <LawyerApprovedGate>
+                    <LawyerDashboard />
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.lawyer.cases}
+              element={
+                <ProtectedRoute allowedRoles={['lawyer']}>
+                  <LawyerApprovedGate>
+                    <LawyerCases />
+                  </LawyerApprovedGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.lawyer.documents}
+              element={
+                <ProtectedRoute allowedRoles={['lawyer']}>
+                  <LawyerDocuments />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path={ROUTES.lawyer.profile}
+              element={
+                <ProtectedRoute allowedRoles={['lawyer']}>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin */}
+            <Route
+              path={ROUTES.admin.dashboard}
+              element={
+                <AdminProtectedRoute>
+                  <AdminDashboard />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.notifications}
+              element={
+                <AdminProtectedRoute>
+                  <CaseNotificationsPage />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route
+              path={ROUTES.admin.caseRequests}
+              element={
+                <AdminProtectedRoute>
+                  <AdminCaseRequests />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route
+              path={ROUTES.admin.sessionRequests}
+              element={
+                <AdminProtectedRoute>
+                  <AdminSessionRequests />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.lawyerPendingDocuments}
+              element={
+                <AdminProtectedRoute>
+                  <AdminLawyerPendingDocumentsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.users}
+              element={
+                <AdminProtectedRoute>
+                  <AdminUsers />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminUserDetail}
+              element={
+                <AdminProtectedRoute>
+                  <AdminUserDetail />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.lawyers}
+              element={
+                <AdminProtectedRoute>
+                  <AdminLawyers />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminLawyerDocuments}
+              element={
+                <AdminProtectedRoute>
+                  <AdminLawyerDocumentsPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminLawyerDetail}
+              element={
+                <AdminProtectedRoute>
+                  <AdminLawyerDetail />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.cases}
+              element={
+                <AdminProtectedRoute>
+                  <AdminCases />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route
+              path={ROUTES.admin.lawyerVerifications}
+              element={
+                <AdminProtectedRoute>
+                  <AdminLawyerVerifications />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminCaseDetail}
+              element={
+                <AdminProtectedRoute>
+                  <AdminCaseDetail />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminCaseChat}
+              element={
+                <AdminProtectedRoute>
+                  <CaseChatPage />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTE_PATTERNS.adminCaseDocuments}
+              element={
+                <AdminProtectedRoute>
+                  <AdminCaseDocuments />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.subscriptions}
+              element={
+                <AdminProtectedRoute>
+                  <AdminSubscriptions />
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.admin.payments}
+              element={
+                <AdminProtectedRoute>
+                  <AdminPayments />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route
+              path={ROUTES.admin.settings}
+              element={
+                <AdminProtectedRoute>
+                  <AdminSettings />
+                </AdminProtectedRoute>
+              }
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
