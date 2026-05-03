@@ -1,26 +1,24 @@
-import { useToast } from "@/hooks/use-toast";
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
+import { Slide, ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+import './toastify-overrides.css';
 
 export function Toaster() {
-  const { toasts } = useToast();
-
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid min-w-0 flex-1 gap-1.5">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        );
-      })}
-      <ToastViewport />
-    </ToastProvider>
+    <ToastContainer
+      position="top-center"
+      autoClose={4000}
+      newestOnTop
+      limit={4}
+      closeOnClick={false}
+      draggable={false}
+      pauseOnHover
+      pauseOnFocusLoss
+      theme="light"
+      transition={Slide}
+      hideProgressBar
+      closeButton
+      aria-label="Notifications"
+    />
   );
 }

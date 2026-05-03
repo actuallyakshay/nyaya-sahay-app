@@ -2,7 +2,7 @@ import { getAdminAnalytics } from '@/api-client';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
-import { path, ROUTES } from '@/constants';
+import { ROUTES, path } from '@/constants';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { mockPayments } from '@/lib/mock-data';
 import { useQuery } from '@tanstack/react-query';
