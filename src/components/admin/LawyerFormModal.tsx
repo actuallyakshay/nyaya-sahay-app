@@ -194,14 +194,17 @@ export const LawyerFormModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Lawyer' : 'Add Lawyer'}</DialogTitle>
+      <DialogContent className="flex max-h-[min(90dvh,calc(100dvh-2rem))] flex-col gap-0 overflow-hidden p-0 sm:max-h-[85vh] sm:gap-4 sm:overflow-y-auto sm:p-6 sm:max-w-lg">
+        <DialogHeader className="shrink-0 space-y-0 border-b px-4 pb-3 pt-5 text-left sm:border-0 sm:px-0 sm:pb-0 sm:pt-0">
+          <DialogTitle className="pr-8 text-base leading-snug sm:pr-0 sm:text-lg">
+            {isEditMode ? 'Edit Lawyer' : 'Add Lawyer'}
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-4 py-3 sm:max-h-none sm:flex-none sm:overflow-visible sm:px-0 sm:py-0">
+          <div className="space-y-3 sm:space-y-4">
           {/* Name & Email */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>
                 Full Name <span className="text-destructive">*</span>
@@ -260,7 +263,7 @@ export const LawyerFormModal = ({
           )}
 
           {/* Phone & Bar Council ID */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Phone</Label>
               <div className="flex rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
@@ -294,7 +297,7 @@ export const LawyerFormModal = ({
           </div>
 
           {/* Degree & Career Start Date */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Degree</Label>
               <Input
@@ -321,44 +324,56 @@ export const LawyerFormModal = ({
               onChange={(e) => setBio(e.target.value)}
               placeholder="Short bio about the lawyer..."
               rows={3}
+              className="min-h-[5.5rem] sm:min-h-0"
             />
           </div>
 
           {/* Specializations */}
           <div className="space-y-1.5">
             <Label>Specializations</Label>
-            <div className="flex flex-wrap gap-1.5">
-              {categoriesLoading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    <WithShimmer
-                      key={i}
-                      loading
-                      className="h-7 w-20 rounded-full"
-                    />
-                  ))
-                : categories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => toggleSpec(cat.id)}
-                      className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
-                        selectedSpecializations.includes(cat.id)
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-muted text-muted-foreground hover:bg-accent'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
+            <div className="max-h-32 overflow-y-auto overscroll-y-contain rounded-md border border-border/60 bg-muted/20 p-2 sm:max-h-40 sm:border-0 sm:bg-transparent sm:p-0">
+              <div className="flex flex-wrap gap-1.5">
+                {categoriesLoading
+                  ? Array.from({ length: 6 }).map((_, i) => (
+                      <WithShimmer
+                        key={i}
+                        loading
+                        className="h-7 w-20 rounded-full"
+                      />
+                    ))
+                  : categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => toggleSpec(cat.id)}
+                        className={`rounded-full border px-2.5 py-1 text-left text-xs leading-snug transition-colors ${
+                          selectedSpecializations.includes(cat.id)
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-muted text-muted-foreground hover:bg-accent'
+                        }`}
+                      >
+                        <span className="line-clamp-2">{cat.name}</span>
+                      </button>
+                    ))}
+              </div>
             </div>
+          </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="shrink-0 gap-2 border-t bg-background px-4 py-3 pb-[max(0.75rem,calc(0.5rem+env(safe-area-inset-bottom,0px)))] sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:pb-0">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isPending}>
+          <Button
+            onClick={handleSave}
+            disabled={isPending}
+            className="w-full sm:w-auto"
+          >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isEditMode ? 'Save Changes' : 'Add Lawyer'}
           </Button>
