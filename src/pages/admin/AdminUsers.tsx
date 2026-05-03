@@ -129,11 +129,15 @@ const AdminUsers = () => {
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
                     <td className="px-4 py-3 font-medium">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-sm font-bold text-gold">
+                      <Link
+                        to={path.adminUser(u.id)}
+                        aria-label={`View ${u.fullName ?? 'user'}`}
+                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-sm font-bold text-gold ring-offset-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
                         {u.avatarUrl ? (
                           <img
                             src={u.avatarUrl}
-                            alt={u.fullName ?? 'User'}
+                            alt=""
                             className="h-full w-full object-cover"
                           />
                         ) : (
@@ -141,7 +145,7 @@ const AdminUsers = () => {
                             {u.fullName?.charAt(0).toUpperCase() ?? '?'}
                           </span>
                         )}
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-4 py-3 font-medium">
                       <Link

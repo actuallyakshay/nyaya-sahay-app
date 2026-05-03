@@ -174,20 +174,24 @@ const AdminLawyers = () => {
                       className="border-b last:border-0 hover:bg-muted/30"
                     >
                       <td className="px-4 py-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
-                          {l.user?.avatarUrl && (
+                        <Link
+                          to={path.adminLawyer(l.id)}
+                          aria-label={`View ${l.user?.fullName ?? 'lawyer'}`}
+                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-sm font-bold text-gold ring-offset-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                          {l.user?.avatarUrl ? (
                             <img
-                              src={l.user?.avatarUrl}
-                              alt={l.user?.fullName}
-                              className="h-9 w-9 rounded-full object-cover"
+                              src={l.user.avatarUrl}
+                              alt=""
+                              className="h-full w-full object-cover"
                             />
+                          ) : (
+                            <span aria-hidden>
+                              {l.user?.fullName?.charAt(0).toUpperCase() ??
+                                '?'}
+                            </span>
                           )}
-                          {!l.user?.avatarUrl && (
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
-                              {l.user?.fullName.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                        </div>
+                        </Link>
                       </td>
                       <td className="max-w-[160px] px-4 py-3">
                         <div className="min-w-0">
