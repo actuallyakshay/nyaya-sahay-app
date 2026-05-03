@@ -34,3 +34,11 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Cursor
+.cursor/
+
+# Graphiflow
+.graphiflow/
+
+graphify-out

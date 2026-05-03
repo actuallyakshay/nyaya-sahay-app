@@ -72,7 +72,6 @@ const AppInner = () => (
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
             <Route path={ROUTES.faq} element={<FAQPage />} />
-            {/* <Route path={ROUTES.contact} element={<ContactPage />} /> */}
             <Route path={ROUTES.login} element={<LoginPage />} />
 
             {/* User */}
