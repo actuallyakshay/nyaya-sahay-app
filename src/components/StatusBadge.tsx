@@ -6,8 +6,6 @@ const statusStyles: Record<CaseStatus, string> = {
   new: 'bg-blue-50 text-blue-700 border-blue-200',
   under_review: 'bg-amber-50 text-amber-700 border-amber-200',
   lawyer_assigned: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  in_consultation: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  waiting_for_user: 'bg-orange-50 text-orange-700 border-orange-200',
   resolved: 'bg-green-50 text-green-700 border-green-200',
   closed: 'bg-gray-50 text-gray-500 border-gray-200',
   emergency: 'bg-red-50 text-red-700 border-red-200',
@@ -22,7 +20,7 @@ export const StatusBadge = ({
 }) => (
   <span
     className={cn(
-      'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
+      'inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium',
       statusStyles[status],
       className
     )}
@@ -43,7 +41,7 @@ export const PracticeAreaBadge = ({
 }) => (
   <span
     className={cn(
-      'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium',
+      'inline-flex max-w-full min-w-0 items-center gap-1 break-words rounded-full border px-2.5 py-0.5 text-xs font-medium',
       'border-gray-200 bg-yellow-50 text-yellow-700',
       className
     )}

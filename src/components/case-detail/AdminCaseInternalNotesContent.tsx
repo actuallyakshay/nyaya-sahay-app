@@ -1,4 +1,5 @@
 import { deleteAdminCaseNote } from '@/api-client';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { PaginationControls } from '@/components/PaginationControls';
 import {
   AlertDialog,
@@ -167,7 +168,7 @@ export function AdminCaseInternalNotesContent({
             : 'Private — visible only to admins and lawyers.'}
         </span>
         {caseCode && (
-          <span className="font-mono font-medium opacity-80">{caseCode}</span>
+          <CaseCodeText className="font-medium opacity-80">{caseCode}</CaseCodeText>
         )}
       </div>
 

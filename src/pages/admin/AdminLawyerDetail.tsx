@@ -86,9 +86,9 @@ const AdminLawyerDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="rounded-xl border bg-card p-6">
-          <div className="flex items-start gap-4">
+      <div className="min-w-0 space-y-6">
+        <div className="rounded-xl border bg-card p-4 sm:p-6">
+          <div className="flex min-w-0 items-start gap-4">
             <WithShimmer loading={isLoading} className="h-14 w-14 rounded-full">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gold/20 text-lg font-bold text-gold">
                 {lawyerData?.user?.avatarUrl ? (
@@ -102,13 +102,13 @@ const AdminLawyerDetail = () => {
                 )}
               </div>
             </WithShimmer>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-2">
                 <WithShimmer loading={isLoading} className="h-7 w-40">
                   <h1 className="text-xl font-bold">Adv. {user?.fullName}</h1>
                 </WithShimmer>
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                 {isLoading ? (
                   <>
                     <WithShimmer loading className="h-4 w-36" />
@@ -118,19 +118,19 @@ const AdminLawyerDetail = () => {
                 ) : (
                   <>
                     {user?.email && (
-                      <span className="flex items-center gap-1">
+                      <span className="flex min-w-0 max-w-full items-center gap-1 break-all">
                         <Mail className="h-3.5 w-3.5 shrink-0" />
                         {user.email}
                       </span>
                     )}
                     {user?.phone && (
-                      <span className="flex items-center gap-1">
+                      <span className="flex min-w-0 items-center gap-1 break-words">
                         <Phone className="h-3.5 w-3.5 shrink-0" />
                         +91-{user.phone}
                       </span>
                     )}
                     {lawyerData?.barCouncilId && (
-                      <span className="flex items-center gap-1">
+                      <span className="flex min-w-0 max-w-full items-center gap-1 break-words">
                         <Award className="h-3.5 w-3.5 shrink-0" />
                         {lawyerData.barCouncilId}
                       </span>
@@ -140,7 +140,9 @@ const AdminLawyerDetail = () => {
               </div>
               {isLoading && <WithShimmer loading className="mt-2 h-4 w-full" />}
               {!isLoading && lawyerData?.bio?.trim() && (
-                <p className="mt-2 text-sm text-foreground">{lawyerData.bio}</p>
+                <p className="mt-2 break-words text-sm text-foreground">
+                  {lawyerData.bio}
+                </p>
               )}
               <div className="mt-2">
                 {isLoading ? (
@@ -148,7 +150,9 @@ const AdminLawyerDetail = () => {
                 ) : (
                   <p className="flex items-start gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    <span>{formattedAddress ?? 'Address not provided.'}</span>
+                    <span className="min-w-0 break-words">
+                      {formattedAddress ?? 'Address not provided.'}
+                    </span>
                   </p>
                 )}
               </div>
@@ -162,16 +166,16 @@ const AdminLawyerDetail = () => {
                 ) : (
                   <>
                     {lawyerData?.degree?.trim() && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                      <span className="inline-block max-w-full break-words rounded-full bg-muted px-2 py-0.5 text-xs">
                         {lawyerData.degree}
                       </span>
                     )}
                     {experienceLabel && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                      <span className="inline-block max-w-full break-words rounded-full bg-muted px-2 py-0.5 text-xs">
                         {experienceLabel}
                       </span>
                     )}
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                    <span className="inline-block max-w-full rounded-full bg-muted px-2 py-0.5 text-xs whitespace-nowrap">
                       {totalCasesHandled}{' '}
                       {totalCasesHandled === 1 ? 'case' : 'cases'}
                     </span>
@@ -194,7 +198,7 @@ const AdminLawyerDetail = () => {
                     {practiceAreas.map((s) => (
                       <span
                         key={s.practiceAreaId}
-                        className="rounded-full bg-gold/10 px-2 py-0.5 text-xs font-medium text-gold"
+                        className="inline-block max-w-full break-words rounded-full bg-gold/10 px-2 py-0.5 text-left text-xs font-medium text-gold"
                       >
                         {s.practiceArea?.name}
                       </span>

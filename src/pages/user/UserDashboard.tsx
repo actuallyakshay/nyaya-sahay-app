@@ -2,6 +2,7 @@ import { getUserAnalytics } from '@/api-client';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import SessionQueryPromptModal from '@/components/SessionQueryPromptModal';
 import { SkeletonCard } from '@/components/SkeletonCard';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import WithShimmer from '@/components/WithShimmer';
@@ -178,9 +179,9 @@ const UserDashboard = () => {
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
+                        <CaseCodeText className="text-xs text-muted-foreground">
                           {c.caseCode}
-                        </span>
+                        </CaseCodeText>
                         <StatusBadge status={c.status} />
                         {c.isEmergency && (
                           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">

@@ -1,4 +1,5 @@
 import { getAdminCaseRequests } from '@/api-client';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
@@ -109,9 +110,9 @@ const AdminCaseRequests = () => {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="mb-1 flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-xs text-muted-foreground">
+                          <CaseCodeText className="text-xs text-muted-foreground">
                             {c.caseCode}
-                          </span>
+                          </CaseCodeText>
                           <StatusBadge status={c.status} />
                           <span
                             className={`rounded-full px-2 py-0.5 text-xs font-medium ${

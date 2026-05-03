@@ -2,6 +2,7 @@ import {
   getAdminSessionRequests,
   updateCaseSessionRequestStatus,
 } from '@/api-client';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { PaginationControls } from '@/components/PaginationControls';
 import { CaseCardSkeleton } from '@/components/skeletons/CaseCardSkeleton';
 import { Button } from '@/components/ui/button';
@@ -143,9 +144,9 @@ const AdminSessionRequests = () => {
                             to={path.adminCase(req?.case?.id ?? '')}
                             className="hover:text-gold hover:underline"
                           >
-                            <span className="font-mono text-xs text-muted-foreground">
+                            <CaseCodeText className="text-xs text-muted-foreground">
                               {req?.case?.caseCode}
-                            </span>
+                            </CaseCodeText>
                           </Link>
                           <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
                             <Icon className="h-3 w-3" />

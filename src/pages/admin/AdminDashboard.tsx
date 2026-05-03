@@ -1,4 +1,5 @@
 import { getAdminAnalytics } from '@/api-client';
+import { CaseCodeLink } from '@/components/CaseCodeText';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
@@ -130,13 +131,13 @@ const AdminDashboard = () => {
                     key={c.caseCode}
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
-                    <td className="px-4 py-3 font-mono text-xs">
-                      <Link
+                    <td className="px-4 py-3">
+                      <CaseCodeLink
                         to={path.adminCase(c.id)}
-                        className="hover:text-gold hover:underline"
+                        className="text-xs"
                       >
                         #{c.caseCode}
-                      </Link>
+                      </CaseCodeLink>
                     </td>
                     <td className="px-4 py-3">{c.user?.fullName || '-'}</td>
                     <td className="hidden max-w-[200px] truncate px-4 py-3 font-medium text-muted-foreground sm:table-cell">

@@ -1,3 +1,4 @@
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { Button } from '@/components/ui/button';
 import { env } from '@/config/env';
 import {
@@ -204,8 +205,11 @@ export function CaseChatGlobalNotifier() {
               >
                 <X className="h-5 w-5" />
               </button>
-              <p className="pr-8 text-xs font-semibold uppercase tracking-wide text-primary">
-                New message · {livePeek.payload.caseCode}
+              <p className="pr-8 text-xs font-semibold tracking-wide text-primary">
+                <span className="uppercase">New message · </span>
+                <CaseCodeText className="font-semibold text-primary">
+                  {livePeek.payload.caseCode}
+                </CaseCodeText>
               </p>
               <p className="mt-1 text-sm font-medium text-foreground">
                 {peekSenderLabel(livePeek.payload.message.senderRole)}

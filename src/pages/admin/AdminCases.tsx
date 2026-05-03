@@ -1,5 +1,6 @@
 import { getAdminCases } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
+import { CaseCodeLink } from '@/components/CaseCodeText';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { Input } from '@/components/ui/input';
@@ -160,13 +161,13 @@ const AdminCases = () => {
                     key={c.id}
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
-                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs">
-                      <Link
+                    <td className="px-4 py-3">
+                      <CaseCodeLink
                         to={path.adminCase(c.id)}
-                        className="hover:text-gold hover:underline"
+                        className="text-xs"
                       >
                         {c.caseCode}
-                      </Link>
+                      </CaseCodeLink>
                     </td>
                     <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                       <Link

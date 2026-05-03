@@ -1,3 +1,4 @@
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -43,8 +44,9 @@ export function CloseCaseDialog({
         <DialogHeader>
           <DialogTitle>Close Case</DialogTitle>
           <DialogDescription>
-            This will permanently close case {caseCode ?? '—'}. Please provide a
-            reason.
+            This will permanently close case{' '}
+            <CaseCodeText className="text-sm">{caseCode ?? '—'}</CaseCodeText>
+            . Please provide a reason.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">

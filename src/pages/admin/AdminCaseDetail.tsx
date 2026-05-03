@@ -1,5 +1,6 @@
 import { AdminCaseLawyerAssign } from '@/components/admin/AdminCaseLawyerAssign';
 import { CloseCaseDialog } from '@/components/case-detail/CloseCaseDialog';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { CaseDescriptionModal } from '@/components/CaseDescriptionModal';
 import { CaseMeetingUri } from '@/components/CaseMeetingUri';
 import { GenericTooltip } from '@/components/GenericTooltip';
@@ -243,9 +244,9 @@ const AdminCaseDetail = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-6 py-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Hash className="h-3.5 w-3.5 shrink-0" />
-                <span className="font-mono font-medium text-foreground">
+                <CaseCodeText className="font-medium text-foreground">
                   {caseData?.caseCode}
-                </span>
+                </CaseCodeText>
               </span>
 
               <span className="flex items-center gap-1.5">

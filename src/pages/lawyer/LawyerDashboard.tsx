@@ -1,5 +1,6 @@
 import { getLawyerAnalytics } from '@/api-client';
 import { SkeletonCard } from '@/components/SkeletonCard';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { StatusBadge } from '@/components/StatusBadge';
 import WithShimmer from '@/components/WithShimmer';
 import { path, ROUTES } from '@/constants';
@@ -119,9 +120,9 @@ const LawyerDashboard = () => {
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-muted-foreground">
+                        <CaseCodeText className="text-xs text-muted-foreground">
                           {c.caseCode}
-                        </span>
+                        </CaseCodeText>
                         <StatusBadge status={c.status} />
                         {c.priority === 'urgent' && (
                           <span className="flex items-center gap-1 text-xs text-destructive">

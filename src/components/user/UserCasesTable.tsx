@@ -1,5 +1,6 @@
 import { PaginationControls } from '@/components/PaginationControls';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
+import { CaseCodeLink } from '@/components/CaseCodeText';
 import { PracticeAreaBadge, StatusBadge } from '@/components/StatusBadge';
 import { Input } from '@/components/ui/input';
 import {
@@ -110,15 +111,15 @@ export const UserCasesTable = ({
                   key={c.id}
                   className="border-b last:border-0 hover:bg-muted/30"
                 >
-                  <td className="px-4 py-3 font-mono text-xs">
-                    <Link
+                  <td className="px-4 py-3">
+                    <CaseCodeLink
                       to={
                         isAdmin ? path.adminCase(c.id) : path.caseDetail(c.id)
                       }
-                      className="hover:text-gold hover:underline"
+                      className="text-xs"
                     >
                       {c.caseCode}
-                    </Link>
+                    </CaseCodeLink>
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 font-medium">
                     <Link

@@ -22,7 +22,7 @@ export const CaseDescriptionModal = ({
 }: CaseDescriptionModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[min(80vh,720px)] w-full max-w-2xl flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
+      <DialogContent className="flex h-[min(80vh,720px)] max-w-2xl flex-col gap-0 overflow-hidden p-0">
         <DialogHeader className="shrink-0 space-y-1 border-b px-6 py-4 pr-14 text-left">
           <GenericTooltip content={caseTitle || 'Case'} side="bottom">
             <DialogTitle className="line-clamp-2 text-left text-base font-semibold leading-snug">

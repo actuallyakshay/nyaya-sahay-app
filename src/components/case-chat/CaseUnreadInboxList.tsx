@@ -1,3 +1,4 @@
+import { CaseCodeText } from '@/components/CaseCodeText';
 import { CaseUnreadInboxSkeleton } from '@/components/skeletons/CaseUnreadInboxSkeleton';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -64,10 +65,10 @@ export function CaseUnreadInboxList({
                   className="flex w-full flex-col gap-0.5 border-b border-border/60 px-4 py-3 text-left last:border-0 hover:bg-muted/60"
                   onClick={() => onOpenCase(row)}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  <div className="flex min-w-0 items-center justify-between gap-2 overflow-x-auto">
+                    <CaseCodeText className="text-xs font-semibold uppercase tracking-wide text-primary">
                       {row.caseCode}
-                    </span>
+                    </CaseCodeText>
                     <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                       {row.unreadCount} new
                     </span>
