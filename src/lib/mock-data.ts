@@ -112,6 +112,12 @@ export const PAGE_SIZE = 10;
 export const MAX_FILES = 5;
 export const MAX_SIZE_MB = 10;
 
+/** Short label for lists and headers; long context belongs in description. */
+export const CASE_TITLE_MAX_LENGTH = 300;
+
+/** Lawyer profile bio shown to clients. */
+export const LAWYER_BIO_MAX_LENGTH = 1000;
+
 export const CASE_STATUS_FILTERS: { value: string; label: string }[] = [
   { value: 'all', label: 'All Statuses' },
   { value: 'new', label: 'New' },

@@ -11,6 +11,7 @@ import {
 import WithShimmer from '@/components/WithShimmer';
 import { ROUTES } from '@/constants';
 import { useCategories } from '@/hooks/useCategories';
+import { LAWYER_BIO_MAX_LENGTH } from '@/lib/mock-data';
 import type { ProfilePageController } from '@/hooks/useProfilePage';
 import { Camera, FileText, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -307,15 +308,24 @@ export function LawyerProfileForm({ profile }: LawyerProfileFormProps) {
 
       <div className="mt-3 border-t pt-5">
         <div className="space-y-2">
-          <Label>Bio</Label>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <Label>Bio</Label>
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {(form.bio ?? '').length}/{LAWYER_BIO_MAX_LENGTH}
+            </span>
+          </div>
           <WithShimmer loading={isLoading} className="h-10 w-full">
             <Textarea
               rows={6}
               value={form.bio}
+              maxLength={LAWYER_BIO_MAX_LENGTH}
               onChange={(e) => patchForm({ bio: e.target.value })}
               placeholder="Tell us about yourself"
             />
           </WithShimmer>
+          <p className="text-xs text-muted-foreground">
+            Maximum {LAWYER_BIO_MAX_LENGTH} characters.
+          </p>
         </div>
       </div>
 

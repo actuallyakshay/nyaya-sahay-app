@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import {
+  CASE_TITLE_MAX_LENGTH,
   CATEGORY_SKELETON_WIDTHS,
   MAX_FILES,
   MAX_SIZE_MB,
@@ -146,14 +147,24 @@ const NewCase = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">Brief Title</Label>
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <Label htmlFor="title">Brief Title</Label>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {title.length}/{CASE_TITLE_MAX_LENGTH}
+              </span>
+            </div>
             <Input
               id="title"
               placeholder="e.g. Property ownership dispute"
               value={title}
+              maxLength={CASE_TITLE_MAX_LENGTH}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              One line is enough. Put facts and background in detailed description
+              below (max {CASE_TITLE_MAX_LENGTH} characters).
+            </p>
           </div>
 
           <div className="space-y-2">
