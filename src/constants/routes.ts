@@ -1,6 +1,8 @@
 /**
  * Browser paths for React Router and redirects.
  * API URLs stay in `src/api-client/routes`.
+ *
+ * FCM push deep links: keep path strings aligned with `nyaya/src/push-notifications/push-app-paths.ts`.
  */
 
 export const PATH_PREFIX = {

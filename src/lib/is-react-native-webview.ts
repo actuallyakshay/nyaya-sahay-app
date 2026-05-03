@@ -18,3 +18,14 @@ export function isReactNativeWebView(): boolean {
   const bridge = w.ReactNativeWebView;
   return typeof bridge === 'object' && bridge !== null && typeof bridge.postMessage === 'function';
 }
+
+/** JSON message to the Expo shell (`App.js` `onMessage`). Safe no-op outside the native WebView. */
+export function postNativeWebViewMessage(payload: Record<string, unknown>): void {
+  if (typeof window === 'undefined') return;
+  const w = window as NativeWebWindow;
+  try {
+    w.ReactNativeWebView?.postMessage(JSON.stringify(payload));
+  } catch {
+    /* ignore */
+  }
+}

@@ -15,10 +15,14 @@ import { useToast } from '@/hooks/use-toast';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { CASE_DOCUMENT_ACCEPT, getCookie } from '@/lib/helpers';
+import {
+  isReactNativeWebView,
+  postNativeWebViewMessage,
+} from '@/lib/is-react-native-webview';
 import { getApiErrorMessage } from '@/lib/utils';
 import type { UserRole } from '@/types';
 import { ArrowLeft, File, Loader2, Plus, X } from 'lucide-react';
-import { useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   Link,
   useLocation,
@@ -38,6 +42,14 @@ const caseChatPatternStyle = (src: string): CSSProperties => ({
 export default function CaseChatPage() {
   const { id } = useParams();
   const location = useLocation();
+
+  useEffect(() => {
+    if (!isReactNativeWebView()) return;
+    postNativeWebViewMessage({ type: 'NATIVE_PULL_TO_REFRESH', enabled: false });
+    return () => {
+      postNativeWebViewMessage({ type: 'NATIVE_PULL_TO_REFRESH', enabled: true });
+    };
+  }, [location.pathname, id]);
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
 

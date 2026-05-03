@@ -244,7 +244,8 @@ export function CaseChatThread({
   };
 
   const scrollAreaClass = cn(
-    'scrollbar-hide flex-1 min-h-0 overflow-y-auto',
+    /* overscroll-behavior: contain — stops scroll chaining to the WebView document (Android shell pull-to-refresh / rubber-band). */
+    'scrollbar-hide flex-1 min-h-0 touch-pan-y overflow-y-auto overscroll-y-contain',
     conversation
       ? cn('py-2', composerOverPattern ? 'px-4 md:px-6 lg:px-8' : 'px-1')
       : 'p-4'
