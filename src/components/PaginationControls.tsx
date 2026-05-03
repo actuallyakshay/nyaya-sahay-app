@@ -68,7 +68,7 @@ export const PaginationControls = ({
           <span className="font-medium text-foreground">{totalPages}</span>
         </p>
       )}
-      <div className="flex items-center gap-1">
+      <div className="flex w-full max-w-full items-center justify-center gap-1 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:w-auto sm:justify-end [&::-webkit-scrollbar]:hidden">
         <button
           onClick={onPrev}
           disabled={page <= 1}

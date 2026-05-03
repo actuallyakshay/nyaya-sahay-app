@@ -1,5 +1,4 @@
 import { getLawyersList } from '@/api-client';
-import { GenericTooltip } from '@/components/GenericTooltip';
 import { PaginationControls } from '@/components/PaginationControls';
 import WithShimmer from '@/components/WithShimmer';
 import {
@@ -80,15 +79,15 @@ const LawyersDirectory = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Our Lawyers</h1>
-          <p className="mt-1 text-muted-foreground">
+      <div className="min-w-0 space-y-6">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold sm:text-2xl">Our Lawyers</h1>
+          <p className="mt-1 text-sm text-muted-foreground sm:text-base">
             Browse verified lawyers available on the platform.
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="rounded-xl border bg-card p-5">
@@ -130,8 +129,11 @@ const LawyersDirectory = () => {
             </div>
           ) : (
             lawyers.map((l) => (
-              <div key={l.id} className="rounded-xl border bg-card p-5">
-                <div className="flex items-start gap-3">
+              <div
+                key={l.id}
+                className="min-w-0 overflow-hidden rounded-xl border bg-card p-4 sm:p-5"
+              >
+                <div className="flex min-w-0 items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/20 font-bold text-gold">
                     {l.user?.avatarUrl ? (
                       <img
@@ -145,16 +147,16 @@ const LawyersDirectory = () => {
                       </div>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="truncate text-sm font-medium">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 items-start gap-1.5">
+                      <p className="min-w-0 break-words text-sm font-medium leading-snug">
                         Adv. {l.user?.fullName || 'Unknown Lawyer'}
                       </p>
                       {l.barCouncilId && (
-                        <CheckCircle className="h-3.5 w-3.5 shrink-0 text-green-600" />
+                        <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-600" />
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="mt-0.5 break-words text-xs leading-snug text-muted-foreground line-clamp-2">
                       {l.degree || 'Degree not specified'}
                     </p>
                   </div>
@@ -164,7 +166,7 @@ const LawyersDirectory = () => {
                     l.lawyerPracticeAreas.map((area) => (
                       <span
                         key={area.id}
-                        className="rounded-full bg-gold/10 px-2 py-0.5 text-[11px] font-medium text-gold"
+                        className="inline-block max-w-full break-words rounded-full bg-gold/10 px-2 py-0.5 text-left text-[11px] font-medium leading-snug text-gold"
                       >
                         {area.practiceArea?.name}
                       </span>
@@ -175,19 +177,21 @@ const LawyersDirectory = () => {
                     </span>
                   )}
                 </div>
-                <div className="mt-3 flex items-center gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="h-3 w-3" />
-                    {calculateYearsOfExperience(l.careerStartDate)}
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span className="flex min-w-0 items-center gap-1">
+                    <Briefcase className="h-3 w-3 shrink-0" />
+                    <span className="break-words">
+                      {calculateYearsOfExperience(l.careerStartDate)}
+                    </span>
                   </span>
                   {l.gender && (
                     <span className="flex items-center gap-1">
-                      <Award className="h-3 w-3" />
+                      <Award className="h-3 w-3 shrink-0" />
                       {l.gender}
                     </span>
                   )}
                 </div>
-                <GenericTooltip content={l?.bio} />
+                <LawyerBio bio={l.bio} />
               </div>
             ))
           )}

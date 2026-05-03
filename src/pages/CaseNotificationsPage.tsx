@@ -18,7 +18,12 @@ export default function CaseNotificationsPage() {
   const { user } = useAuth();
   const isAdmin = pathname.startsWith('/admin');
 
-  const { data: unread, isPending, isFetching, refetch } = useCaseChatUnreadSummary(user?.id);
+  const {
+    data: unread,
+    isPending,
+    isFetching,
+    refetch,
+  } = useCaseChatUnreadSummary(user?.id);
 
   const Layout = isAdmin ? AdminLayout : DashboardLayout;
 
