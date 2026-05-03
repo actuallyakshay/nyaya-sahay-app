@@ -96,6 +96,9 @@ const AdminUsers = () => {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Name
                 </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Mem Number
+                </th>
                 <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
                   Email
                 </th>
@@ -154,6 +157,9 @@ const AdminUsers = () => {
                       >
                         {u.fullName}
                       </Link>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {u.memNumber ?? '-'}
                     </td>
                     <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
                       {u.email}
