@@ -585,8 +585,8 @@ export function CaseChatThread({
       <div
         className={
           composerOverPattern
-            ? 'flex shrink-0 flex-col gap-1 bg-transparent px-4 pb-4 pt-2 md:px-6 lg:px-8'
-            : 'flex shrink-0 flex-col gap-1 bg-background/80 p-3 backdrop-blur-sm'
+            ? 'flex shrink-0 flex-col gap-1 bg-transparent px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:px-6 lg:px-8'
+            : 'flex shrink-0 flex-col gap-1 bg-background/80 px-3 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] backdrop-blur-sm'
         }
       >
         <div

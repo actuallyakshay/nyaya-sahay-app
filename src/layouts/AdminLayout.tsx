@@ -72,27 +72,25 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           : 'min-h-screen lg:h-[100dvh] lg:max-h-[100dvh] lg:min-h-0 lg:overflow-hidden'
       )}
     >
-      <header className="sticky top-0 z-50 border-b bg-card pt-[env(safe-area-inset-top,0px)] lg:hidden">
-        <div className="flex h-14 min-h-14 items-center justify-between gap-2 px-4">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="shrink-0 rounded-md p-2 hover:bg-muted"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1">
-            <BrandLogo
-              as="link"
-              to={ROUTES.admin.dashboard}
-              size="sm"
-              textVariant="headerCompact"
-            />
-          </div>
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
-            {user?.fullName?.charAt(0)?.toUpperCase() ?? 'A'}
-          </div>
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between gap-2 border-b bg-card px-4 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="shrink-0 rounded-md p-2 hover:bg-muted"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1">
+          <BrandLogo
+            as="link"
+            to={ROUTES.admin.dashboard}
+            size="sm"
+            textVariant="headerCompact"
+          />
+        </div>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-primary-foreground">
+          {user?.fullName?.charAt(0)?.toUpperCase() ?? 'A'}
         </div>
       </header>
 
@@ -111,7 +109,7 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           'w-60'
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col max-lg:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
           <div
             className={cn(
               'flex h-16 items-center px-5',
