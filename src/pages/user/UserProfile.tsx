@@ -27,8 +27,7 @@ const UserProfile = () => {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const isLawyer = getCookie('x-active-role') === 'lawyer';
   const profile = useProfilePage();
-  const { subscription, isLoading: subscriptionLoading } =
-    useActiveSubscription();
+  const { subscription } = useActiveSubscription();
   const lawyerApproved = isLawyer && isLawyerApprovedForPractice(user);
   const lp = user?.lawyerProfile;
   const showAdvisoryCardNotice =
