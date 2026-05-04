@@ -136,6 +136,14 @@ export const createAdminUser = (body) => {
   });
 };
 
+export const getAdminPayments = (params) => {
+  return apiClient({
+    method: routes.ADMIN_PAYMENTS.METHOD,
+    url: routes.ADMIN_PAYMENTS.URL,
+    params,
+  });
+};
+
 export const getAdminUsers = (params) => {
   return apiClient({
     method: routes.ADMIN_USERS.METHOD,
@@ -218,6 +226,13 @@ export const getAdminAnalytics = () => {
   });
 };
 
+export const getAdminSubscriptionAnalytics = () => {
+  return apiClient({
+    method: routes.ADMIN_SUBSCRIPTION_ANALYTICS.METHOD,
+    url: routes.ADMIN_SUBSCRIPTION_ANALYTICS.URL,
+  });
+};
+
 export const getLawyerAnalytics = () => {
   return apiClient({
     method: routes.LAWYER_ANALYTICS.METHOD,
@@ -297,6 +312,36 @@ export const getSubscriptionPlans = () => {
   return apiClient({
     method: routes.SUBSCRIPTION_PLANS.METHOD,
     url: routes.SUBSCRIPTION_PLANS.URL,
+  });
+};
+
+export const adminPatchSubscriptionPlan = (planId, body) => {
+  return apiClient({
+    method: routes.ADMIN_SUBSCRIPTION_PLAN_PATCH.METHOD,
+    url: routes.ADMIN_SUBSCRIPTION_PLAN_PATCH.URL.replace(':planId', planId),
+    data: body,
+  });
+};
+
+export const getMyRazorpaySubscription = () => {
+  return apiClient({
+    method: routes.RAZORPAY_SUBSCRIPTION_ME.METHOD,
+    url: routes.RAZORPAY_SUBSCRIPTION_ME.URL,
+  });
+};
+
+export const startRazorpaySubscription = (body) => {
+  return apiClient({
+    method: routes.RAZORPAY_SUBSCRIPTION_START.METHOD,
+    url: routes.RAZORPAY_SUBSCRIPTION_START.URL,
+    data: body,
+  });
+};
+
+export const cancelRazorpaySubscription = () => {
+  return apiClient({
+    method: routes.RAZORPAY_SUBSCRIPTION_CANCEL.METHOD,
+    url: routes.RAZORPAY_SUBSCRIPTION_CANCEL.URL,
   });
 };
 

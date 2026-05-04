@@ -5,7 +5,6 @@ import WithShimmer from '@/components/WithShimmer';
 import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { ROUTES, path } from '@/constants';
 import { AdminLayout } from '@/layouts/AdminLayout';
-import { mockPayments } from '@/lib/mock-data';
 import { useQuery } from '@tanstack/react-query';
 import { Briefcase, FileText, UserCheck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -24,6 +23,32 @@ const AdminDashboard = () => {
   const activeCases = analyticsData?.activeCases || 0;
   const resolvedCases = analyticsData?.resolvedCases || 0;
   const newCases = analyticsData?.newCases || [];
+  const recentPayments = analyticsData?.recentPayments || [];
+
+  /*
+
+{
+            "id": "68c30c53-c83e-4cf7-9321-4a3d515be5ae",
+            "userId": "230f3412-0665-4b2b-a8d7-6af126f4f0a7",
+            "subscriptionPlanId": "59073c76-cf8a-4a11-990d-5c2be88554bd",
+            "razorpaySubscriptionId": "sub_SlD28HMGelchiC",
+            "status": "active",
+            "currentPeriodStart": "2026-05-04T07:45:26.000Z",
+            "currentPeriodEnd": "2027-05-03T18:30:00.000Z",
+            "createdAt": "2026-05-04T02:15:11.461Z",
+            "updatedAt": "2026-05-04T02:15:40.190Z",
+            "user": {
+                "id": "230f3412-0665-4b2b-a8d7-6af126f4f0a7",
+                "fullName": "Akshay Rajput"
+            },
+            "subscriptionPlan": {
+                "id": "59073c76-cf8a-4a11-990d-5c2be88554bd",
+                "name": "Yearly",
+                "priceInr": "999.00",
+                "billingCycle": "yearly"
+            }
+        },
+  */
 
   return (
     <AdminLayout>
@@ -116,7 +141,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {newCases.length === 0 && (
+                {newCases.length === 0 && !isLoading && (
                   <tr>
                     <td
                       colSpan={5}
@@ -175,47 +200,74 @@ const AdminDashboard = () => {
               <thead className="border-b bg-muted/50">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Transaction
+                    Subscription ID
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                     User
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                    Amount
+                    Plan
                   </th>
                   <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">
-                    Method
+                    Billing
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    Amount (INR)
                   </th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                     Status
                   </th>
+                  <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">
+                    Period end
+                  </th>
+                  <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">
+                    Created
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {mockPayments.map((p) => (
+                {recentPayments.map((p) => (
                   <tr
                     key={p.id}
                     className="border-b last:border-0 hover:bg-muted/30"
                   >
                     <td className="px-4 py-3 font-mono text-xs">
-                      {p.transactionId}
+                      {p.razorpaySubscriptionId}
                     </td>
-                    <td className="px-4 py-3">{p.userName}</td>
+                    <td className="px-4 py-3">{p.user.fullName || '-'}</td>
+                    <td className="px-4 py-3">
+                      {p.subscriptionPlan.name || '-'}
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
+                      {p.subscriptionPlan.billingCycle || '-'}
+                    </td>
                     <td className="px-4 py-3 font-medium">
-                      ₹{p.amount.toLocaleString('en-IN')}
-                    </td>
-                    <td className="hidden px-4 py-3 text-xs uppercase text-muted-foreground sm:table-cell">
-                      {p.method.replace('_', ' ')}
+                      ₹
+                      {p.subscriptionPlan.priceInr.toLocaleString('en-IN') ||
+                        '-'}
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${p.status === 'success' ? 'bg-green-50 text-green-700' : p.status === 'pending' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${p.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
                       >
                         {p.status}
                       </span>
                     </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
+                      {p.currentPeriodEnd
+                        ? new Date(p.currentPeriodEnd).toLocaleDateString(
+                            'en-IN'
+                          )
+                        : '-'}
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">
+                      {p.createdAt
+                        ? new Date(p.createdAt).toLocaleDateString('en-IN')
+                        : '-'}
+                    </td>
                   </tr>
                 ))}
+                {isLoading && <CasesTableSkeleton length={3} />}
               </tbody>
             </table>
           </div>

@@ -1,7 +1,9 @@
 import { getAdminUserCases, getAdminUserDetails } from '@/api-client';
 import { UserCasesTable } from '@/components/user/UserCasesTable';
+import { UserPaymentsTable } from '@/components/user/UserPaymentsTable';
 import WithShimmer from '@/components/WithShimmer';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useAdminPayments } from '@/hooks/useAdminPayments';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { CasesResponse } from '@/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -19,6 +21,7 @@ const AdminUserDetail = () => {
       const response = await getAdminUserDetails(id);
       return response.data;
     },
+    enabled: Boolean(id),
   });
 
   const [page, setPage] = useState(1);
@@ -37,14 +40,21 @@ const AdminUserDetail = () => {
       const response = await getAdminUserCases(id, params);
       return response.data;
     },
+    enabled: Boolean(id),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+  });
+
+  const payments = useAdminPayments({
+    userId: id,
+    enabled: Boolean(id),
   });
 
   const cases = data?.data ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total ?? 0;
+  const casesLoading = isFetching;
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -55,11 +65,6 @@ const AdminUserDetail = () => {
     setStatusFilter(value);
     if (page !== 1) setPage(1);
   };
-
-  const userCases = [];
-  const userPayments = [];
-
-  const loading = isLoading || isFetching;
 
   return (
     <AdminLayout>
@@ -127,7 +132,7 @@ const AdminUserDetail = () => {
         <div>
           <UserCasesTable
             cases={cases}
-            isFetching={loading}
+            isFetching={casesLoading}
             isError={isError}
             totalPages={totalPages}
             total={total}
@@ -141,58 +146,21 @@ const AdminUserDetail = () => {
           />
         </div>
 
-        {/* Payments */}
-        <div>
-          <h2 className="mb-3 text-lg font-semibold">
-            Payments ({userPayments.length})
-          </h2>
-          {userPayments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No payments found.</p>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border bg-card">
-              <table className="w-full text-sm">
-                <thead className="border-b bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      Transaction
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      Amount
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userPayments.map((p) => (
-                    <tr key={p.id} className="border-b last:border-0">
-                      <td className="px-4 py-3 font-mono text-xs">
-                        {p.transactionId}
-                      </td>
-                      <td className="px-4 py-3 font-medium">
-                        ₹{p.amount.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${p.status === 'success' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {new Date(p.createdAt).toLocaleDateString('en-IN')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <UserPaymentsTable
+          hideUserColumn
+          rows={payments.rows}
+          isFetching={payments.isFetching}
+          isError={payments.isError}
+          totalPages={payments.totalPages}
+          total={payments.total}
+          page={payments.page}
+          setPage={payments.setPage}
+          search={payments.search}
+          statusFilter={payments.statusFilter}
+          handleSearchChange={payments.handleSearchChange}
+          handleStatusChange={payments.handleStatusChange}
+          refetch={payments.refetch}
+        />
       </div>
     </AdminLayout>
   );

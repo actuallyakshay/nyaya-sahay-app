@@ -71,6 +71,10 @@ const routes = {
     URL: '/api/admin/analytics',
     METHOD: 'GET',
   },
+  ADMIN_SUBSCRIPTION_ANALYTICS: {
+    URL: '/api/admin/subscription-analytics',
+    METHOD: 'GET',
+  },
   CASE_DETAILS: {
     URL: '/api/cases/:id',
     METHOD: 'GET',
@@ -98,6 +102,22 @@ const routes = {
   SUBSCRIPTION_PLANS: {
     URL: '/api/subscriptions',
     METHOD: 'GET',
+  },
+  ADMIN_SUBSCRIPTION_PLAN_PATCH: {
+    URL: '/api/admin/subscription-plans/:planId',
+    METHOD: 'PATCH',
+  },
+  RAZORPAY_SUBSCRIPTION_ME: {
+    URL: '/api/razorpay/subscriptions/me',
+    METHOD: 'GET',
+  },
+  RAZORPAY_SUBSCRIPTION_START: {
+    URL: '/api/razorpay/subscriptions/start',
+    METHOD: 'POST',
+  },
+  RAZORPAY_SUBSCRIPTION_CANCEL: {
+    URL: '/api/razorpay/subscriptions/me',
+    METHOD: 'DELETE',
   },
   LAWYERS_LIST: {
     URL: '/api/lawyers',
@@ -186,6 +206,10 @@ const routes = {
   ADMIN_CASE_MARK_CHAT_READ: {
     URL: '/api/admin/cases/:caseId/read-chat',
     METHOD: 'POST',
+  },
+  ADMIN_PAYMENTS: {
+    URL: '/api/admin/payments',
+    METHOD: 'GET',
   },
   ADMIN_USERS: {
     URL: '/api/admin/users',

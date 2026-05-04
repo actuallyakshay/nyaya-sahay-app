@@ -1,8 +1,8 @@
 import { getUserAnalytics } from '@/api-client';
+import { CaseCodeText } from '@/components/CaseCodeText';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 import SessionQueryPromptModal from '@/components/SessionQueryPromptModal';
 import { SkeletonCard } from '@/components/SkeletonCard';
-import { CaseCodeText } from '@/components/CaseCodeText';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import WithShimmer from '@/components/WithShimmer';
@@ -62,6 +62,7 @@ const UserDashboard = () => {
   const totalCases = analyticsData?.totalCasesCount || 0;
   const activeCasesCount = analyticsData?.activeCasesCount || 0;
   const emergencyCases = analyticsData?.emergencyCasesCount || 0;
+  const subscriptionPlan = analyticsData?.subscriptionPlan || null;
 
   return (
     <DashboardLayout>
@@ -111,7 +112,7 @@ const UserDashboard = () => {
             },
             {
               label: 'Plan',
-              value: analyticsData?.subscriptionPlan?.planName || 'Free',
+              value: subscriptionPlan?.subscription?.plan?.name || 'Free',
               icon: CreditCard,
               color: 'text-gold',
             },
@@ -189,7 +190,7 @@ const UserDashboard = () => {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 min-w-0 line-clamp-2 break-words font-medium">
+                      <p className="mt-1 line-clamp-2 min-w-0 break-words font-medium">
                         {c.title}
                       </p>
                       <p className="text-sm text-muted-foreground">

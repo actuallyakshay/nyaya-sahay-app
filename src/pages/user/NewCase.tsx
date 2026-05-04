@@ -1,12 +1,14 @@
 import { createCase, uploadAsset } from '@/api-client';
-import { ROUTES } from '@/constants';
 import { FileUpload } from '@/components/FileUpload';
+import PaywallModal from '@/components/PaywallModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import WithShimmer from '@/components/WithShimmer';
+import { ROUTES } from '@/constants';
 import { useToast } from '@/hooks/use-toast';
+import { useActiveSubscription } from '@/hooks/useActiveSubscription';
 import { useCategories } from '@/hooks/useCategories';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import {
@@ -45,7 +47,9 @@ const NewCase = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const { isActive } = useActiveSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
   const {
@@ -149,7 +153,7 @@ const NewCase = () => {
           <div className="space-y-2">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <Label htmlFor="title">Brief Title</Label>
-              <span className="text-xs text-muted-foreground tabular-nums">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 {title.length}/{CASE_TITLE_MAX_LENGTH}
               </span>
             </div>
@@ -162,8 +166,8 @@ const NewCase = () => {
               required
             />
             <p className="text-xs text-muted-foreground">
-              One line is enough. Put facts and background in detailed description
-              below (max {CASE_TITLE_MAX_LENGTH} characters).
+              One line is enough. Put facts and background in detailed
+              description below (max {CASE_TITLE_MAX_LENGTH} characters).
             </p>
           </div>
 
@@ -196,7 +200,14 @@ const NewCase = () => {
                 <input
                   type="checkbox"
                   checked={isEmergency}
-                  onChange={(e) => setIsEmergency(e.target.checked)}
+                  onChange={(e) => {
+                    const next = e.target.checked;
+                    if (next && !isActive) {
+                      setPaywallOpen(true);
+                      return;
+                    }
+                    setIsEmergency(next);
+                  }}
                   className="rounded"
                 />
                 Mark as Emergency
@@ -216,6 +227,18 @@ const NewCase = () => {
             {isPending ? 'Submitting...' : 'Submit Query'}
           </Button>
         </form>
+
+        <PaywallModal
+          open={paywallOpen}
+          onOpenChange={setPaywallOpen}
+          title="Emergency cases need a subscription"
+          description="Upgrade to Premium to mark your query as an emergency and get priority handling."
+          perks={[
+            'Emergency queries get priority in the queue',
+            'Faster advocate assignment when it matters',
+            'Full Premium access across the platform',
+          ]}
+        />
       </div>
     </DashboardLayout>
   );

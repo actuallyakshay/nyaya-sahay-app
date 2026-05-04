@@ -284,6 +284,76 @@ export interface Subscription {
   autoRenew: boolean;
 }
 
+/** Plan snapshot on subscription rows from GET /api/razorpay/subscriptions/me */
+export interface SubscriptionPlanSummary {
+  id: string;
+  slug: string;
+  name: string;
+  billingCycle: string;
+}
+
+/** One Razorpay-linked row from GET /api/razorpay/subscriptions/me */
+export interface UserSubscriptionHistoryRow {
+  id: string;
+  razorpaySubscriptionId: string;
+  status: string;
+  currentPeriodStart: string | null;
+  currentPeriodEnd: string | null;
+  createdAt: string;
+  updatedAt: string;
+  plan: SubscriptionPlanSummary;
+}
+
+/** GET /api/razorpay/subscriptions/me */
+export interface MyRazorpaySubscriptionsResponse {
+  hasActiveSubscription: boolean;
+  subscription: {
+    id: string;
+    status: string;
+    cancelledAtPeriodEnd: boolean;
+    currentPeriodStart: string | null;
+    currentPeriodEnd: string | null;
+    plan: SubscriptionPlanSummary;
+  } | null;
+}
+
+/** POST /api/razorpay/subscriptions/start */
+export interface StartRazorpaySubscriptionResponse {
+  subscriptionId: string;
+  status?: string;
+  shortUrl?: string;
+  razorpayKeyId: string;
+  planName: string;
+}
+
+/** GET /api/subscriptions (catalog) and plan rows inside admin subscription analytics. */
+export interface SubscriptionCatalogPlan {
+  id: string;
+  name: string;
+  slug?: string;
+  description: string | null;
+  features: string;
+  priceInr: string;
+  billingCycle: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Active subscriber count per catalog plan from admin subscription analytics. */
+export interface ActiveSubscriptionCountRow {
+  subscriptionPlanId: string;
+  name: string;
+  /** Backend may serialize as string (e.g. Postgres bigint). */
+  count: string | number;
+}
+
+/** GET /api/admin/subscription-analytics */
+export interface AdminSubscriptionAnalyticsResponse {
+  subscriptionPlans: SubscriptionCatalogPlan[];
+  activeSubscriptionCounts: ActiveSubscriptionCountRow[];
+}
+
 export interface Notification {
   id: string;
   title: string;
@@ -304,6 +374,40 @@ export interface Payment {
   planName: string;
   transactionId: string;
   createdAt: string;
+}
+
+/** Nested user on GET /api/admin/payments when rows are subscriptions. */
+export interface AdminPaymentListUserNested {
+  id: string;
+  fullName: string;
+  email?: string | null;
+  phone?: string | null;
+}
+
+/** Nested plan on GET /api/admin/payments when rows are subscriptions. */
+export interface AdminPaymentListPlanNested {
+  id: string;
+  name: string;
+  priceInr: string | number;
+  billingCycle?: string | null;
+}
+
+/** GET /api/admin/payments — one row (Razorpay subscription list). */
+export interface AdminPaymentsSubscriptionRow {
+  id: string;
+  razorpaySubscriptionId: string;
+  status: string;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  createdAt: string;
+  updatedAt?: string;
+  user?: AdminPaymentListUserNested | null;
+  subscriptionPlan?: AdminPaymentListPlanNested | null;
+}
+
+export interface AdminPaymentsListResponse {
+  data: AdminPaymentsSubscriptionRow[];
+  pagination: Pagination;
 }
 
 export interface LawyersListUser {

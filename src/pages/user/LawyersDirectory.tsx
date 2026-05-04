@@ -1,5 +1,6 @@
 import { getLawyersList } from '@/api-client';
 import { PaginationControls } from '@/components/PaginationControls';
+import PaywallModal from '@/components/PaywallModal';
 import WithShimmer from '@/components/WithShimmer';
 import {
   Tooltip,
@@ -7,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useActiveSubscription } from '@/hooks/useActiveSubscription';
 import { useIsTruncated } from '@/hooks/useIsTruncated';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { calculateYearsOfExperience } from '@/lib/helpers';
@@ -41,25 +43,33 @@ const LawyerBio = ({ bio }: { bio?: string }) => {
 
 const LawyersDirectory = () => {
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(30);
   const [orderBy] = useState('createdAt');
   const [order] = useState('ASC');
+  const { isActive, isLoading: subscriptionLoading } = useActiveSubscription();
+
+  const subscriptionGateResolved = !subscriptionLoading;
+  const hasDirectoryAccess = subscriptionGateResolved && isActive;
+  const paywallOpen = subscriptionGateResolved && !isActive;
 
   const {
     data: lawyersData,
-    isLoading,
+    isLoading: lawyersLoading,
     error,
   } = useQuery({
     queryKey: ['lawyersList', page, limit, orderBy, order],
     queryFn: async () => {
-      const response = await getLawyersList({
-        page,
-        limit,
-        orderBy,
-        order,
-      });
+      const response = !hasDirectoryAccess
+        ? { data: [], pagination: { total: 0, totalPages: 0 } }
+        : await getLawyersList({
+            page,
+            limit,
+            orderBy,
+            order,
+          });
       return response.data;
     },
+    enabled: hasDirectoryAccess,
   });
 
   const lawyers = lawyersData?.data || [];
@@ -88,7 +98,7 @@ const LawyersDirectory = () => {
         </div>
 
         <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {isLoading ? (
+          {subscriptionLoading || (hasDirectoryAccess && lawyersLoading) ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="rounded-xl border bg-card p-5">
                 <div className="flex items-start gap-3">
@@ -115,7 +125,7 @@ const LawyersDirectory = () => {
                 </div>
               </div>
             ))
-          ) : error ? (
+          ) : !hasDirectoryAccess ? null : error ? (
             <div className="col-span-full rounded-xl border bg-card p-8 text-center">
               <p className="text-destructive">
                 Failed to load lawyers. Please try again.
@@ -156,7 +166,7 @@ const LawyersDirectory = () => {
                         <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-600" />
                       )}
                     </div>
-                    <p className="mt-0.5 break-words text-xs leading-snug text-muted-foreground line-clamp-2">
+                    <p className="mt-0.5 line-clamp-2 break-words text-xs leading-snug text-muted-foreground">
                       {l.degree || 'Degree not specified'}
                     </p>
                   </div>
@@ -197,7 +207,7 @@ const LawyersDirectory = () => {
           )}
         </div>
 
-        {!isLoading && !error && (
+        {hasDirectoryAccess && !lawyersLoading && !error && (
           <PaginationControls
             page={page}
             totalPages={totalPages}
@@ -207,6 +217,19 @@ const LawyersDirectory = () => {
             onPrev={handlePrevPage}
           />
         )}
+
+        <PaywallModal
+          open={paywallOpen}
+          onOpenChange={() => {}}
+          showCloseButton={false}
+          title="Lawyer directory is for subscribers"
+          description="Activate a plan to browse verified advocates, credentials, and practice areas on the platform."
+          perks={[
+            'See full profiles, experience, and specializations',
+            'Bar verification and bios in one place',
+            'Included with every paid subscription',
+          ]}
+        />
       </div>
     </DashboardLayout>
   );
