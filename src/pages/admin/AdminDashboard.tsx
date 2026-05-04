@@ -6,7 +6,13 @@ import { CasesTableSkeleton } from '@/components/skeletons/CasesTableSkeleton';
 import { ROUTES, path } from '@/constants';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
-import { Briefcase, FileText, UserCheck, Users } from 'lucide-react';
+import {
+  Briefcase,
+  CreditCard,
+  FileText,
+  UserCheck,
+  Users,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -24,31 +30,7 @@ const AdminDashboard = () => {
   const resolvedCases = analyticsData?.resolvedCases || 0;
   const newCases = analyticsData?.newCases || [];
   const recentPayments = analyticsData?.recentPayments || [];
-
-  /*
-
-{
-            "id": "68c30c53-c83e-4cf7-9321-4a3d515be5ae",
-            "userId": "230f3412-0665-4b2b-a8d7-6af126f4f0a7",
-            "subscriptionPlanId": "59073c76-cf8a-4a11-990d-5c2be88554bd",
-            "razorpaySubscriptionId": "sub_SlD28HMGelchiC",
-            "status": "active",
-            "currentPeriodStart": "2026-05-04T07:45:26.000Z",
-            "currentPeriodEnd": "2027-05-03T18:30:00.000Z",
-            "createdAt": "2026-05-04T02:15:11.461Z",
-            "updatedAt": "2026-05-04T02:15:40.190Z",
-            "user": {
-                "id": "230f3412-0665-4b2b-a8d7-6af126f4f0a7",
-                "fullName": "Akshay Rajput"
-            },
-            "subscriptionPlan": {
-                "id": "59073c76-cf8a-4a11-990d-5c2be88554bd",
-                "name": "Yearly",
-                "priceInr": "999.00",
-                "billingCycle": "yearly"
-            }
-        },
-  */
+  const activeSubscriptions = analyticsData?.activeSubscriptions || 0;
 
   return (
     <AdminLayout>
@@ -60,7 +42,7 @@ const AdminDashboard = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           {[
             {
               label: 'Users',
@@ -81,10 +63,16 @@ const AdminDashboard = () => {
               color: 'text-foreground',
             },
             {
-              label: 'Resolved',
+              label: 'Resolved Cases',
               value: resolvedCases,
               icon: FileText,
               color: 'text-success',
+            },
+            {
+              label: 'Active Subscriptions',
+              value: activeSubscriptions,
+              icon: CreditCard,
+              color: 'text-gold',
             },
           ].map((s) => (
             <div
