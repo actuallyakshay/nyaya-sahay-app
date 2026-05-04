@@ -1,0 +1,75 @@
+<div
+  class='samvidhan-advisory-card'
+  style="box-sizing:border-box;width:100%;max-width:640px;margin:0 auto;padding:28px 32px;background:#fff;color:#171717;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;border:2px solid #c9a227;border-radius:12px;"
+>
+  <div
+    style='display:flex;align-items:center;gap:16px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid #e8e4d4;'
+  >
+    <img
+      src='{{logoUrl}}'
+      alt='Samvidhan'
+      width='56'
+      height='56'
+      style='display:block;width:56px;height:56px;object-fit:contain;flex-shrink:0;'
+    />
+    <div>
+      <div
+        style='font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#7a6a2e;font-weight:600;'
+      >
+        Samvidhan Legal Advisory
+      </div>
+      <div
+        style='font-size:20px;font-weight:700;color:#1a1508;margin-top:4px;line-height:1.2;'
+      >
+        Membership card
+      </div>
+    </div>
+  </div>
+
+  <div style='font-size:13px;color:#444;margin-bottom:20px;'>
+    This card confirms an active subscription on the Samvidhan Legal Advisory
+    platform. Keep a copy for your records.
+  </div>
+
+  <table style='width:100%;border-collapse:collapse;font-size:14px;'>
+    <tr>
+      <td style='padding:10px 0;color:#666;width:38%;vertical-align:top;'>Member
+        name</td>
+      <td
+        style='padding:10px 0;font-weight:600;color:#111;vertical-align:top;'
+      >{{memberName}}</td>
+    </tr>
+    <tr>
+      <td style='padding:10px 0;color:#666;vertical-align:top;'>Membership no.</td>
+      <td
+        style='padding:10px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-weight:600;letter-spacing:0.04em;color:#111;vertical-align:top;'
+      >{{memNumber}}</td>
+    </tr>
+    <tr>
+      <td style='padding:10px 0;color:#666;vertical-align:top;'>Plan</td>
+      <td
+        style='padding:10px 0;font-weight:600;color:#111;vertical-align:top;'
+      >{{planName}}</td>
+    </tr>
+    <tr>
+      <td style='padding:10px 0;color:#666;vertical-align:top;'>Valid from</td>
+      <td
+        style='padding:10px 0;font-weight:600;color:#111;vertical-align:top;'
+      >{{validFrom}}</td>
+    </tr>
+    <tr>
+      <td style='padding:10px 0;color:#666;vertical-align:top;'>Valid till</td>
+      <td
+        style='padding:10px 0;font-weight:600;color:#111;vertical-align:top;'
+      >{{validTill}}</td>
+    </tr>
+  </table>
+
+  <div
+    style='margin-top:22px;padding:12px 14px;background:linear-gradient(135deg,#faf6e8 0%,#fff9e6 100%);border-radius:8px;border:1px solid #e8dfbf;font-size:11px;line-height:1.55;color:#5c5428;'
+  >
+    Issued on
+    {{issuedOn}}. This document is generated from your account and is not a
+    substitute for legal advice or a lawyer–client relationship.
+  </div>
+</div>

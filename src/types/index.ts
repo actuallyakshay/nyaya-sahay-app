@@ -460,6 +460,7 @@ export interface AuthUser {
   email: string;
   phone?: string;
   avatarUrl?: string;
+  memNumber: string;
   roles: UserRole[];
   isProfileCompleted?: boolean;
   provider: 'email' | 'google';
