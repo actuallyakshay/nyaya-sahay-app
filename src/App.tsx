@@ -16,6 +16,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
 import AdminLoginPage from './pages/AdminLoginPage';
+import DpdpConsentPage from './pages/DpdpConsentPage';
 import FAQPage from './pages/FAQPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import Index from './pages/Index';
@@ -73,6 +74,7 @@ const AppInner = () => (
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
             <Route path={ROUTES.faq} element={<FAQPage />} />
+            <Route path={ROUTES.dpdpConsent} element={<DpdpConsentPage />} />
             <Route path={ROUTES.login} element={<LoginPage />} />
             <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
 

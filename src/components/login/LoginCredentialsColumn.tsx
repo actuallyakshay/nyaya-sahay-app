@@ -1,7 +1,9 @@
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { BrandLogo } from '@/components/BrandLogo';
+import { LoginDpdpConsent } from '@/components/login/LoginDpdpConsent';
 import { LoginRoleToggle } from '@/components/login/LoginRoleToggle';
 import type { LoginRole } from '@/components/login/LoginRoleToggle';
+import { useState } from 'react';
 
 interface LoginCredentialsColumnProps {
   role: LoginRole;
@@ -16,6 +18,8 @@ export function LoginCredentialsColumn({
   onGoogleSuccess,
   onAdminOtp,
 }: LoginCredentialsColumnProps) {
+  const [dpdpConsentAccepted, setDpdpConsentAccepted] = useState(false);
+
   return (
     <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
       <div className="w-full max-w-md">
@@ -29,7 +33,13 @@ export function LoginCredentialsColumn({
         </p>
 
         <LoginRoleToggle value={role} onChange={onRoleChange} />
-        <GoogleLoginButton role={role} onSuccess={onGoogleSuccess} onAdminOtp={onAdminOtp} />
+        <LoginDpdpConsent checked={dpdpConsentAccepted} onCheckedChange={setDpdpConsentAccepted} />
+        <GoogleLoginButton
+          role={role}
+          dpdpConsentAccepted={dpdpConsentAccepted}
+          onSuccess={onGoogleSuccess}
+          onAdminOtp={onAdminOtp}
+        />
       </div>
     </div>
   );

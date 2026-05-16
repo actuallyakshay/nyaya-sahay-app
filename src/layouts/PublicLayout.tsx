@@ -134,6 +134,14 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   </a>
                 </li>
                 <li>
+                  <Link
+                    to={ROUTES.dpdpConsent}
+                    className="hover:text-primary-foreground"
+                  >
+                    DPDP Consent
+                  </Link>
+                </li>
+                <li>
                   <a href="#" className="hover:text-primary-foreground">
                     Privacy Policy
                   </a>

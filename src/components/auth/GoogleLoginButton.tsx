@@ -1,3 +1,4 @@
+import { DPDP_CONSENT_REQUIRED_TOAST } from '@/components/login/LoginDpdpConsent';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface GoogleLoginButtonProps {
   role: UserRole;
+  dpdpConsentAccepted: boolean;
   onSuccess: () => void;
   onAdminOtp?: (args: { email: string; expiresInSeconds: number; message?: string }) => void;
 }
@@ -45,15 +47,28 @@ function GoogleGMark({ className }: { className?: string }) {
 const googleSignInChrome =
   'flex h-10 w-full items-center justify-center gap-3 rounded-full border border-border bg-card text-sm font-medium text-muted-foreground shadow-sm transition-colors group-hover:border-gold/40 group-hover:bg-gold/10 group-hover:text-foreground';
 
-const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonProps) => {
+const GoogleLoginButton = ({
+  role,
+  dpdpConsentAccepted,
+  onSuccess,
+  onAdminOtp,
+}: GoogleLoginButtonProps) => {
   const { googleLogin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const nativeShell = isReactNativeWebView();
 
+  const requireDpdpConsent = useCallback(() => {
+    if (dpdpConsentAccepted) return true;
+    toast({ ...DPDP_CONSENT_REQUIRED_TOAST, variant: 'destructive' });
+    return false;
+  }, [dpdpConsentAccepted, toast]);
+
   const finishWithIdToken = useCallback(
     async (idToken: string) => {
+      if (!requireDpdpConsent()) return;
+
       if (!idToken) {
         toast({
           title: 'Google sign-in failed',
@@ -101,7 +116,7 @@ const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonPro
         setIsLoading(false);
       }
     },
-    [googleLogin, navigate, onAdminOtp, onSuccess, role, toast]
+    [googleLogin, navigate, onAdminOtp, onSuccess, requireDpdpConsent, role, toast]
   );
 
   useEffect(() => {
@@ -116,6 +131,7 @@ const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonPro
   }, [finishWithIdToken, nativeShell]);
 
   const requestNativeGoogleSignIn = () => {
+    if (!requireDpdpConsent()) return;
     const bridge = (window as Window & { ReactNativeWebView?: { postMessage(msg: string): void } })
       .ReactNativeWebView;
     bridge?.postMessage(JSON.stringify({ type: 'REQUEST_GOOGLE_SIGN_IN', role }));
@@ -168,7 +184,12 @@ const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonPro
               <GoogleGMark className="h-5 w-5 shrink-0" />
               Sign in with Google
             </div>
-            <div className="absolute inset-0 z-[1] overflow-hidden rounded-full opacity-0">
+            <div
+              className={cn(
+                'absolute inset-0 z-[1] overflow-hidden rounded-full opacity-0',
+                !dpdpConsentAccepted && 'pointer-events-none'
+              )}
+            >
               <GoogleLogin
                 onSuccess={handleCredentialResponse}
                 onError={handleError}
@@ -185,6 +206,14 @@ const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonPro
                 }}
               />
             </div>
+            {!dpdpConsentAccepted ? (
+              <button
+                type="button"
+                className="absolute inset-0 z-[2] cursor-pointer rounded-full bg-transparent"
+                onClick={() => requireDpdpConsent()}
+                aria-label="Accept DPDP consent to sign in with Google"
+              />
+            ) : null}
           </div>
         )}
       </div>

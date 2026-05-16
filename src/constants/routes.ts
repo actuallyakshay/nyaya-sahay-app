@@ -17,6 +17,7 @@ export const ROUTES = {
   about: '/about',
   howItWorks: '/how-it-works',
   faq: '/faq',
+  dpdpConsent: '/dpdp-consent',
   login: '/login',
   register: '/login',
   forgotPassword: '/forgot-password',
