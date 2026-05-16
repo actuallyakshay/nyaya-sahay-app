@@ -100,27 +100,23 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               <h4 className="mb-3 text-sm font-semibold text-gold">Platform</h4>
               <ul className="space-y-2 text-sm text-primary-foreground/70">
                 <li>
-                  <Link
-                    to={ROUTES.plans}
-                    className="hover:text-primary-foreground"
-                  >
-                    Subscription Plans
+                  <Link to={ROUTES.home} className="hover:text-primary-foreground">
+                    Home
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to={ROUTES.howItWorks}
-                    className="hover:text-primary-foreground"
-                  >
-                    How It Works
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to={ROUTES.faq}
-                    className="hover:text-primary-foreground"
-                  >
+                  <Link to={ROUTES.faq} className="hover:text-primary-foreground">
                     FAQ
+                  </Link>
+                </li>
+                <li>
+                  <a href="/#case-flow" className="hover:text-primary-foreground">
+                    Case flow
+                  </a>
+                </li>
+                <li>
+                  <Link to={ROUTES.about} className="hover:text-primary-foreground">
+                    About
                   </Link>
                 </li>
               </ul>
@@ -129,27 +125,17 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               <h4 className="mb-3 text-sm font-semibold text-gold">Legal</h4>
               <ul className="space-y-2 text-sm text-primary-foreground/70">
                 <li>
-                  <a href="#" className="hover:text-primary-foreground">
-                    Terms of Service
-                  </a>
+                  <Link to={ROUTES.terms} className="hover:text-primary-foreground">
+                    Terms & conditions
+                  </Link>
                 </li>
                 <li>
                   <Link
                     to={ROUTES.dpdpConsent}
                     className="hover:text-primary-foreground"
                   >
-                    DPDP Consent
+                    DPDP consent
                   </Link>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary-foreground">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary-foreground">
-                    Refund Policy
-                  </a>
                 </li>
               </ul>
             </div>

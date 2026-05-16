@@ -13,11 +13,13 @@ export const PATH_PREFIX = {
 /** Static marketing / auth paths */
 export const ROUTES = {
   home: '/',
+  faq: '/faq',
+  terms: '/terms',
+  dpdpConsent: '/dpdp-consent',
+  /** @deprecated Public marketing removed — redirects to home */
   plans: '/plans',
   about: '/about',
   howItWorks: '/how-it-works',
-  faq: '/faq',
-  dpdpConsent: '/dpdp-consent',
   login: '/login',
   register: '/login',
   forgotPassword: '/forgot-password',

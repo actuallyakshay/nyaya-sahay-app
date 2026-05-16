@@ -7,10 +7,10 @@ import { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const quickLinks = [
-  { label: 'Plans & pricing', to: ROUTES.plans },
-  { label: 'How it works', to: ROUTES.howItWorks },
+  { label: 'Home', to: ROUTES.home },
+  { label: 'Case flow', to: '/#case-flow' },
+  { label: 'About', to: ROUTES.about },
   { label: 'FAQ', to: ROUTES.faq },
-  { label: 'About us', to: ROUTES.about },
   { label: 'Sign in', to: ROUTES.login },
 ] as const;
 
@@ -37,13 +37,11 @@ const NotFound = () => {
             Page not found
           </p>
           <h1 className="mt-2 font-serif text-3xl font-bold text-navy md:text-4xl">
-            We couldn’t open that page
+            We couldn’t find that page
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            The address may be mistyped, or the page may have moved. Samvidhan
-            Legal Advisory is here to help you reach verified advocates and
-            manage your legal
-            matters—let’s get you back on track.
+            The link may be wrong or the page was removed. Head back home or sign in to your
+            dashboard.
           </p>
 
           {location.pathname !== '/' && (
@@ -69,25 +67,20 @@ const NotFound = () => {
             </Button>
           </div>
 
-          <div className="mt-10 border-t pt-8">
-            <p className="text-sm font-medium text-foreground">
-              Popular next steps
-            </p>
-            <nav
-              className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm"
-              aria-label="Helpful links"
-            >
-              {quickLinks.map(({ label, to }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className="text-primary underline-offset-4 hover:text-primary/90 hover:underline"
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
+          <nav
+            className="mt-10 flex flex-wrap justify-center gap-x-4 gap-y-2 border-t pt-8 text-sm"
+            aria-label="Helpful links"
+          >
+            {quickLinks.map(({ label, to }) => (
+              <Link
+                key={to}
+                to={to}
+                className="text-primary underline-offset-4 hover:text-primary/90 hover:underline"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </PublicLayout>

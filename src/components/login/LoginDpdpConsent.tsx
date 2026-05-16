@@ -26,16 +26,25 @@ export function LoginDpdpConsent({ checked, onCheckedChange }: LoginDpdpConsentP
         className="mt-0.5"
       />
       <Label htmlFor={id} className="cursor-pointer text-sm font-normal leading-snug text-muted-foreground">
-        I have read and agree to the{' '}
+        I agree to the{' '}
         <Link
           to={ROUTES.dpdpConsent}
           className="font-medium text-foreground underline underline-offset-2 hover:text-gold"
           target="_blank"
           rel="noopener noreferrer"
         >
-          DPDP consent notice
-        </Link>
-        , including processing of my personal data and case-related information on this platform.
+          DPDP notice
+        </Link>{' '}
+        and{' '}
+        <Link
+          to={ROUTES.terms}
+          className="font-medium text-foreground underline underline-offset-2 hover:text-gold"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          terms
+        </Link>{' '}
+        for processing my data and case information.
       </Label>
     </div>
   );

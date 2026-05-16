@@ -1,46 +1,70 @@
 import { BrandLogo } from '@/components/BrandLogo';
+import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { Shield, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const AboutPage = () => (
   <PublicLayout>
-    <section className="py-16 md:py-24">
-      <div className="container max-w-3xl">
-        <h1 className="text-3xl font-bold sm:text-4xl text-center">
-          About Samvidhan Legal Advisory
-        </h1>
-        <p className="mt-4 text-center text-muted-foreground">Bridging the gap between Indian citizens and accessible, affordable legal aid.</p>
+    <section className="py-12 md:py-16">
+      <div className="container max-w-2xl">
+        <h1 className="text-2xl font-bold sm:text-3xl">About Samvidhan Legal Advisory</h1>
+        <p className="mt-3 text-muted-foreground">
+          We connect Indian citizens with verified advocates through a simple online case
+          workspace—so legal help is easier to access, not harder to find.
+        </p>
 
-        <div className="mt-12 space-y-8 text-sm leading-relaxed">
+        <div className="mt-10 space-y-8">
           <div className="flex gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10">
               <BrandLogo as="div" showText={false} size={32} className="gap-0" />
             </div>
             <div>
-              <h3 className="font-semibold text-base">Our Mission</h3>
-              <p className="mt-1 text-muted-foreground">
-                Samvidhan Legal Advisory was founded to make quality legal
-                services accessible to every Indian — regardless of geography,
-                language, or financial background. We connect citizens with
-                verified advocates through a simple subscription model.
+              <h2 className="font-semibold">Our mission</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Make quality legal support reachable regardless of city or background. You manage
+                cases, documents, and messages in one place; we handle verification and matching.
               </p>
             </div>
           </div>
           <div className="flex gap-4">
-            <div className="shrink-0 h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center"><Shield className="h-5 w-5 text-gold" /></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10">
+              <Shield className="h-5 w-5 text-gold" />
+            </div>
             <div>
-              <h3 className="font-semibold text-base">Trust & Security</h3>
-              <p className="mt-1 text-muted-foreground">All lawyers on our platform are Bar Council verified. Your documents and communications are encrypted. We follow strict data protection practices aligned with Indian IT Act provisions.</p>
+              <h2 className="font-semibold">Trust & data protection</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Advocates are Bar Council verified. Your case data is handled under our{' '}
+                <Link to={ROUTES.dpdpConsent} className="font-medium text-foreground underline-offset-4 hover:underline">
+                  DPDP notice
+                </Link>
+                . Read our{' '}
+                <Link to={ROUTES.terms} className="font-medium text-foreground underline-offset-4 hover:underline">
+                  terms
+                </Link>{' '}
+                before signing in.
+              </p>
             </div>
           </div>
           <div className="flex gap-4">
-            <div className="shrink-0 h-10 w-10 rounded-lg bg-gold/10 flex items-center justify-center"><Users className="h-5 w-5 text-gold" /></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/10">
+              <Users className="h-5 w-5 text-gold" />
+            </div>
             <div>
-              <h3 className="font-semibold text-base">Our Network</h3>
-              <p className="mt-1 text-muted-foreground">We have a growing network of 80+ verified advocates specializing in civil, criminal, family, corporate, and consumer law across major Indian cities.</p>
+              <h2 className="font-semibold">Practice areas</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Civil, criminal, family, property, consumer, corporate, and more—choose a category
+                when you open a case and we match you with a suitable advocate.
+              </p>
             </div>
           </div>
         </div>
+
+        <p className="mt-10 text-sm text-muted-foreground">
+          <Link to={ROUTES.home} className="font-medium text-foreground underline-offset-4 hover:underline">
+            ← Back to home
+          </Link>
+        </p>
       </div>
     </section>
   </PublicLayout>

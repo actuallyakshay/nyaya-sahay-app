@@ -1,483 +1,364 @@
 import { BrandLogo } from '@/components/BrandLogo';
 import { Button } from '@/components/ui/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { ROUTES } from '@/constants';
 import { PublicLayout } from '@/layouts/PublicLayout';
-import { mockPlans } from '@/lib/mock-data';
-import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BadgeCheck,
-  CheckCircle2,
+  Bell,
+  Briefcase,
   Clock,
   FileText,
+  FolderOpen,
   Gavel,
   MessageSquare,
   Scale,
   Shield,
-  Star,
-  Users,
+  Upload,
+  UserCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.1,
-      duration: 0.5,
-      ease: [0, 0, 0.2, 1] as const,
-    },
-  }),
-};
 
 const features = [
   {
     icon: BadgeCheck,
-    title: 'Verified Advocates',
-    desc: 'Every lawyer is bar-verified with High Court and District Court credentials.',
+    title: 'Verified advocates',
+    desc: 'Every lawyer is checked against Bar Council registration before joining the network.',
+  },
+  {
+    icon: Briefcase,
+    title: 'Case management',
+    desc: 'Open matters, track status, and keep everything related to one issue in a single workspace.',
   },
   {
     icon: Shield,
-    title: 'Fully Encrypted',
-    desc: 'Your documents, chats, and consultations are end-to-end encrypted.',
-  },
-  {
-    icon: Clock,
-    title: '24-Hour Response',
-    desc: 'Get matched with a lawyer and receive initial advice within 24 hours.',
+    title: 'Secure documents',
+    desc: 'Upload notices, agreements, and evidence. Share them only with your assigned advocate.',
   },
   {
     icon: MessageSquare,
-    title: 'Chat, Call & Video',
-    desc: 'Consult your lawyer via text, phone call, or video — whatever works for you.',
+    title: 'Case chat',
+    desc: 'Message your lawyer inside the case—no scattered WhatsApp or email threads.',
   },
   {
-    icon: FileText,
-    title: 'Document Drafting',
-    desc: 'Get legal notices, agreements, and petitions drafted by experts.',
+    icon: Clock,
+    title: 'Timely updates',
+    desc: 'See when your case is reviewed, assigned, or needs your input.',
   },
   {
-    icon: Users,
-    title: 'All Categories',
-    desc: 'Civil, criminal, family, corporate, property, consumer law — all covered.',
+    icon: Bell,
+    title: 'Notifications',
+    desc: 'Get alerts for new messages and important case activity.',
   },
 ];
 
-const steps = [
+/** End-to-end flow after sign-in (matches the product). */
+const caseFlowSteps = [
   {
-    num: '01',
-    title: 'Choose a Plan',
-    desc: 'Pick from affordable monthly or yearly subscriptions that fit your needs.',
+    icon: UserCheck,
+    title: 'Sign in & consent',
+    desc: 'Sign in with Google, accept the DPDP notice and terms, then land on your dashboard.',
+  },
+  {
+    icon: Scale,
+    title: 'Subscription (if required)',
+    desc: 'Active subscription unlocks new cases. You can view or manage plans from your dashboard.',
+  },
+  {
+    icon: FileText,
+    title: 'Raise a new case',
+    desc: 'Pick a legal category, add a short title and detailed description, and mark urgent matters if needed.',
+  },
+  {
+    icon: Upload,
+    title: 'Attach documents',
+    desc: 'Upload PDFs, images, or other files so your advocate has context from day one.',
+  },
+  {
+    icon: Gavel,
+    title: 'Review & assignment',
+    desc: 'Our team reviews your request and assigns a verified advocate suited to your category.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'Consult & follow up',
+    desc: 'Use case chat to ask questions, share updates, and receive guidance on next steps.',
+  },
+  {
+    icon: FolderOpen,
+    title: 'Documents & status',
+    desc: 'Open the case anytime to see status, files, and message history until the matter progresses.',
+  },
+];
+
+const legalHighlights = [
+  {
+    title: 'DPDP consent',
+    summary:
+      'We explain what personal and case data we collect, why we use it, who can access it (your advocate and platform admins), and your rights under India’s DPDP Act, 2023.',
+    to: ROUTES.dpdpConsent,
+    cta: 'Read full DPDP notice',
+    icon: Shield,
+  },
+  {
+    title: 'Terms & conditions',
+    summary:
+      'Covers how the platform works, your responsibilities when submitting cases, subscriptions, advocate relationships, and limits of our service.',
+    to: ROUTES.terms,
+    cta: 'Read full terms',
     icon: Scale,
   },
+];
+
+const faqs = [
   {
-    num: '02',
-    title: 'Describe Your Issue',
-    desc: 'Tell us about your legal matter and upload relevant documents securely.',
-    icon: FileText,
+    q: 'What is Samvidhan Legal Advisory?',
+    a: 'An online platform to open legal cases, upload documents, and work with verified advocates—without visiting multiple offices for every update.',
   },
   {
-    num: '03',
-    title: 'Get Expert Help',
-    desc: 'A qualified advocate is assigned and reaches out within 24 hours.',
-    icon: Gavel,
+    q: 'How does the case flow work?',
+    a: 'Sign in → (subscribe if needed) → New Case → fill category, title, description, files → we assign a lawyer → you chat and track status on the case page.',
   },
   {
-    num: '04',
-    title: 'Resolve with Confidence',
-    desc: 'Receive advice, drafts, and representation support to resolve your case.',
-    icon: CheckCircle2,
+    q: 'Is my case information private?',
+    a: 'Yes. Case data is shared with your assigned advocate and platform staff only for verification and support. Details are in our DPDP notice.',
+  },
+  {
+    q: 'Do I need to accept DPDP and terms?',
+    a: 'Yes. You must accept both at login before using the platform. Links are on this page and on the sign-in screen.',
+  },
+  {
+    q: 'Can I upload documents with my case?',
+    a: 'Yes. When raising a case you can attach relevant files so your advocate can review them securely.',
+  },
+  {
+    q: 'How do I start?',
+    a: 'Click Sign in, complete consent, then use “New Case” from your dashboard.',
   },
 ];
 
-const stats = [
-  { value: '1,200+', label: 'Active Users' },
-  { value: '500+', label: 'Verified Lawyers' },
-  { value: '98%', label: 'Satisfaction Rate' },
-  { value: '24 hrs', label: 'Avg. Response Time' },
-];
-
-const testimonials = [
-  {
-    name: 'Ananya M.',
-    location: 'Mumbai',
-    text: 'Samvidhan Legal Advisory helped me resolve a property dispute that had been going on for 2 years. The lawyer was incredibly knowledgeable and responsive.',
-    rating: 5,
-  },
-  {
-    name: 'Rajesh K.',
-    location: 'Delhi',
-    text: 'Got expert consumer court guidance within hours. The subscription model makes legal help so affordable. Highly recommend to every family.',
-    rating: 5,
-  },
-  {
-    name: 'Priya S.',
-    location: 'Bangalore',
-    text: "The video consultation feature is amazing. I didn't have to travel anywhere and still got proper legal advice for my employment issue.",
-    rating: 5,
-  },
-];
-
-const Homepage = () => {
-  return (
-    <PublicLayout>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-navy">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(43_55%_52%_/_0.12),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_hsl(220_40%_30%_/_0.5),_transparent_60%)]" />
-        <div className="container relative py-12 md:py-14 lg:py-16">
-          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-10">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
-              <motion.div variants={fadeUp} custom={0}>
-                <BrandLogo
-                  as="div"
-                  showText={false}
-                  size={64}
-                  className="gap-0"
-                />
-              </motion.div>
-              <motion.div
-                variants={fadeUp}
-                custom={1}
-                className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm font-medium text-gold"
-              >
-                <Star className="h-3.5 w-3.5 fill-current" /> Trusted by 1,200+
-                users across India
-              </motion.div>
-              <motion.h1
-                variants={fadeUp}
-                custom={2}
-                className="text-3xl font-bold leading-[1.1] text-primary-foreground sm:text-4xl md:text-5xl lg:text-[3.5rem]"
-              >
-                Affordable Legal Help,{' '}
-                <span className="text-gold">Now Accessible</span> to Every
-                Indian
-              </motion.h1>
-              <motion.p
-                variants={fadeUp}
-                custom={3}
-                className="max-w-lg text-base text-primary-foreground/70 sm:text-lg"
-              >
-                Subscribe to expert legal assistance. Get matched with verified
-                advocates for property disputes, consumer complaints, family
-                law, and more.
-              </motion.p>
-              <motion.div
-                variants={fadeUp}
-                custom={4}
-                className="flex flex-col gap-3 sm:flex-row"
-              >
-                <Button
-                  size="lg"
-                  className="bg-gold text-accent-foreground shadow-lg shadow-gold/20 hover:bg-gold/90"
-                  asChild
-                >
-                  <Link to={ROUTES.plans}>
-                    View Plans & Pricing <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary-foreground/20 text-black hover:bg-primary-foreground/10"
-                  asChild
-                >
-                  <Link to={ROUTES.howItWorks}>See How It Works</Link>
-                </Button>
-              </motion.div>
-            </motion.div>
-
-            {/* Hero right — stat cards */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              className="hidden grid-cols-2 gap-3 lg:grid"
-            >
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  variants={fadeUp}
-                  custom={i + 3}
-                  className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-5 text-center backdrop-blur"
-                >
-                  <p className="text-3xl font-bold text-gold">{s.value}</p>
-                  <p className="mt-1 text-sm text-primary-foreground/60">
-                    {s.label}
-                  </p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Mobile stats row */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:hidden">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="rounded-lg border border-primary-foreground/10 bg-primary-foreground/5 p-4 text-center"
-              >
-                <p className="text-xl font-bold text-gold">{s.value}</p>
-                <p className="mt-0.5 text-xs text-primary-foreground/60">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-12 md:py-16">
-        <div className="container">
-          <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              Why Families Trust Samvidhan Legal Advisory
-            </h2>
-            <p className="mt-3 text-base text-muted-foreground sm:text-lg">
-              Modern legal assistance that's accessible, affordable, and
-              reliable.
-            </p>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-40px' }}
-                variants={fadeUp}
-                custom={i}
-                className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <div className="mb-4 inline-flex rounded-lg bg-gold/10 p-2.5 text-gold transition-colors group-hover:bg-gold/20">
-                  <f.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mb-1.5 text-base font-semibold">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {f.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-muted/50 py-12 md:py-16">
-        <div className="container">
-          <div className="mx-auto mb-10 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              How It Works
-            </h2>
-            <p className="mt-3 text-base text-muted-foreground sm:text-lg">
-              Four simple steps from sign-up to resolution.
-            </p>
-          </div>
-          <div className="relative">
-            {/* Connecting line */}
-            <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-border lg:block" />
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {steps.map((s, i) => (
-                <motion.div
-                  key={s.num}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: '-40px' }}
-                  variants={fadeUp}
-                  custom={i}
-                  className="relative rounded-xl border bg-card p-6 text-center"
-                >
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-navy text-gold">
-                    <s.icon className="h-6 w-6" />
-                  </div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-gold">
-                    Step {s.num}
-                  </span>
-                  <h3 className="mt-2 text-base font-semibold">{s.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">
-                    {s.desc}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-12 md:py-16">
-        <div className="container">
-          <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              What Our Users Say
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Real stories from real people who found legal support through
-              Samvidhan Legal Advisory.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-40px' }}
-                variants={fadeUp}
-                custom={i}
-                className="rounded-xl border bg-card p-6 shadow-sm"
-              >
-                <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-gold text-gold" />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed text-foreground">
-                  "{t.text}"
-                </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-semibold text-gold">
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t.location}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Plans preview */}
-      <section className="bg-muted/50 py-12 md:py-16">
-        <div className="container">
-          <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Affordable legal protection for every Indian family. No hidden
-              fees.
-            </p>
-          </div>
-          <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
-            {mockPlans.map((plan, i) => (
-              <motion.div
-                key={plan.id}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-40px' }}
-                variants={fadeUp}
-                custom={i}
-                className={`relative rounded-xl border p-6 transition-all hover:shadow-lg md:p-8 ${plan.isPopular ? 'scale-[1.02] border-gold shadow-lg ring-1 ring-gold/20' : 'bg-card shadow-sm'}`}
-              >
-                {plan.badge && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-gold px-3 py-0.5 text-xs font-semibold text-accent-foreground">
-                    {plan.badge}
-                  </span>
-                )}
-                <h3 className="text-lg font-semibold">{plan.name}</h3>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold">
-                    ₹{plan.price.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    /{plan.period}
-                  </span>
-                </div>
-                <ul className="mt-6 space-y-2.5">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className={`mt-8 w-full ${plan.isPopular ? 'bg-gold text-accent-foreground hover:bg-gold/90' : ''}`}
-                  variant={plan.isPopular ? 'default' : 'outline'}
-                  asChild
-                >
-                  <Link to={ROUTES.register}>Subscribe Now</Link>
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Teaser */}
-      <section className="py-12 md:py-16">
-        <div className="container">
-          <div className="mx-auto max-w-3xl rounded-2xl border bg-card p-6 text-center shadow-sm md:p-10">
-            <h2 className="text-xl font-bold sm:text-2xl">Have Questions?</h2>
-            <p className="mt-2 text-muted-foreground">
-              Check out our frequently asked questions or reach out to our
-              support team.
-            </p>
-            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Button variant="outline" asChild>
-                <Link to={ROUTES.faq}>Read FAQ</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-navy py-12 md:py-16">
-        <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center"
+const Homepage = () => (
+  <PublicLayout>
+    {/* Hero */}
+    <section className="relative overflow-hidden bg-navy">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(43_55%_52%_/_0.12),_transparent_60%)]" />
+      <div className="container relative py-14 md:py-20">
+        <BrandLogo as="div" showText={false} size={56} className="gap-0" />
+        <h1 className="mt-6 max-w-2xl text-3xl font-bold leading-tight text-primary-foreground sm:text-4xl md:text-5xl">
+          Manage legal cases with verified advocates,{' '}
+          <span className="text-gold">in one place</span>
+        </h1>
+        <p className="mt-4 max-w-2xl text-primary-foreground/75 sm:text-lg">
+          Samvidhan Legal Advisory helps you open a matter, share documents, message your
+          lawyer, and track progress—built for how legal work actually happens in India.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button
+            size="lg"
+            className="bg-gold text-accent-foreground hover:bg-gold/90"
+            asChild
           >
-            <motion.h2
-              variants={fadeUp}
-              custom={0}
-              className="text-2xl font-bold text-primary-foreground sm:text-3xl lg:text-4xl"
+            <Link to={ROUTES.login}>
+              Sign in <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-primary-foreground/25 text-primary-background hover:bg-primary-foreground/10"
+            asChild
+          >
+            <a href="#case-flow">See case flow</a>
+          </Button>
+        </div>
+        <nav
+          className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-sm text-primary-foreground/60"
+          aria-label="On this page"
+        >
+          <a href="#features" className="hover:text-primary-foreground">
+            Features
+          </a>
+          <a href="#case-flow" className="hover:text-primary-foreground">
+            Case flow
+          </a>
+          <a href="#legal" className="hover:text-primary-foreground">
+            Terms & DPDP
+          </a>
+          <a href="#faq" className="hover:text-primary-foreground">
+            FAQ
+          </a>
+          <Link to={ROUTES.about} className="hover:text-primary-foreground">
+            About
+          </Link>
+        </nav>
+      </div>
+    </section>
+
+    {/* Features */}
+    <section id="features" className="scroll-mt-20 py-12 md:py-16">
+      <div className="container">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-bold sm:text-3xl">Built for real legal cases</h2>
+          <p className="mt-2 text-muted-foreground">
+            Everything you need after sign-in—from filing a query to working with your advocate.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-xl border bg-card p-5 shadow-sm"
             >
-              Start Your Legal Journey Today
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
-              custom={1}
-              className="mx-auto mt-3 max-w-lg text-base text-primary-foreground/70 sm:text-lg"
+              <f.icon className="mb-3 h-5 w-5 text-gold" aria-hidden />
+              <h3 className="font-semibold">{f.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Case flow */}
+    <section id="case-flow" className="scroll-mt-20 bg-muted/40 py-12 md:py-16">
+      <div className="container max-w-3xl">
+        <h2 className="text-center text-2xl font-bold sm:text-3xl">How the case flow works</h2>
+        <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
+          From your first sign-in to ongoing work with your advocate—step by step on the platform.
+        </p>
+        <ol className="mt-10 space-y-5">
+          {caseFlowSteps.map((step, i) => (
+            <li
+              key={step.title}
+              className="flex gap-4 rounded-xl border bg-card p-5 shadow-sm"
             >
-              Join thousands of Indians who trust Samvidhan Legal Advisory for
-              reliable, affordable legal assistance.
-            </motion.p>
-            <motion.div
-              variants={fadeUp}
-              custom={2}
-              className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-sm font-semibold text-gold">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <step.icon className="h-4 w-4 shrink-0 text-gold" aria-hidden />
+                  <h3 className="font-semibold">{step.title}</h3>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">{step.desc}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link
+            to={ROUTES.login}
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Sign in to open a case
+          </Link>
+        </p>
+      </div>
+    </section>
+
+    {/* Terms & DPDP on homepage */}
+    <section id="legal" className="scroll-mt-20 py-12 md:py-16">
+      <div className="container">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-bold sm:text-3xl">Terms & data protection</h2>
+          <p className="mt-2 text-muted-foreground">
+            We process personal and case-related data to run the service. You must accept both
+            documents when you sign in.
+          </p>
+        </div>
+        <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
+          {legalHighlights.map((doc) => (
+            <div
+              key={doc.title}
+              className="flex flex-col rounded-xl border bg-card p-6 shadow-sm"
             >
-              <Button
-                size="lg"
-                className="bg-gold text-accent-foreground shadow-lg shadow-gold/20 hover:bg-gold/90"
-                asChild
-              >
-                <Link to={ROUTES.register}>
-                  Create Free Account <ArrowRight className="ml-2 h-4 w-4" />
+              <doc.icon className="h-6 w-6 text-gold" aria-hidden />
+              <h3 className="mt-4 font-semibold">{doc.title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {doc.summary}
+              </p>
+              <Button variant="outline" size="sm" className="mt-5 w-fit" asChild>
+                <Link to={doc.to}>
+                  {doc.cta} <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </Link>
               </Button>
-            </motion.div>
-          </motion.div>
+            </div>
+          ))}
         </div>
-      </section>
-    </PublicLayout>
-  );
-};
+      </div>
+    </section>
+
+    {/* FAQ */}
+    <section id="faq" className="scroll-mt-20 bg-muted/30 py-12 md:py-16">
+      <div className="container max-w-2xl">
+        <h2 className="text-center text-2xl font-bold sm:text-3xl">Common questions</h2>
+        <Accordion type="single" collapsible className="mt-8">
+          {faqs.map((faq, i) => (
+            <AccordionItem key={faq.q} value={`faq-${i}`}>
+              <AccordionTrigger className="text-left text-sm font-medium">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          <Link
+            to={ROUTES.faq}
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            View all FAQ
+          </Link>
+          {' · '}
+          <Link
+            to={ROUTES.about}
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            About us
+          </Link>
+        </p>
+      </div>
+    </section>
+
+    {/* CTA */}
+    <section className="bg-navy py-12 md:py-16">
+      <div className="container text-center">
+        <h2 className="text-2xl font-bold text-primary-foreground sm:text-3xl">
+          Start your case today
+        </h2>
+        <p className="mx-auto mt-3 max-w-lg text-primary-foreground/70">
+          Sign in, accept terms and DPDP consent, and raise your first legal query from the
+          dashboard.
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-primary-foreground/60">
+          <Link to={ROUTES.terms} className="hover:text-primary-foreground">
+            Terms
+          </Link>
+          <span aria-hidden>·</span>
+          <Link to={ROUTES.dpdpConsent} className="hover:text-primary-foreground">
+            DPDP notice
+          </Link>
+        </div>
+        <Button
+          size="lg"
+          className="mt-8 bg-gold text-accent-foreground hover:bg-gold/90"
+          asChild
+        >
+          <Link to={ROUTES.login}>
+            Sign in <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    </section>
+  </PublicLayout>
+);
 
 export default Homepage;

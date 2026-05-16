@@ -44,8 +44,7 @@ export const LAWYER_NAV: NavItem[] = [
 /** Marketing / public site header nav (paths only). */
 export const PUBLIC_NAV_LINKS = [
   { label: 'Home', to: ROUTES.home },
-  { label: 'Plans', to: ROUTES.plans },
-  { label: 'How It Works', to: ROUTES.howItWorks },
+  { label: 'Case flow', to: '/#case-flow' },
   { label: 'About', to: ROUTES.about },
   { label: 'FAQ', to: ROUTES.faq },
 ] as const;

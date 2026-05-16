@@ -12,16 +12,15 @@ import { isReactNativeWebView } from '@/lib/is-react-native-webview';
 import { queryClient } from '@/lib/query-client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import AboutPage from './pages/AboutPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import DpdpConsentPage from './pages/DpdpConsentPage';
 import FAQPage from './pages/FAQPage';
-import HowItWorksPage from './pages/HowItWorksPage';
 import Index from './pages/Index';
 import LoginPage from './pages/LoginPage';
-import PlansPage from './pages/PlansPage';
+import TermsPage from './pages/TermsPage';
 
 import CaseInternalNotesPage from './pages/CaseInternalNotesPage';
 import CaseDetail from './pages/user/CaseDetail';
@@ -70,11 +69,15 @@ const AppInner = () => (
           <Routes>
             {/* Public */}
             <Route path={ROUTES.home} element={<Index />} />
-            <Route path={ROUTES.plans} element={<PlansPage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
-            <Route path={ROUTES.howItWorks} element={<HowItWorksPage />} />
             <Route path={ROUTES.faq} element={<FAQPage />} />
+            <Route path={ROUTES.terms} element={<TermsPage />} />
             <Route path={ROUTES.dpdpConsent} element={<DpdpConsentPage />} />
+            <Route path={ROUTES.plans} element={<Navigate to={ROUTES.home} replace />} />
+            <Route
+              path={ROUTES.howItWorks}
+              element={<Navigate to={{ pathname: ROUTES.home, hash: 'case-flow' }} replace />}
+            />
             <Route path={ROUTES.login} element={<LoginPage />} />
             <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
 
