@@ -55,14 +55,6 @@ export const logout = () => {
   });
 };
 
-export const register = (body) => {
-  return apiClient({
-    method: routes.REGISTER.METHOD,
-    url: routes.REGISTER.URL,
-    data: body,
-  });
-};
-
 export const getCurrentUser = () => {
   return apiClient({
     method: routes.USERS_ME.METHOD,
@@ -296,14 +288,6 @@ export const markAdminCaseChatRead = (caseId, body = {}) => {
   return apiClient({
     method: routes.ADMIN_CASE_MARK_CHAT_READ.METHOD,
     url: routes.ADMIN_CASE_MARK_CHAT_READ.URL.replace(':caseId', caseId),
-    data: body,
-  });
-};
-
-export const resetPassword = (body) => {
-  return apiClient({
-    method: routes.RESET_PASSWORD.METHOD,
-    url: routes.RESET_PASSWORD.URL,
     data: body,
   });
 };

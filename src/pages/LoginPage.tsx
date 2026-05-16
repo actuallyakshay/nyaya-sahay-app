@@ -1,31 +1,45 @@
 import { AdminLoginOtpModalConnected } from '@/components/auth/AdminLoginOtpModal';
 import { LoginBrandingAside } from '@/components/login/LoginBrandingAside';
 import { LoginCredentialsColumn } from '@/components/login/LoginCredentialsColumn';
-import { dashboardForRole } from '@/constants';
-import {
-  useLoginEmailAuth,
-  type LoginRole,
-} from '@/hooks/use-login-email-auth';
+import type { LoginRole } from '@/components/login/LoginRoleToggle';
+import { ROUTES, dashboardForRole } from '@/constants';
+import { syncFcmToken } from '@/hooks/use-fcm-token';
+import { useAdminLoginOtp } from '@/hooks/use-admin-login-otp';
 import { useLoginSessionRedirect } from '@/hooks/use-login-session-redirect';
+import { useToast } from '@/hooks/use-toast';
+import { setCookie } from '@/lib/helpers';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [role, setRole] = useState<LoginRole>('user');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useLoginSessionRedirect();
-  const emailAuth = useLoginEmailAuth(role);
+
+  const finishAsAdmin = () => {
+    setCookie('x-active-role', 'admin');
+    void syncFcmToken();
+    toast({ title: 'Welcome back!', description: 'Signed in to admin.' });
+    navigate(ROUTES.admin.dashboard);
+  };
+
+  const adminOtp = useAdminLoginOtp(finishAsAdmin);
+
+  const handleAdminOtp = (args: { email: string; expiresInSeconds: number; message?: string }) => {
+    adminOtp.openModal({ email: args.email, password: '', expiresInSeconds: args.expiresInSeconds, message: args.message, isGoogleAdmin: true });
+  };
 
   return (
     <div className="flex min-h-screen">
-      <AdminLoginOtpModalConnected controller={emailAuth.adminOtp} />
+      <AdminLoginOtpModalConnected controller={adminOtp} />
       <LoginBrandingAside />
       <LoginCredentialsColumn
         role={role}
         onRoleChange={setRole}
         onGoogleSuccess={() => navigate(dashboardForRole(role))}
-        emailAuth={emailAuth}
+        onAdminOtp={handleAdminOtp}
       />
     </div>
   );

@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
-import type { LoginRole } from '@/hooks/use-login-email-auth';
 import { Scale, User } from 'lucide-react';
+
+export type LoginRole = 'user' | 'lawyer';
 
 const ROLES: LoginRole[] = ['user', 'lawyer'];
 

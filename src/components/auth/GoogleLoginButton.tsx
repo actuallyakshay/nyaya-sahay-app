@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 interface GoogleLoginButtonProps {
   role: UserRole;
   onSuccess: () => void;
+  onAdminOtp?: (args: { email: string; expiresInSeconds: number; message?: string }) => void;
 }
 
 /** Multicolor G mark for “Sign in with Google” (official palette). */
@@ -44,7 +45,7 @@ function GoogleGMark({ className }: { className?: string }) {
 const googleSignInChrome =
   'flex h-10 w-full items-center justify-center gap-3 rounded-full border border-border bg-card text-sm font-medium text-muted-foreground shadow-sm transition-colors group-hover:border-gold/40 group-hover:bg-gold/10 group-hover:text-foreground';
 
-const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
+const GoogleLoginButton = ({ role, onSuccess, onAdminOtp }: GoogleLoginButtonProps) => {
   const { googleLogin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -65,6 +66,16 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
       setIsLoading(true);
       try {
         const data = await googleLogin(idToken, role);
+
+        if (data?.requiresOtp && data.adminEmail) {
+          onAdminOtp?.({
+            email: data.adminEmail,
+            expiresInSeconds: data.expiresInSeconds ?? 600,
+            message: data.message,
+          });
+          return;
+        }
+
         if (!data.status) throw new Error(data.message);
         if (data?.isAdmin) {
           setCookie('x-active-role', 'admin');
@@ -90,7 +101,7 @@ const GoogleLoginButton = ({ role, onSuccess }: GoogleLoginButtonProps) => {
         setIsLoading(false);
       }
     },
-    [googleLogin, navigate, onSuccess, role, toast]
+    [googleLogin, navigate, onAdminOtp, onSuccess, role, toast]
   );
 
   useEffect(() => {

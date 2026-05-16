@@ -27,10 +27,6 @@ const routes = {
     URL: '/api/auth/logout',
     METHOD: 'POST',
   },
-  REGISTER: {
-    URL: '/api/auth/email',
-    METHOD: 'POST',
-  },
   USERS_ME: {
     URL: '/api/users/me',
     METHOD: 'GET',
@@ -94,10 +90,6 @@ const routes = {
   LAWYER_ANALYTICS: {
     URL: '/api/lawyers/analytics',
     METHOD: 'GET',
-  },
-  RESET_PASSWORD: {
-    URL: '/api/admin/reset-password',
-    METHOD: 'PATCH',
   },
   SUBSCRIPTION_PLANS: {
     URL: '/api/subscriptions',

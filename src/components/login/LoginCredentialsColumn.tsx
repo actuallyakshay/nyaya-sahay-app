@@ -1,22 +1,20 @@
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import { BrandLogo } from '@/components/BrandLogo';
-import { LoginEmailPasswordForm } from '@/components/login/LoginEmailPasswordForm';
-import { LoginOAuthDivider } from '@/components/login/LoginOAuthDivider';
 import { LoginRoleToggle } from '@/components/login/LoginRoleToggle';
-import type { LoginEmailAuth, LoginRole } from '@/hooks/use-login-email-auth';
+import type { LoginRole } from '@/components/login/LoginRoleToggle';
 
 interface LoginCredentialsColumnProps {
   role: LoginRole;
   onRoleChange: (role: LoginRole) => void;
   onGoogleSuccess: () => void;
-  emailAuth: LoginEmailAuth;
+  onAdminOtp?: (args: { email: string; expiresInSeconds: number; message?: string }) => void;
 }
 
 export function LoginCredentialsColumn({
   role,
   onRoleChange,
   onGoogleSuccess,
-  emailAuth,
+  onAdminOtp,
 }: LoginCredentialsColumnProps) {
   return (
     <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
@@ -27,13 +25,11 @@ export function LoginCredentialsColumn({
 
         <h1 className="text-2xl font-bold">Sign in to your account</h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Select your role and enter your credentials
+          Select your role and sign in with Google
         </p>
 
         <LoginRoleToggle value={role} onChange={onRoleChange} />
-        <GoogleLoginButton role={role} onSuccess={onGoogleSuccess} />
-        <LoginOAuthDivider />
-        <LoginEmailPasswordForm auth={emailAuth} />
+        <GoogleLoginButton role={role} onSuccess={onGoogleSuccess} onAdminOtp={onAdminOtp} />
       </div>
     </div>
   );

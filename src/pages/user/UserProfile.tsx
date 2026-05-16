@@ -1,4 +1,3 @@
-import PasswordResetModal from '@/components/PasswordResetModal';
 import { LawyerProfileForm } from '@/components/profile/LawyerProfileForm';
 import { UserProfileForm } from '@/components/profile/UserProfileForm';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -18,13 +17,10 @@ import {
   Clock,
   CreditCard,
   Info,
-  Shield,
 } from 'lucide-react';
-import { useState } from 'react';
 
 const UserProfile = () => {
   const { user } = useAuth();
-  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const isLawyer = getCookie('x-active-role') === 'lawyer';
   const profile = useProfilePage();
   const { subscription } = useActiveSubscription();
@@ -148,31 +144,7 @@ const UserProfile = () => {
           </>
         )}
 
-        {user?.provider === 'email' && (
-          <div className="space-y-3 rounded-xl border bg-card p-6">
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-gold" />
-              <h3 className="font-semibold">Security</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Your data is encrypted and stored securely. All communications
-              with your lawyer are confidential.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPasswordModalOpen(true)}
-            >
-              Change Password
-            </Button>
-          </div>
-        )}
       </div>
-
-      <PasswordResetModal
-        open={passwordModalOpen}
-        onOpenChange={setPasswordModalOpen}
-      />
     </DashboardLayout>
   );
 };

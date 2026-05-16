@@ -9,12 +9,15 @@ import type { AuthUser, UserRole } from '@/types';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
 interface GoogleLoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  isNewUser: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  isNewUser?: boolean;
   status: boolean;
-  message: string;
+  message?: string;
   isAdmin?: boolean;
+  requiresOtp?: boolean;
+  expiresInSeconds?: number;
+  adminEmail?: string;
 }
 
 interface AuthContextType {

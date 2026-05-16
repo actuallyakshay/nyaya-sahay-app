@@ -8,9 +8,9 @@ import { getApiErrorMessage } from '@/lib/utils';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const OTP_DEFAULT_SEC = 600;
-
 export type LoginRole = 'user' | 'lawyer';
+
+const OTP_DEFAULT_SEC = 600;
 
 export function useLoginEmailAuth(role: LoginRole) {
   const navigate = useNavigate();

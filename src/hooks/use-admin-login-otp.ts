@@ -10,6 +10,7 @@ export function useAdminLoginOtp(onVerified: () => void) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isGoogleAdmin, setIsGoogleAdmin] = useState(false);
   const [hintMessage, setHintMessage] = useState('');
   const [otpDeadline, setOtpDeadline] = useState<number | null>(null);
   const [resendNotBefore, setResendNotBefore] = useState(0);
@@ -36,6 +37,7 @@ export function useAdminLoginOtp(onVerified: () => void) {
     setOpen(false);
     setEmail('');
     setPassword('');
+    setIsGoogleAdmin(false);
     setHintMessage('');
     setOtpDeadline(null);
     setResendNotBefore(0);
@@ -47,9 +49,11 @@ export function useAdminLoginOtp(onVerified: () => void) {
       password: string;
       expiresInSeconds: number;
       message?: string;
+      isGoogleAdmin?: boolean;
     }) => {
       setEmail(args.email);
       setPassword(args.password);
+      setIsGoogleAdmin(args.isGoogleAdmin ?? false);
       setHintMessage(args.message ?? '');
       setOtpDeadline(Date.now() + args.expiresInSeconds * 1000);
       setResendNotBefore(0);
@@ -89,7 +93,7 @@ export function useAdminLoginOtp(onVerified: () => void) {
   );
 
   const resendOtp = useCallback(async (): Promise<boolean> => {
-    if (Date.now() < resendNotBefore || !email || password.length < 6) {
+    if (Date.now() < resendNotBefore || !email || (!isGoogleAdmin && password.length < 6)) {
       return false;
     }
     setIsResending(true);
@@ -124,7 +128,7 @@ export function useAdminLoginOtp(onVerified: () => void) {
     } finally {
       setIsResending(false);
     }
-  }, [email, password, resendNotBefore, toast]);
+  }, [email, password, isGoogleAdmin, resendNotBefore, toast]);
 
   return {
     isOpen: open,
@@ -134,8 +138,8 @@ export function useAdminLoginOtp(onVerified: () => void) {
     hintMessage,
     otpRemainingSec,
     resendCooldownSec,
-    /** Backend resend requires password (min 6 chars). */
-    resendAllowed: password.length >= 6,
+    /** Google admins can always resend; email admins need password (min 6 chars). */
+    resendAllowed: isGoogleAdmin || password.length >= 6,
     verifyOtp,
     resendOtp,
     isVerifying,
