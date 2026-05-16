@@ -79,13 +79,13 @@ export const DashboardLayout = ({
   const handleSwitchRole = () => {
     const newRole = activeRole === 'lawyer' ? 'user' : 'lawyer';
     setCookie('x-active-role', newRole);
-    if (newRole === 'lawyer' && !isLawyerApprovedForPractice(user)) {
-      navigate(ROUTES.lawyer.profile);
-      return;
-    }
-    navigate(
-      newRole === 'lawyer' ? ROUTES.lawyer.dashboard : ROUTES.user.dashboard
-    );
+    const target =
+      newRole === 'lawyer' && !isLawyerApprovedForPractice(user)
+        ? ROUTES.lawyer.profile
+        : newRole === 'lawyer'
+          ? ROUTES.lawyer.dashboard
+          : ROUTES.user.dashboard;
+    window.location.assign(target);
   };
 
   return (

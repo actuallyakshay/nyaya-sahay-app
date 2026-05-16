@@ -5,6 +5,16 @@ export type LoginRole = 'user' | 'lawyer';
 
 const ROLES: LoginRole[] = ['user', 'lawyer'];
 
+export function parseLoginRole(value: string | null): LoginRole {
+  return value === 'lawyer' ? 'lawyer' : 'user';
+}
+
+/** Login URL for a role — used before full page reload on toggle. */
+export function loginUrlForRole(role: LoginRole, basePath = '/login'): string {
+  if (role === 'lawyer') return `${basePath}?role=lawyer`;
+  return basePath;
+}
+
 interface LoginRoleToggleProps {
   value: LoginRole;
   onChange: (role: LoginRole) => void;
