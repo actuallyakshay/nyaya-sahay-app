@@ -41,6 +41,14 @@ export const adminLoginResendOtp = (body) => {
   });
 };
 
+export const dummyLogin = (body) => {
+  return apiClient({
+    method: routes.DUMMY_LOGIN.METHOD,
+    url: routes.DUMMY_LOGIN.URL,
+    data: body,
+  });
+};
+
 export const refreshAuthToken = () => {
   return apiClient({
     method: routes.REFRESH_TOKEN.METHOD,

@@ -52,8 +52,7 @@ export const ROUTES = {
     payments: `${PATH_PREFIX.admin}/payments`,
     settings: `${PATH_PREFIX.admin}/settings`,
     /** Unread case messages (admin shell). */
-    notifications: `${PATH_PREFIX.admin}/notifications`,
-    login: `${PATH_PREFIX.admin}/login`,
+    notifications: `${PATH_PREFIX.admin}/notifications`
   },
 } as const;
 

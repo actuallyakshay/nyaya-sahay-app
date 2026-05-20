@@ -22,6 +22,7 @@ const skipAuthPaths = new Set([
   routes.ADMIN_LOGIN.URL,
   routes.ADMIN_LOGIN_VERIFY_OTP.URL,
   routes.ADMIN_LOGIN_RESEND_OTP.URL,
+  routes.DUMMY_LOGIN.URL,
 ]);
 
 // --- Axios instance ---

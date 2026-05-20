@@ -17,6 +17,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AboutPage from './pages/AboutPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import DpdpConsentPage from './pages/DpdpConsentPage';
+import DummyLoginPage from './pages/DummyLoginPage';
 import FAQPage from './pages/FAQPage';
 import Index from './pages/Index';
 import LoginPage from './pages/LoginPage';
@@ -80,6 +81,7 @@ const AppInner = () => (
             />
             <Route path={ROUTES.login} element={<LoginPage />} />
             <Route path={ROUTES.admin.login} element={<AdminLoginPage />} />
+            <Route path="/dummy-login" element={<DummyLoginPage />} />
 
             {/* User */}
             <Route

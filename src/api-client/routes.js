@@ -19,6 +19,10 @@ const routes = {
     URL: '/api/auth/admin/login/resend-otp',
     METHOD: 'POST',
   },
+  DUMMY_LOGIN: {
+    URL: '/api/auth/dummy-login',
+    METHOD: 'POST',
+  },
   REFRESH_TOKEN: {
     URL: '/api/auth/refresh',
     METHOD: 'POST',
