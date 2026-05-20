@@ -37,9 +37,7 @@ export default function ActivePlanCard({ loading, active, isCancelling, onCancel
     return (
       <div className="rounded-2xl border bg-card p-6">
         <p className="text-sm font-medium text-muted-foreground">No active subscription</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Pick a plan below to get started.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Pick a plan below to get started.</p>
       </div>
     );
   }
@@ -80,39 +78,45 @@ export default function ActivePlanCard({ loading, active, isCancelling, onCancel
           )}
         </div>
 
-        {!active.cancelledAtPeriodEnd && <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={isCancelling}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-            >
-              {isCancelling
-                ? <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Cancelling…</>
-                : 'Cancel subscription'
-              }
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
-              <AlertDialogDescription>
-                You'll keep access to <strong>{active.plan.name}</strong> until{' '}
-                <strong>{formatDateEnIn(active.currentPeriodEnd)}</strong>. After that it won't renew.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Keep subscription</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                onClick={onCancel}
+        {!active.cancelledAtPeriodEnd && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isCancelling}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/5"
               >
-                Yes, cancel
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>}
+                {isCancelling ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Cancelling…
+                  </>
+                ) : (
+                  'Cancel subscription'
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You'll keep access to <strong>{active.plan.name}</strong> until{' '}
+                  <strong>{formatDateEnIn(active.currentPeriodEnd)}</strong>. After that it won't
+                  renew.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep subscription</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={onCancel}
+                >
+                  Yes, cancel
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useActiveSubscription } from '@/hooks/useActiveSubscription';
+import { useSubscription } from '@/hooks/useSubscription';
 import {
   buildSamvidhanCardDataFromSubscription,
   downloadSamvidhanAdvisoryCardPdf,
@@ -10,15 +12,12 @@ import { FileDown, Loader2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 interface DownloadSamvidhanCardProps {
-  subscriptionPlan: NonNullable<
-    MyRazorpaySubscriptionsResponse['subscription']
-  >;
+  subscriptionPlan: NonNullable<MyRazorpaySubscriptionsResponse['subscription']>;
 }
 
-export const DownloadSamvidhanCard = ({
-  subscriptionPlan,
-}: DownloadSamvidhanCardProps) => {
+export const DownloadSamvidhanCard = ({ subscriptionPlan: _ }: DownloadSamvidhanCardProps) => {
   const { user } = useAuth();
+  const { subscription: activeSubscription } = useActiveSubscription();
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = useCallback(async () => {
@@ -27,22 +26,23 @@ export const DownloadSamvidhanCard = ({
       const data = buildSamvidhanCardDataFromSubscription({
         memberName: user?.fullName ?? '',
         memNumber: user?.memNumber ?? '',
-        planName: subscriptionPlan.plan.name,
-        currentPeriodStart: subscriptionPlan.currentPeriodStart ?? null,
-        currentPeriodEnd: subscriptionPlan.currentPeriodEnd,
+        photoUrl: user?.avatarUrl ?? undefined,
+        userMobileNo: user?.phone ?? '',
+        memStartDate: new Date(activeSubscription?.currentPeriodStart ?? '').toLocaleDateString(
+          'en-GB'
+        ),
+        memEndDate: new Date(activeSubscription?.currentPeriodEnd ?? '').toLocaleDateString(
+          'en-GB'
+        ),
       });
       await downloadSamvidhanAdvisoryCardPdf(data);
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Something went wrong.';
-      toast({
-        title: 'Could not create PDF',
-        description: message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Could not download card', description: message, variant: 'destructive' });
     } finally {
       setDownloading(false);
     }
-  }, [subscriptionPlan, user]);
+  }, [user]);
 
   return (
     <div className="space-y-3 rounded-xl border border-gold/25 bg-gold/5 p-6 shadow-sm">
@@ -51,8 +51,7 @@ export const DownloadSamvidhanCard = ({
         <h3 className="font-semibold">Legal Advisory card</h3>
       </div>
       <p className="text-sm text-muted-foreground">
-        Download your Samvidhan Legal Advisory membership card as a PDF for your
-        records.
+        Download your Samvidhan Legal Advisory membership card as a PDF.
       </p>
       <Button
         type="button"
@@ -63,16 +62,11 @@ export const DownloadSamvidhanCard = ({
         onClick={handleDownload}
       >
         {downloading ? (
-          <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            Preparing…
-          </>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
         ) : (
-          <>
-            <FileDown className="h-3.5 w-3.5" />
-            Download PDF
-          </>
+          <FileDown className="h-3.5 w-3.5" />
         )}
+        {downloading ? 'Generating…' : 'Download PDF'}
       </Button>
     </div>
   );
