@@ -7,13 +7,12 @@ import {
   type LoginRole,
 } from '@/components/login/LoginRoleToggle';
 import { ROUTES, dashboardForRole } from '@/constants';
-import { syncFcmToken } from '@/hooks/use-fcm-token';
 import { useAdminLoginOtp } from '@/hooks/use-admin-login-otp';
+import { syncFcmToken } from '@/hooks/use-fcm-token';
 import { useLoginSessionRedirect } from '@/hooks/use-login-session-redirect';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
@@ -51,13 +50,6 @@ const LoginPage = () => {
     <div className="flex min-h-screen">
       <AdminLoginOtpModalConnected controller={adminOtp} />
       <LoginBrandingAside />
-      <Button
-        onClick={() => {
-          navigate('/dummy-login');
-        }}
-      >
-        Login as User
-      </Button>
       <LoginCredentialsColumn
         role={role}
         onRoleChange={handleRoleChange}

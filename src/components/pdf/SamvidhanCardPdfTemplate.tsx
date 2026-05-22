@@ -5,6 +5,10 @@ const NAVY = '#0f2c5c';
 const WHITE = '#ffffff';
 const CARD_W = 340;
 const CARD_H = 500;
+const DETAIL_LABEL_W = 118;
+const DETAIL_COLON_W = 10;
+const DETAIL_VALUE_W = CARD_W - 48 - DETAIL_LABEL_W - DETAIL_COLON_W;
+const AVATAR_SIZE = 110;
 
 const styles = StyleSheet.create({
   page: {
@@ -56,44 +60,53 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     flex: 1,
   },
-  avatarCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  avatarClip: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
     borderWidth: 3,
     borderColor: '#cccccc',
     borderStyle: 'solid',
     overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: 'relative',
     backgroundColor: '#e5e5e5',
-    objectFit: 'contain',
   },
+  // Oversized + clipped — react-pdf often ignores objectFit: cover on square photos.
   avatarImage: {
-    width: 110,
-    height: 110,
+    position: 'absolute',
+    top: -12,
+    left: -12,
+    width: AVATAR_SIZE + 24,
+    height: AVATAR_SIZE + 24,
     objectFit: 'cover',
   },
   detailsWrap: {
     paddingHorizontal: 24,
-    paddingTop: 20,
-    width: '100%',
-    gap: 14,
+    paddingTop: 18,
+    width: CARD_W,
+    gap: 10,
   },
   detailRow: {
     flexDirection: 'row',
-    fontSize: 12,
-    color: '#1a1a1a',
+    alignItems: 'flex-start',
+    width: DETAIL_LABEL_W + DETAIL_COLON_W + DETAIL_VALUE_W,
   },
   detailLabel: {
     fontFamily: 'Helvetica-Bold',
-    width: 80,
+    fontSize: 11,
+    width: DETAIL_LABEL_W,
+    flexShrink: 0,
   },
   detailColon: {
-    width: 10,
+    fontSize: 11,
+    width: DETAIL_COLON_W,
+    flexShrink: 0,
   },
   detailValue: {
-    flex: 1,
+    fontSize: 11,
+    width: DETAIL_VALUE_W,
+    flexShrink: 0,
+    lineHeight: 1.35,
   },
   // Bottom footer on front (wave)
   frontFooterWrap: {
@@ -190,7 +203,7 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
         {/* Body */}
         <View style={styles.frontBody}>
           {/* Profile photo */}
-          <View style={styles.avatarCircle}>
+          <View style={styles.avatarClip}>
             {data.photoUrl && <Image src={data.photoUrl} style={styles.avatarImage} />}
           </View>
 
@@ -198,8 +211,8 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
           <View style={styles.detailsWrap}>
             <DetailRow label="Name" value={data.name} />
             <DetailRow label="Mem. No" value={data.memberNo} />
-            <DetailRow label="Validity Start" value={data.memStartDate} />
-            <DetailRow label="Validity End" value={data.memEndDate} />
+            <DetailRow label="Valid from" value={data.memStartDate} />
+            <DetailRow label="Valid till" value={data.memEndDate} />
             <DetailRow label="Mob. No" value={data.userMobileNo} />
           </View>
         </View>
@@ -248,12 +261,18 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
   </Document>
 );
 
+/** Prevent PDF line-breaks on hyphens in names (e.g. "Dum-my" → three lines). */
+function pdfSafeText(value?: string): string {
+  if (!value) return '';
+  return value.replace(/-/g, '\u2011');
+}
+
 function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
       <Text style={styles.detailColon}>:</Text>
-      <Text style={styles.detailValue}>{value ?? ''}</Text>
+      <Text style={styles.detailValue}>{pdfSafeText(value)}</Text>
     </View>
   );
 }
