@@ -25,16 +25,12 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
     updateLawyerMutation,
   } = profile;
 
-  const saving =
-    updateProfileMutation.isPending || updateLawyerMutation.isPending;
+  const saving = updateProfileMutation.isPending || updateLawyerMutation.isPending;
 
   return (
     <div className="space-y-5 rounded-xl border bg-card p-6">
       <div className="flex items-center gap-4">
-        <WithShimmer
-          loading={isLoading || isUploading}
-          className="h-16 w-16 rounded-full"
-        >
+        <WithShimmer loading={isLoading || isUploading} className="h-16 w-16 rounded-full">
           <div className="group relative">
             {form.avatarUrl || currentUser?.avatarUrl ? (
               <img
@@ -68,14 +64,10 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
         </WithShimmer>
         <div>
           <WithShimmer loading={isLoading} className="h-6 w-32">
-            <p className="text-lg font-semibold">
-              {currentUser?.fullName || user?.fullName}
-            </p>
+            <p className="text-lg font-semibold">{currentUser?.fullName || user?.fullName}</p>
           </WithShimmer>
           <WithShimmer loading={isLoading} className="mt-1 h-4 w-48">
-            <p className="text-sm text-muted-foreground">
-              {currentUser?.email || user?.email}
-            </p>
+            <p className="text-sm text-muted-foreground">{currentUser?.email || user?.email}</p>
           </WithShimmer>
         </div>
       </div>
@@ -109,9 +101,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                 placeholder="9876543210"
                 maxLength={10}
                 value={form.phone}
-                onChange={(e) =>
-                  patchForm({ phone: e.target.value.replace(/\D/g, '') })
-                }
+                onChange={(e) => patchForm({ phone: e.target.value.replace(/\D/g, '') })}
               />
             </div>
           </WithShimmer>

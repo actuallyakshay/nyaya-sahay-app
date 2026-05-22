@@ -11,13 +11,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { getCookie } from '@/lib/helpers';
 import { isLawyerApprovedForPractice } from '@/lib/lawyer-access';
 import { formatDateEnIn } from '@/pages/user/userSubscription.helpers';
-import {
-  Calendar,
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  Info,
-} from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, CreditCard, Info } from 'lucide-react';
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -44,26 +38,21 @@ const UserProfile = () => {
             <AlertDescription>
               {lp?.isProfileCompleted !== true ? (
                 <p>
-                  Complete your advocate profile below. After you submit your
-                  details and documents, an admin will review and verify your
-                  account before you can open cases or messages.
+                  Complete your advocate profile below. After you submit your details and documents,
+                  an admin will review and verify your account before you can open cases or
+                  messages.
                 </p>
               ) : (
                 <p>
-                  Your profile is submitted. An admin is reviewing your
-                  verification. You will get full access once your account is
-                  approved.
+                  Your profile is submitted. An admin is reviewing your verification. You will get
+                  full access once your account is approved.
                 </p>
               )}
             </AlertDescription>
           </Alert>
         ) : null}
 
-        {isLawyer ? (
-          <LawyerProfileForm profile={profile} />
-        ) : (
-          <UserProfileForm profile={profile} />
-        )}
+        {isLawyer ? <LawyerProfileForm profile={profile} /> : <UserProfileForm profile={profile} />}
 
         {!isLawyer && (
           <>
@@ -77,9 +66,7 @@ const UserProfile = () => {
                 <>
                   <div className="flex flex-wrap items-start justify-between gap-3 rounded-md">
                     <div>
-                      <p className="text-lg font-bold">
-                        {subscription.plan.name}
-                      </p>
+                      <p className="text-lg font-bold">{subscription.plan.name}</p>
                       <p className="text-sm capitalize text-muted-foreground">
                         Billed {subscription.plan.billingCycle}
                       </p>
@@ -88,15 +75,9 @@ const UserProfile = () => {
                       <div className="flex items-center justify-end gap-1 text-muted-foreground">
                         <Calendar className="h-3.5 w-3.5 shrink-0" />
                         {subscription.cancelledAtPeriodEnd ? (
-                          <span>
-                            Access until{' '}
-                            {formatDateEnIn(subscription.currentPeriodEnd)}
-                          </span>
+                          <span>Access until {formatDateEnIn(subscription.currentPeriodEnd)}</span>
                         ) : (
-                          <span>
-                            Renews{' '}
-                            {formatDateEnIn(subscription.currentPeriodEnd)}
-                          </span>
+                          <span>Renews {formatDateEnIn(subscription.currentPeriodEnd)}</span>
                         )}
                       </div>
                       <div
@@ -128,8 +109,7 @@ const UserProfile = () => {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    You do not have an active subscription. Choose a plan to get
-                    full access.
+                    You do not have an active subscription. Choose a plan to get full access.
                   </p>
                   <Button variant="outline" size="sm" asChild>
                     <a href={ROUTES.user.subscription}>View plans</a>
@@ -143,7 +123,6 @@ const UserProfile = () => {
             ) : null}
           </>
         )}
-
       </div>
     </DashboardLayout>
   );

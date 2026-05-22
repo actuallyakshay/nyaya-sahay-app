@@ -238,22 +238,14 @@ export function useProfilePage() {
         const avatarUrl = data.assetUrl;
         await updateProfileMutation.mutateAsync({ avatarUrl });
         setForm((prev) => ({ ...prev, avatarUrl }));
-        toast({
-          title: 'Photo uploaded',
-          description:
-            'Profile photo has been uploaded. Click Save Changes to update your profile.',
-        });
-      } catch {
-        toast({
-          title: 'Upload failed',
-          description: 'Failed to upload photo. Please try again.',
-          variant: 'destructive',
-        });
+       
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
       } finally {
         setIsUploading(false);
       }
     },
-    [toast, updateProfileMutation]
+    [updateProfileMutation]
   );
 
   const handleSaveChanges = useCallback(

@@ -1,6 +1,8 @@
+import { getCurrentUser } from '@/api-client';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useActiveSubscription } from '@/hooks/useActiveSubscription';
 import {
   buildSamvidhanCardDataFromSubscription,
   downloadSamvidhanAdvisoryCardPdf,
@@ -16,33 +18,52 @@ interface DownloadSamvidhanCardProps {
 }
 
 export const DownloadSamvidhanCard = ({
-  subscriptionPlan,
+  subscriptionPlan: _,
 }: DownloadSamvidhanCardProps) => {
   const { user } = useAuth();
+  const { subscription: activeSubscription } = useActiveSubscription();
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
-      const data = buildSamvidhanCardDataFromSubscription({
-        memberName: user?.fullName ?? '',
+      // Fetch fresh user data from API to ensure phone & avatarUrl are available
+      const response = await getCurrentUser();
+      const freshUser = response?.data;
+
+      console.log('[PDF Debug] Fresh user:', freshUser);
+      console.log('[PDF Debug] avatarUrl from API:', freshUser?.avatarUrl);
+      console.log('[PDF Debug] avatarUrl from auth:', user?.avatarUrl);
+
+      // Use API data, fallback to auth context
+      const photoUrl = freshUser?.avatarUrl ?? user?.avatarUrl ?? undefined;
+      const phone = freshUser?.phone || user?.phone || '';
+
+      const data = await buildSamvidhanCardDataFromSubscription({
+        memberName: freshUser?.fullName ?? user?.fullName ?? '',
         memNumber: user?.memNumber ?? '',
-        planName: subscriptionPlan.plan.name,
-        currentPeriodStart: subscriptionPlan.currentPeriodStart ?? null,
-        currentPeriodEnd: subscriptionPlan.currentPeriodEnd,
+        photoUrl: photoUrl,
+        userMobileNo: phone,
+        memStartDate: new Date(
+          activeSubscription?.currentPeriodStart ?? ''
+        ).toLocaleDateString('en-GB'),
+        memEndDate: new Date(
+          activeSubscription?.currentPeriodEnd ?? ''
+        ).toLocaleDateString('en-GB'),
       });
       await downloadSamvidhanAdvisoryCardPdf(data);
     } catch (e) {
+      console.error('[PDF Debug] Error:', e);
       const message = e instanceof Error ? e.message : 'Something went wrong.';
       toast({
-        title: 'Could not create PDF',
+        title: 'Could not download card',
         description: message,
         variant: 'destructive',
       });
     } finally {
       setDownloading(false);
     }
-  }, [subscriptionPlan, user]);
+  }, [user, activeSubscription]);
 
   return (
     <div className="space-y-3 rounded-xl border border-gold/25 bg-gold/5 p-6 shadow-sm">
@@ -51,8 +72,7 @@ export const DownloadSamvidhanCard = ({
         <h3 className="font-semibold">Legal Advisory card</h3>
       </div>
       <p className="text-sm text-muted-foreground">
-        Download your Samvidhan Legal Advisory membership card as a PDF for your
-        records.
+        Download your Samvidhan Legal Advisory membership card as a PDF.
       </p>
       <Button
         type="button"
@@ -63,16 +83,11 @@ export const DownloadSamvidhanCard = ({
         onClick={handleDownload}
       >
         {downloading ? (
-          <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            Preparing…
-          </>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
         ) : (
-          <>
-            <FileDown className="h-3.5 w-3.5" />
-            Download PDF
-          </>
+          <FileDown className="h-3.5 w-3.5" />
         )}
+        {downloading ? 'Generating…' : 'Download PDF'}
       </Button>
     </div>
   );
