@@ -3,10 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { useActiveSubscription } from '@/hooks/useActiveSubscription';
-import {
-  buildSamvidhanCardDataFromSubscription,
-  downloadSamvidhanAdvisoryCardPdf,
-} from '@/lib/samvidhan-advisory-card-pdf';
+import { downloadSamvidhanAdvisoryCardPdf } from '@/lib/samvidhan-advisory-card-pdf';
 import type { MyRazorpaySubscriptionsResponse } from '@/types';
 import { FileDown, Loader2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
@@ -27,23 +24,13 @@ export const DownloadSamvidhanCard = ({
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
-      // Fetch fresh user data from API to ensure phone & avatarUrl are available
-      const response = await getCurrentUser();
-      const freshUser = response?.data;
+      const { data: freshUser } = await getCurrentUser();
 
-      console.log('[PDF Debug] Fresh user:', freshUser);
-      console.log('[PDF Debug] avatarUrl from API:', freshUser?.avatarUrl);
-      console.log('[PDF Debug] avatarUrl from auth:', user?.avatarUrl);
-
-      // Use API data, fallback to auth context
-      const photoUrl = freshUser?.avatarUrl ?? user?.avatarUrl ?? undefined;
-      const phone = freshUser?.phone || user?.phone || '';
-
-      const data = await buildSamvidhanCardDataFromSubscription({
+      await downloadSamvidhanAdvisoryCardPdf({
         memberName: freshUser?.fullName ?? user?.fullName ?? '',
         memNumber: user?.memNumber ?? '',
-        photoUrl: photoUrl,
-        userMobileNo: phone,
+        photoUrl: freshUser?.avatarUrl ?? user?.avatarUrl,
+        userMobileNo: freshUser?.phone ?? user?.phone ?? '',
         memStartDate: new Date(
           activeSubscription?.currentPeriodStart ?? ''
         ).toLocaleDateString('en-GB'),
@@ -51,9 +38,7 @@ export const DownloadSamvidhanCard = ({
           activeSubscription?.currentPeriodEnd ?? ''
         ).toLocaleDateString('en-GB'),
       });
-      await downloadSamvidhanAdvisoryCardPdf(data);
     } catch (e) {
-      console.error('[PDF Debug] Error:', e);
       const message = e instanceof Error ? e.message : 'Something went wrong.';
       toast({
         title: 'Could not download card',

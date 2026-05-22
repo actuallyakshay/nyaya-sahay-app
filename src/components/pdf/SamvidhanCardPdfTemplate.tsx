@@ -1,14 +1,5 @@
-import type { SamvidhanAdvisoryCardTemplateData } from '@/lib/samvidhan-advisory-card-pdf';
-import {
-  Document,
-  Image,
-  Page,
-  Path,
-  StyleSheet,
-  Svg,
-  Text,
-  View,
-} from '@react-pdf/renderer';
+import type { SamvidhanCardPdfData } from '@/lib/samvidhan-advisory-card-pdf';
+import { Document, Image, Page, Path, StyleSheet, Svg, Text, View } from '@react-pdf/renderer';
 
 const NAVY = '#0f2c5c';
 const WHITE = '#ffffff';
@@ -43,6 +34,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 55,
     height: 55,
+    objectFit: 'contain',
   },
   headerTextWrap: {
     flex: 1,
@@ -75,10 +67,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#e5e5e5',
+    objectFit: 'contain',
   },
   avatarImage: {
     width: 110,
     height: 110,
+    objectFit: 'cover',
   },
   detailsWrap: {
     paddingHorizontal: 24,
@@ -176,7 +170,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  data: SamvidhanAdvisoryCardTemplateData;
+  data: SamvidhanCardPdfData;
 }
 
 export const SamvidhanCardPdfDocument = ({ data }: Props) => (
@@ -197,9 +191,7 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
         <View style={styles.frontBody}>
           {/* Profile photo */}
           <View style={styles.avatarCircle}>
-            {data.photoUrl && (
-              <Image src={data.photoUrl} style={styles.avatarImage} />
-            )}
+            {data.photoUrl && <Image src={data.photoUrl} style={styles.avatarImage} />}
           </View>
 
           {/* Details */}
@@ -228,23 +220,17 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
         {/* Terms header */}
         <View style={styles.backHeader}>
           <Text style={styles.backHeaderTitle}>TERM &amp; CONDITION</Text>
+          <Text style={styles.termText}>1. This Card Is For Identity Only.</Text>
+          <Text style={styles.termText}>2. This Card Must Be Displayed By The Holder.</Text>
           <Text style={styles.termText}>
-            1. This Card Is For Identity Only.
-          </Text>
-          <Text style={styles.termText}>
-            2. This Card Must Be Displayed By The Holder.
-          </Text>
-          <Text style={styles.termText}>
-            3. Please Ensure Safe Custody Of This Card And Report Loss
-            Immediately To Issuing Authority.
+            3. Please Ensure Safe Custody Of This Card And Report Loss Immediately To Issuing
+            Authority.
           </Text>
         </View>
 
         {/* Signature section */}
         <View style={styles.backBody}>
-          {data.signatureUrl && (
-            <Image src={data.signatureUrl} style={styles.signatureImage} />
-          )}
+          {data.signatureUrl && <Image src={data.signatureUrl} style={styles.signatureImage} />}
           <View style={styles.signatureLine} />
           <Text style={styles.signatureLabel}>SIGNATURE</Text>
           <Text style={styles.phoneText}>+91 9152921212</Text>
@@ -253,8 +239,8 @@ export const SamvidhanCardPdfDocument = ({ data }: Props) => (
         {/* Address footer */}
         <View style={styles.backFooter}>
           <Text style={styles.addressText}>
-            Add.: Office No. 12, Shiv Surbhi Apartment,{'\n'}Thakur Village,
-            Kandivali East,{'\n'}Mumbai - 400101
+            Add.: Office No. 12, Shiv Surbhi Apartment,{'\n'}Thakur Village, Kandivali East,{'\n'}
+            Mumbai - 400101
           </Text>
         </View>
       </View>
