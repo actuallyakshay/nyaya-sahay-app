@@ -1,3 +1,9 @@
+import { Buffer } from 'buffer';
+// @react-pdf/renderer uses Node's Buffer internally — must polyfill before import.
+if (typeof globalThis.Buffer === 'undefined') {
+  (globalThis as unknown as Record<string, unknown>).Buffer = Buffer;
+}
+
 import logoUrl from '@/assets/logo.png';
 import signUrl from '@/assets/sign.png';
 import { proxyAsset } from '@/api-client';
@@ -56,7 +62,18 @@ function isReactNativeWebView(): boolean {
   );
 }
 
-function blobToBase64(blob: Blob): Promise<string> {
+async function blobToBase64(blob: Blob): Promise<string> {
+  // Prefer arrayBuffer → btoa path (works in all WebView environments).
+  if (typeof blob.arrayBuffer === 'function') {
+    const buffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  }
+  // Fallback: FileReader (browser desktop).
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -87,19 +104,7 @@ async function savePdfBlob(blob: Blob, filename: string): Promise<void> {
     return;
   }
 
-  // Mobile browser: system share sheet when available.
-  if (typeof navigator.share === 'function') {
-    try {
-      const file = new File([blob], filename, { type: 'application/pdf' });
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: filename });
-        return;
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return;
-    }
-  }
-
+  // Always use direct download — no share sheet.
   const objectUrl = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = objectUrl;
@@ -115,6 +120,7 @@ export async function downloadSamvidhanAdvisoryCardPdf(
 ): Promise<void> {
   const data = await buildCardData(input);
   const doc = createElement(SamvidhanCardPdfDocument, { data });
-  const blob = await pdf(doc).toBlob();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const blob = await pdf(doc as any).toBlob();
   await savePdfBlob(blob, `${data.title}.pdf`);
 }

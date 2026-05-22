@@ -16,6 +16,14 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      buffer: 'buffer',
     },
+  },
+  define: {
+    // @react-pdf/renderer needs Buffer (Node built-in) — polyfill for browser/WebView.
+    global: 'globalThis',
+  },
+  optimizeDeps: {
+    include: ['buffer'],
   },
 }));
