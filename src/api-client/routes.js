@@ -55,6 +55,10 @@ const routes = {
     URL: '/api/assets/upload',
     METHOD: 'POST',
   },
+  PROXY_ASSET: {
+    URL: '/api/assets/proxy',
+    METHOD: 'GET',
+  },
   GET_CASES: {
     URL: '/api/cases',
     METHOD: 'GET',

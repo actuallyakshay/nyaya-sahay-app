@@ -1,8 +1,8 @@
+import { getCurrentUser } from '@/api-client';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { useActiveSubscription } from '@/hooks/useActiveSubscription';
-import { useSubscription } from '@/hooks/useSubscription';
 import {
   buildSamvidhanCardDataFromSubscription,
   downloadSamvidhanAdvisoryCardPdf,
@@ -12,10 +12,14 @@ import { FileDown, Loader2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 interface DownloadSamvidhanCardProps {
-  subscriptionPlan: NonNullable<MyRazorpaySubscriptionsResponse['subscription']>;
+  subscriptionPlan: NonNullable<
+    MyRazorpaySubscriptionsResponse['subscription']
+  >;
 }
 
-export const DownloadSamvidhanCard = ({ subscriptionPlan: _ }: DownloadSamvidhanCardProps) => {
+export const DownloadSamvidhanCard = ({
+  subscriptionPlan: _,
+}: DownloadSamvidhanCardProps) => {
   const { user } = useAuth();
   const { subscription: activeSubscription } = useActiveSubscription();
   const [downloading, setDownloading] = useState(false);
@@ -23,26 +27,43 @@ export const DownloadSamvidhanCard = ({ subscriptionPlan: _ }: DownloadSamvidhan
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
-      const data = buildSamvidhanCardDataFromSubscription({
-        memberName: user?.fullName ?? '',
+      // Fetch fresh user data from API to ensure phone & avatarUrl are available
+      const response = await getCurrentUser();
+      const freshUser = response?.data;
+
+      console.log('[PDF Debug] Fresh user:', freshUser);
+      console.log('[PDF Debug] avatarUrl from API:', freshUser?.avatarUrl);
+      console.log('[PDF Debug] avatarUrl from auth:', user?.avatarUrl);
+
+      // Use API data, fallback to auth context
+      const photoUrl = freshUser?.avatarUrl ?? user?.avatarUrl ?? undefined;
+      const phone = freshUser?.phone || user?.phone || '';
+
+      const data = await buildSamvidhanCardDataFromSubscription({
+        memberName: freshUser?.fullName ?? user?.fullName ?? '',
         memNumber: user?.memNumber ?? '',
-        photoUrl: user?.avatarUrl ?? undefined,
-        userMobileNo: user?.phone ?? '',
-        memStartDate: new Date(activeSubscription?.currentPeriodStart ?? '').toLocaleDateString(
-          'en-GB'
-        ),
-        memEndDate: new Date(activeSubscription?.currentPeriodEnd ?? '').toLocaleDateString(
-          'en-GB'
-        ),
+        photoUrl: photoUrl,
+        userMobileNo: phone,
+        memStartDate: new Date(
+          activeSubscription?.currentPeriodStart ?? ''
+        ).toLocaleDateString('en-GB'),
+        memEndDate: new Date(
+          activeSubscription?.currentPeriodEnd ?? ''
+        ).toLocaleDateString('en-GB'),
       });
       await downloadSamvidhanAdvisoryCardPdf(data);
     } catch (e) {
+      console.error('[PDF Debug] Error:', e);
       const message = e instanceof Error ? e.message : 'Something went wrong.';
-      toast({ title: 'Could not download card', description: message, variant: 'destructive' });
+      toast({
+        title: 'Could not download card',
+        description: message,
+        variant: 'destructive',
+      });
     } finally {
       setDownloading(false);
     }
-  }, [user]);
+  }, [user, activeSubscription]);
 
   return (
     <div className="space-y-3 rounded-xl border border-gold/25 bg-gold/5 p-6 shadow-sm">

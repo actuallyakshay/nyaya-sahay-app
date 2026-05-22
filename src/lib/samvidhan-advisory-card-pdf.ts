@@ -1,6 +1,11 @@
 import logoAssetUrl from '@/assets/logo.png';
+import signAssetUrl from '@/assets/sign.png';
+import { proxyAsset } from '@/api-client';
+import { SamvidhanCardPdfDocument } from '@/components/pdf/SamvidhanCardPdfTemplate';
 import templateSource from '@/templates/samvidhan-advisory-card.hbs?raw';
+import { pdf } from '@react-pdf/renderer';
 import Handlebars from 'handlebars';
+import { createElement } from 'react';
 
 export type SamvidhanAdvisoryCardTemplateData = {
   title: string;
@@ -33,7 +38,7 @@ function defaultLogoUrl(): string {
 }
 
 function defaultSignatureUrl(): string {
-  return assetUrl('/assets/sign.png');
+  return signAssetUrl;
 }
 
 async function waitForImages(doc: Document): Promise<void> {
@@ -122,9 +127,7 @@ export function renderSamvidhanAdvisoryCardHtml(
 }
 
 /**
- * Renders the card into a hidden iframe, captures it with html2canvas,
- * and triggers a direct PDF download — no print dialog.
- * Card dimensions match the @page size: 250mm × 170mm.
+ * Generates a vector PDF using @react-pdf/renderer and triggers download.
  */
 export async function urlToDataUrl(url: string): Promise<string> {
   try {
@@ -137,72 +140,79 @@ export async function urlToDataUrl(url: string): Promise<string> {
       reader.readAsDataURL(blob);
     });
   } catch {
-    return url; // fall back to original URL if CORS fails
+    return url;
   }
 }
+
 
 export async function downloadSamvidhanAdvisoryCardPdf(
   data: SamvidhanAdvisoryCardTemplateData
 ): Promise<void> {
-  // Convert remote photoUrl to a data URL so html2canvas can draw it
-  // without being blocked by CORS / tainted-canvas restrictions.
-  const resolvedData =
-    data.photoUrl && data.photoUrl.startsWith('http')
-      ? { ...data, photoUrl: await urlToDataUrl(data.photoUrl) }
-      : data;
-
-  const html = compiled(resolvedData);
-
-  // 1. Mount a visible-sized hidden iframe so html2canvas can measure it
-  const iframe = document.createElement('iframe');
-  iframe.setAttribute('aria-hidden', 'true');
-  iframe.style.cssText =
-    'position:fixed;left:-9999px;top:0;width:900px;height:560px;border:0;pointer-events:none;';
-  iframe.srcdoc = html;
-  document.body.appendChild(iframe);
-
-  const cleanup = () => {
-    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+  // For @react-pdf/renderer, pass absolute URLs directly.
+  // The library handles image fetching internally.
+  const toAbsoluteUrl = (url: string | undefined): string | undefined => {
+    if (!url) return undefined;
+    if (url.startsWith('data:')) return url;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/')) return `${window.location.origin}${url}`;
+    return `${window.location.origin}/${url}`;
   };
 
-  try {
-    await new Promise<void>((resolve) => {
-      iframe.addEventListener('load', () => resolve(), { once: true });
-    });
+  const resolvedData: SamvidhanAdvisoryCardTemplateData = {
+    ...data,
+    logoUrl: toAbsoluteUrl(data.logoUrl) ?? data.logoUrl,
+    signatureUrl: toAbsoluteUrl(data.signatureUrl) ?? data.signatureUrl,
+    photoUrl: toAbsoluteUrl(data.photoUrl),
+  };
 
-    const innerDoc = iframe.contentDocument;
-    if (!innerDoc) throw new Error('Card frame failed to initialise');
+  console.log('[PDF] Resolved URLs:', {
+    logo: resolvedData.logoUrl?.substring(0, 60),
+    signature: resolvedData.signatureUrl?.substring(0, 60),
+    photo: resolvedData.photoUrl?.substring(0, 60),
+  });
 
-    await waitForImages(innerDoc);
+  const doc = createElement(SamvidhanCardPdfDocument, { data: resolvedData });
+  const blob = await pdf(doc).toBlob();
 
-    // 2. Find the card element and capture it
-    const cardEl = innerDoc.querySelector<HTMLElement>('.rounded-2xl');
-    if (!cardEl) throw new Error('Card element not found');
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${data.title}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
-    const { default: html2canvas } = await import('html2canvas');
-    const canvas = await html2canvas(cardEl, {
-      useCORS: true,
-      allowTaint: true,
-      scale: 2,
-      width: 900,
-      height: 560,
-      windowWidth: 900,
-      windowHeight: 560,
-      scrollX: 0,
-      scrollY: 0,
-      backgroundColor: '#ffffff',
-    });
-
-    // 3. Derive PDF height from canvas ratio so image is never stretched
-    const { jsPDF } = await import('jspdf');
-    const pdfW = 250; // mm
-    const pdfH = (canvas.height / canvas.width) * pdfW;
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [pdfW, pdfH] });
-    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfW, pdfH);
-    pdf.save(`${data.title}.pdf`);
-  } finally {
-    cleanup();
-  }
+/**
+ * Loads an image via <img> element with crossOrigin and draws to canvas
+ * to extract as data URI. This works for GCS/S3 URLs that support
+ * crossorigin attribute on img tags but block fetch CORS.
+ */
+function loadImageViaCanvas(url: string): Promise<string | undefined> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(undefined);
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      } catch {
+        // Canvas tainted — can't extract
+        resolve(undefined);
+      }
+    };
+    img.onerror = () => resolve(undefined);
+    img.src = url;
+  });
 }
 
 export async function buildSamvidhanCardDataFromSubscription(input: {
@@ -216,14 +226,43 @@ export async function buildSamvidhanCardDataFromSubscription(input: {
   const title = `${input.memberName}-${input.memNumber}-samvidhan-legal-advisory-card`;
   console.log('photoUrl', input.photoUrl);
 
+  // Convert photo URL to base64 via backend proxy to bypass CORS
+  let resolvedPhotoUrl: string | undefined = undefined;
+  if (input.photoUrl) {
+    if (input.photoUrl.startsWith('data:')) {
+      resolvedPhotoUrl = input.photoUrl;
+    } else {
+      try {
+        const response = await proxyAsset(input.photoUrl);
+        const arrayBuffer = response.data;
+        const uint8 = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < uint8.length; i++) {
+          binary += String.fromCharCode(uint8[i]);
+        }
+        const base64 = btoa(binary);
+        const ext = input.photoUrl.split('.').pop()?.split('?')[0]?.toLowerCase();
+        const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+        resolvedPhotoUrl = `data:${mime};base64,${base64}`;
+      } catch (e) {
+        console.warn('[PDF] Proxy failed, trying direct fetch:', e);
+        const fetched = await urlToDataUrl(input.photoUrl);
+        resolvedPhotoUrl = fetched.startsWith('data:') ? fetched : undefined;
+      }
+    }
+  }
+
   return {
     title,
     logoUrl: defaultLogoUrl(),
-    signatureUrl:  defaultSignatureUrl(),
+    signatureUrl: defaultSignatureUrl(),
     name: input.memberName,
+    role: 'Member',
     memberNo: input.memNumber,
+    mobileNo: input.userMobileNo,
+    phone: input.userMobileNo,
     address: DEFAULT_ADDRESS,
-    photoUrl: input.photoUrl,
+    photoUrl: resolvedPhotoUrl,
     memStartDate: input.memStartDate,
     memEndDate: input.memEndDate,
     userMobileNo: input.userMobileNo,

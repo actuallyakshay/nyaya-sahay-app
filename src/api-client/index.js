@@ -96,6 +96,15 @@ export const uploadAsset = (file) => {
   });
 };
 
+export const proxyAsset = (url) => {
+  return apiClient({
+    method: routes.PROXY_ASSET.METHOD,
+    url: routes.PROXY_ASSET.URL,
+    params: { url },
+    responseType: 'arraybuffer',
+  });
+};
+
 export const getCases = (params) => {
   return apiClient({
     method: routes.GET_CASES.METHOD,
