@@ -7,7 +7,7 @@ export function Toaster() {
   return (
     <ToastContainer
       position="top-center"
-      autoClose={4000}
+      autoClose={1000}
       newestOnTop
       limit={4}
       closeOnClick={false}
