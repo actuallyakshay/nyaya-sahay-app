@@ -101,7 +101,6 @@ export const proxyAsset = (url) => {
     method: routes.PROXY_ASSET.METHOD,
     url: routes.PROXY_ASSET.URL,
     params: { url },
-    responseType: 'arraybuffer',
   });
 };
 
