@@ -1,9 +1,4 @@
-import { Buffer } from 'buffer';
-// @react-pdf/renderer uses Node's Buffer internally — must polyfill before import.
-if (typeof globalThis.Buffer === 'undefined') {
-  (globalThis as unknown as Record<string, unknown>).Buffer = Buffer;
-}
-
+import '@/lib/buffer-polyfill';
 import logoUrl from '@/assets/logo.png';
 import signUrl from '@/assets/sign.png';
 import { proxyAsset } from '@/api-client';
