@@ -13,6 +13,7 @@ import { useLoginSessionRedirect } from '@/hooks/use-login-session-redirect';
 import { useToast } from '@/hooks/use-toast';
 import { setCookie } from '@/lib/helpers';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const LoginPage = () => {
   const [searchParams] = useSearchParams();
@@ -50,6 +51,13 @@ const LoginPage = () => {
     <div className="flex min-h-screen">
       <AdminLoginOtpModalConnected controller={adminOtp} />
       <LoginBrandingAside />
+      <Button
+        onClick={() => {
+          navigate('/dummy-login');
+        }}
+      >
+        Login as User
+      </Button>
       <LoginCredentialsColumn
         role={role}
         onRoleChange={handleRoleChange}
